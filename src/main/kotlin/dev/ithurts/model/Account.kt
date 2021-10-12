@@ -1,17 +1,18 @@
 package dev.ithurts.model
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import dev.ithurts.model.organisation.OrganisationMembership
+import javax.persistence.*
 
 @Entity
 class Account(
-    private val email: String,
-    private val name: String,
-    private val sourceProvider: SourceProvider,
-    private val externalId: String,
+    val email: String,
+    val name: String,
+    val sourceProvider: SourceProvider,
+    val externalId: String,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long? = null
-)
+    val id: Long? = null
+) {
+    @OneToMany(mappedBy = "account", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val organisations: List<OrganisationMembership> = listOf()
+}

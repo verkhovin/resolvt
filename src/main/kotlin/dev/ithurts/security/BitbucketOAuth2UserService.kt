@@ -17,26 +17,26 @@ class BitbucketOAuth2UserService(
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val oAuthUser = super.loadUser(userRequest)
 
-        when (userRequest.clientRegistration.registrationId) {
+        val account = when (userRequest.clientRegistration.registrationId) {
             "bitbucket" -> processBitbucketSignIn(userRequest, oAuthUser)
+            else -> throw Exception("Unknown provider")
         }
-        return oAuthUser
+        return AuthenticatedOAuth2User(account, oAuthUser)
     }
 
-    private fun processBitbucketSignIn(userRequest: OAuth2UserRequest, oAuth2User: OAuth2User) {
+    private fun processBitbucketSignIn(userRequest: OAuth2UserRequest, oAuth2User: OAuth2User): Account {
         val userInfo = BitbucketSourceProviderUserInfo(oAuth2User.attributes)
         val accessToken = userRequest.accessToken.tokenValue
         val email = bitbucketClient.getUserPrimaryEmail(accessToken)
 
-        ensureUser(userInfo, email)
+        return ensureUser(userInfo, email)
     }
 
-    private fun ensureUser(userInfo: SourceProviderUserInfo, email: String) {
+    private fun ensureUser(userInfo: SourceProviderUserInfo, email: String): Account =
         accountRepository.findByEmail(email)
             ?: accountRepository.save(
                 Account(email, userInfo.displayName, userInfo.sourceProvider, userInfo.id)
             )
-    }
 
 //    private fun upsertExternalAccount(
 //        oAuthUser: BitbucketOAuth2User,
