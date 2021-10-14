@@ -1,1 +1,4 @@
-new
+<div th:each="organisation: ${externalOrganisations}">
+    <span th:text="${organisation.name}">name</span>
+    <span th:text="${organisation.id}">id</span>
+</div>

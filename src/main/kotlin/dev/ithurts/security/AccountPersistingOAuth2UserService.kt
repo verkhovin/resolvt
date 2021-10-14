@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
 
 @Service
-class BitbucketOAuth2UserService(
+class AccountPersistingOAuth2UserService(
     private val bitbucketClient: BitbucketClient,
     private val accountRepository: AccountRepository
 ) : DefaultOAuth2UserService() {
@@ -37,17 +37,4 @@ class BitbucketOAuth2UserService(
             ?: accountRepository.save(
                 Account(email, userInfo.displayName, userInfo.sourceProvider, userInfo.id)
             )
-
-//    private fun upsertExternalAccount(
-//        oAuthUser: BitbucketOAuth2User,
-//        accessToken: String,
-//        user: User
-//    ) = userExternalAccountRepository.findBySourceProviderAndExternalId(BITBUCKET, oAuthUser.uuid!!)
-//        ?.also { externalAccount ->
-//            externalAccount.accessToken = accessToken
-//            externalAccount.refreshToken = "TODO"
-//        } ?: UserExternalAccount(
-//        BITBUCKET, accessToken, "TODO", oAuthUser.uuid!!, user
-//    )
-
 }
