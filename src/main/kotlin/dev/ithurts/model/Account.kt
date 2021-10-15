@@ -7,6 +7,7 @@ import javax.persistence.*
 class Account(
     val email: String,
     val name: String,
+    @Enumerated(EnumType.STRING)
     val sourceProvider: SourceProvider,
     val externalId: String,
     @Id

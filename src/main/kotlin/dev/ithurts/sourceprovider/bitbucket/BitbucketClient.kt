@@ -1,5 +1,6 @@
 package dev.ithurts.sourceprovider.bitbucket
 
+import dev.ithurts.model.SourceProvider
 import dev.ithurts.sourceprovider.SourceProviderClient
 import dev.ithurts.sourceprovider.bitbucket.dto.BitbucketUserEmailInfo
 import dev.ithurts.sourceprovider.bitbucket.dto.BitbucketWorkspace
@@ -27,8 +28,18 @@ class BitbucketClient(
             role
         ).body!!.values
         return workspaces.map { workspace ->
-            SourceProviderOrganisation(workspace.slug, workspace.name)
+            workspaceToSourceProviderOrganisation(workspace)
         }
+    }
+
+    override fun getOrganisation(accessToken: String, organisationId: String): SourceProviderOrganisation {
+        val workspace = restTemplate.exchange<BitbucketWorkspace>(
+            "/workspaces/{id}",
+            HttpMethod.GET,
+            noBody(accessToken),
+            organisationId
+        ).body!!
+        return workspaceToSourceProviderOrganisation(workspace)
     }
 
     fun getUserPrimaryEmail(accessToken: String): String {
@@ -39,6 +50,9 @@ class BitbucketClient(
         ).body!!.values
         return (emails.firstOrNull { it.isPrimary } ?: emails[0]).email
     }
+
+    private fun workspaceToSourceProviderOrganisation(workspace: BitbucketWorkspace) =
+        SourceProviderOrganisation(workspace.slug, workspace.name, SourceProvider.BITBUCKET)
 
     private fun noBody(accessToken: String) = HttpEntity(null, authorizationHeader(accessToken))
 

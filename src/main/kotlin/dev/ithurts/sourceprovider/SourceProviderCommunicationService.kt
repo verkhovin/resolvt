@@ -17,6 +17,13 @@ class SourceProviderCommunicationService(
     fun getOwnedExternalOrganisations(): List<SourceProviderOrganisation> =
         client.getUserOrganisations(accessToken, client.organisationOwnerRole)
 
+    fun getCurrentSourceProvider(): SourceProvider =
+        SourceProvider.valueOf(authentication().authorizedClientRegistrationId.uppercase())
+
+    fun getOrganisation(externalOrganisationId: String): SourceProviderOrganisation {
+        return client.getOrganisation(accessToken, externalOrganisationId)
+    }
+
     private val client: SourceProviderClient
         get() = when (SourceProvider.valueOf(authentication().authorizedClientRegistrationId.uppercase())) {
             SourceProvider.BITBUCKET -> bitbucketClient

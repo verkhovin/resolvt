@@ -9,6 +9,7 @@ import javax.persistence.*
 @Entity
 class Organisation(
     val name: String,
+    @Enumerated(EnumType.STRING)
     val sourceProvider: SourceProvider,
     val externalId: String,
     @Id
@@ -16,13 +17,13 @@ class Organisation(
     val id: Long? = null
 ) {
     @OneToMany(mappedBy = "organisation", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val members: List<OrganisationMembership> = listOf()
+    val members: MutableList<OrganisationMembership> = mutableListOf()
 
     fun addMember(
         account: Account,
         role: OrganisationMemberRole = MEMBER,
         status: OrganisationMemebershipStatus = ACTIVE
     ) {
-        OrganisationMembership(account, this, role, status)
+        members.add(OrganisationMembership(account, this, role, status))
     }
 }

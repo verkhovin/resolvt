@@ -1,10 +1,7 @@
 package dev.ithurts.model.organisation
 
 import dev.ithurts.model.Account
-import javax.persistence.EmbeddedId
-import javax.persistence.Entity
-import javax.persistence.ManyToOne
-import javax.persistence.MapsId
+import javax.persistence.*
 
 @Entity
 class OrganisationMembership(
@@ -14,7 +11,9 @@ class OrganisationMembership(
     @ManyToOne
     @MapsId("organisationId")
     val organisation: Organisation,
+    @Enumerated(EnumType.STRING)
     val role: OrganisationMemberRole,
+    @Enumerated(EnumType.STRING)
     val status: OrganisationMemebershipStatus
 ) {
     @EmbeddedId
