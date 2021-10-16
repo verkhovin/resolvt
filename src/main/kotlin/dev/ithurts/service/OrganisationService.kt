@@ -1,9 +1,11 @@
 package dev.ithurts.service
 
+import dev.ithurts.exception.EntityNotFoundException
 import dev.ithurts.model.Account
 import dev.ithurts.model.SourceProvider
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.model.organisation.OrganisationMemberRole
+import dev.ithurts.model.organisation.OrganisationMembership
 import dev.ithurts.repository.OrganisationRepository
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
 import org.springframework.stereotype.Service
@@ -31,5 +33,11 @@ class OrganisationService(
         organisation.addMember(owner, OrganisationMemberRole.ADMIN)
         organisationRepository.save(organisation)
         return organisation.id!!
+    }
+
+    fun getOrganisationMembership(organisationId: Long, accountId: Long): OrganisationMembership? {
+        val organisation = (organisationRepository.getWithMembership(organisationId, accountId)
+            ?: throw EntityNotFoundException("organisation", "id", organisationId.toString()))
+        return if (organisation.members.isEmpty()) null else organisation.members[0]
     }
 }
