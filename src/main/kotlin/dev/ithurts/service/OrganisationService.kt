@@ -6,14 +6,17 @@ import dev.ithurts.model.SourceProvider
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.model.organisation.OrganisationMemberRole
 import dev.ithurts.model.organisation.OrganisationMembership
+import dev.ithurts.repository.AccountRepository
 import dev.ithurts.repository.OrganisationRepository
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
 @Service
 class OrganisationService(
     private val organisationRepository: OrganisationRepository,
+    private val accountRepository: AccountRepository,
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
 ) {
     fun getByMemberAccountId(accountId: Long): List<Organisation> {
@@ -39,5 +42,12 @@ class OrganisationService(
         val organisation = (organisationRepository.getWithMembership(organisationId, accountId)
             ?: throw EntityNotFoundException("organisation", "id", organisationId.toString()))
         return if (organisation.members.isEmpty()) null else organisation.members[0]
+    }
+
+    fun addMemberByEmail(currentOrganisationId: Long, email: String) {
+        val account = accountRepository.findByEmail(email) ?: throw EntityNotFoundException("acccount", "email", email)
+        val organisation = organisationRepository.findByIdOrNull(currentOrganisationId)!!
+        organisation.addMember(account)
+        organisationRepository.save(organisation)
     }
 }

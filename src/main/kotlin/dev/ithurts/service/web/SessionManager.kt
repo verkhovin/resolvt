@@ -30,6 +30,6 @@ class SessionManager(
         organisation: Organisation
     ) {
         session.setAttribute("currentOrganisation.id", organisation.id)
-        session.setAttribute("currentOrganisation.role", organisation.members[0].role)
+        session.setAttribute("currentOrganisation.role", organisation.members[0].role.toString())
     }
 }

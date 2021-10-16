@@ -1,5 +1,6 @@
 package dev.ithurts.controller
 
+import dev.ithurts.controller.dto.MemberInvitationRequest
 import dev.ithurts.controller.dto.OrganisationCreationRequest
 import dev.ithurts.security.AuthenticatedOAuth2User
 import dev.ithurts.service.OrganisationService
@@ -37,14 +38,24 @@ class OrganisationController(
         @ModelAttribute("creationRequest") creationRequest: OrganisationCreationRequest,
         model: Model
     ): String {
-        val organisationId: Long = organisationService.createOrganisationFromExternalOne(
+        organisationService.createOrganisationFromExternalOne(
             creationRequest.externalOrganisationId,
             authentication.account
         )
-//        val organisationMembership =
-//            organisationService.getOrganisationMembership(organisationId, authentication.accountId)
-//        model.addAttribute("currentOrganisation.id", organisationId)
-//        model.addAttribute("currentOrganisation.role", organisationMembership?.role)
+        return "redirect:/dashboard"
+    }
+
+    @GetMapping("/invite")
+    fun memberInvitePage(model: Model) = "organisation/invite".apply {
+        model.addAttribute("memberInvitationRequest", MemberInvitationRequest(""))
+    }
+
+    @PostMapping("/invite")
+    fun inviteMember(
+        @ModelAttribute("memberInvitationRequest") memberInvitationRequest: MemberInvitationRequest,
+        @ModelAttribute("currentOrganisation.id") currentOrganisationId: Long
+    ): String {
+        organisationService.addMemberByEmail(currentOrganisationId, memberInvitationRequest.email)
         return "redirect:/dashboard"
     }
 }

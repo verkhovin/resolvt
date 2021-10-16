@@ -1,0 +1,7 @@
+<form th:object="${memberInvitationRequest}" th:action="@{/organisations/invite}" method="POST">
+    <label>
+        Email:
+        <input type="email" th:field="*{email}"/>
+    </label>
+    <input type="submit" value="Invite"/>
+</form>
