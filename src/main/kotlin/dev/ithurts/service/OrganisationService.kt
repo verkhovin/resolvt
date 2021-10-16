@@ -10,6 +10,7 @@ import dev.ithurts.repository.AccountRepository
 import dev.ithurts.repository.OrganisationRepository
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -44,6 +45,7 @@ class OrganisationService(
         return if (organisation.members.isEmpty()) null else organisation.members[0]
     }
 
+    @PreAuthorize("hasPermission(#currentOrganisationId, 'Organisation', 'ADMIN')")
     fun addMemberByEmail(currentOrganisationId: Long, email: String) {
         val account = accountRepository.findByEmail(email) ?: throw EntityNotFoundException("acccount", "email", email)
         val organisation = organisationRepository.findByIdOrNull(currentOrganisationId)!!
