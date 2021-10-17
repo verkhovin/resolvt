@@ -30,7 +30,7 @@ class OrganisationPermissionEvaluator(
             val organisation = organisationRepository.getWithMembership(targetId as Long, principal.accountId)!!
             if (organisation.members.isEmpty()) return false
             val membership = organisation.members[0]
-            return `membership.status == ACTIVE && membership.role == OrganisationMemberRole.valueOf(permission)`
+            return membership.status == ACTIVE && membership.role == OrganisationMemberRole.valueOf(permission)
         }
         return false
     }

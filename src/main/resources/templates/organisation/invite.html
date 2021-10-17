@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="main">
 <form th:object="${memberInvitationRequest}" th:action="@{/organisations/invite}" method="POST">
     <label>
         Email:
@@ -5,3 +10,6 @@
     </label>
     <input type="submit" value="Invite"/>
 </form>
+</div>
+</body>
+</html>

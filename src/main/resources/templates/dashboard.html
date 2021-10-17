@@ -1,12 +1,21 @@
-<div th:if="${organisations.isEmpty()}">
-    <h2>Nothing here yet..</h2>
-    <p>You can just wait your teammates to invite you to the organisation if ItHurts is already used in your company</p>
-    <p> or </p>
-    <a th:href="@{organisations/new}">Create the organisation</a>
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="main">
+    <div th:if="${organisations.isEmpty()}">
+        <h2>Nothing here yet..</h2>
+        <p>You can just wait your teammates to invite you to the organisation if ItHurts is already used in your
+            company</p>
+        <p> or </p>
+        <a th:href="@{organisations/new}">Create the organisation</a>
+    </div>
+    <div th:else>
+        <h2>Dashboard is empty for now</h2>
+        <a th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{organisations/invite}">
+            Invite teammates
+        </a>
+    </div>
 </div>
-<div th:else>
-    <h2>Dashboard is empty for now</h2>
-    <a th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{organisations/invite}">
-        Invite teammates
-    </a>
-</div>
+</body>
+</html>

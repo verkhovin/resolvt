@@ -19,6 +19,7 @@ class SessionManager(
                     if (userOrganisations.isNotEmpty()) {
                         val organisation = userOrganisations[0]
                         setOrganisationRelatedSessionAttributes(session, organisation)
+                        session.setAttribute("organisations", userOrganisations)
                     }
                 }
             }

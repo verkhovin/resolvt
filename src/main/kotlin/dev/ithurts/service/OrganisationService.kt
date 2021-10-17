@@ -2,7 +2,6 @@ package dev.ithurts.service
 
 import dev.ithurts.exception.EntityNotFoundException
 import dev.ithurts.model.Account
-import dev.ithurts.model.SourceProvider
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.model.organisation.OrganisationMemberRole
 import dev.ithurts.model.organisation.OrganisationMembership
@@ -21,7 +20,7 @@ class OrganisationService(
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
 ) {
     fun getByMemberAccountId(accountId: Long): List<Organisation> {
-        return organisationRepository.getByMemberAccountAndId(accountId)
+        return organisationRepository.getByMemberAccountId(accountId)
     }
 
     @Transactional

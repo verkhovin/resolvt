@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="main">
 <div th:each="organisation: ${externalOrganisations}">
     <span th:text="${organisation.name}">name</span>
     <span th:text="${organisation.id}">id</span>
@@ -10,3 +15,6 @@
     <input type="hidden" th:field="*{sourceProvider}">
     <input type="submit" id="createOrganisation" name="create_organisation" value="Create" />
 </form>
+</div>
+</body>
+</html>
