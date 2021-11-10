@@ -8,7 +8,7 @@ class OrganisationMembership(
     @ManyToOne
     @MapsId("accountId")
     val account: Account,
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @MapsId("organisationId")
     val organisation: Organisation,
     @Enumerated(EnumType.STRING)

@@ -1,24 +1,36 @@
 package dev.ithurts.security
 
+import dev.ithurts.repository.OrganisationMembershipRepository
 import dev.ithurts.service.web.SessionManager
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
-import org.springframework.web.servlet.ModelAndView
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
 class SessionEnrichingHandlerInterceptor(
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val organisationMembershipRepository: OrganisationMembershipRepository
 ) : HandlerInterceptor {
-    override fun postHandle(
+    override fun preHandle(
         request: HttpServletRequest,
         response: HttpServletResponse,
         handler: Any,
-        model: ModelAndView?
-    ) {
+    ): Boolean {
         request.getSession(false)?.let { session ->
-            sessionManager.setAccountSessionProperties(session)
+            if (session.getAttribute("currentOrganisation.id") == null) {
+                SecurityContextHolder.getContext()?.authentication?.principal?.let { user ->
+                    if (user is AuthenticatedOAuth2User) {
+                        val memberships = organisationMembershipRepository.getByAccountId(user.accountId)
+                        if (memberships.isNotEmpty()) {
+                            sessionManager.setCurrentOrganisation(session, memberships[0].organisation.id!!, memberships[0].role)
+                            sessionManager.setOrganisations(session, memberships.map { it.organisation })
+                        }
+                    }
+                }
+            }
         }
+        return true
     }
 }

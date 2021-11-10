@@ -4,19 +4,20 @@ import dev.ithurts.controller.dto.MemberInvitationRequest
 import dev.ithurts.controller.dto.OrganisationCreationRequest
 import dev.ithurts.security.AuthenticatedOAuth2User
 import dev.ithurts.service.OrganisationService
+import dev.ithurts.service.web.SessionManager
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
+import javax.servlet.http.HttpSession
 
 @Controller
 @RequestMapping("organisations")
-@SessionAttributes("currentOrganisation.id", "currentOrganisation.role")
 class OrganisationController(
     private val organisationService: OrganisationService,
-    private val sourceProviderCommunicationService: SourceProviderCommunicationService
+    private val sourceProviderCommunicationService: SourceProviderCommunicationService,
+    private val sessionManager: SessionManager
 ) {
     @GetMapping("/new")
     fun newPage(@AuthenticationPrincipal authentication: AuthenticatedOAuth2User, model: Model) =
@@ -51,12 +52,26 @@ class OrganisationController(
         model.addAttribute("memberInvitationRequest", MemberInvitationRequest(""))
     }
 
+    @GetMapping("{id}/select")
+    fun selectCurrentOrganisation(
+        @AuthenticationPrincipal authentication: AuthenticatedOAuth2User,
+        @PathVariable id: Long,
+        session: HttpSession
+    ): String {
+        val membership = organisationService.getMembership(id, authentication.accountId)
+        sessionManager.setCurrentOrganisation(session, membership.organisation.id!!, membership.role)
+        return "redirect:/dashboard"
+    }
+
     @PostMapping("/invite")
     fun inviteMember(
         @ModelAttribute("memberInvitationRequest") memberInvitationRequest: MemberInvitationRequest,
-        @ModelAttribute("currentOrganisation.id") currentOrganisationId: Long
+        httpSession: HttpSession
     ): String {
-        organisationService.addMemberByEmail(currentOrganisationId, memberInvitationRequest.email)
+        organisationService.addMemberByEmail(
+            httpSession.getAttribute("currentOrganisation.id") as Long,
+            memberInvitationRequest.email
+        )
         return "redirect:/dashboard"
     }
 }

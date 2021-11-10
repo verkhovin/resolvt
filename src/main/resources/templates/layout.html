@@ -4,12 +4,13 @@
     <title>It Hurts</title>
 </head>
 <body>
-    This is Layout.
-    <div>
-        <ul th:each="org: ${#session.getAttribute('organisations')}">
-            <li th:text="${org.name}"></li>
-        </ul>
-    </div>
-    <div layout:fragment="main"></div>
+<div>
+    <ul>
+        <li th:each="org: ${#session.getAttribute('organisations')}">
+            <a th:href="@{organisations/{id}/select(id=${org.id})}" th:text="${org.name}"></a>
+        </li>
+    </ul>
+</div>
+<div layout:fragment="main"></div>
 </body>
 </html>

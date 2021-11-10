@@ -3,7 +3,7 @@
       layout:decorate="~{layout}">
 <body>
 <div layout:fragment="main">
-    <div th:if="${organisations.isEmpty()}">
+    <div th:if="${#session.getAttribute('currentOrganisation.role') == null}">
         <h2>Nothing here yet..</h2>
         <p>You can just wait your teammates to invite you to the organisation if ItHurts is already used in your
             company</p>
@@ -11,6 +11,7 @@
         <a th:href="@{organisations/new}">Create the organisation</a>
     </div>
     <div th:else>
+        <h1 th:text="${org.name}"></h1>
         <h2>Dashboard is empty for now</h2>
         <a th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{organisations/invite}">
             Invite teammates

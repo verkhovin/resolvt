@@ -1,9 +1,9 @@
 package dev.ithurts.security
 
 import dev.ithurts.model.organisation.OrganisationMemberRole
-import dev.ithurts.model.organisation.OrganisationMemebershipStatus
+import dev.ithurts.model.organisation.OrganisationMembership
 import dev.ithurts.model.organisation.OrganisationMemebershipStatus.ACTIVE
-import dev.ithurts.repository.OrganisationRepository
+import dev.ithurts.repository.OrganisationMembershipRepository
 import org.springframework.security.access.PermissionEvaluator
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
@@ -11,8 +11,8 @@ import java.io.Serializable
 
 @Component
 class OrganisationPermissionEvaluator(
-    private val organisationRepository: OrganisationRepository
-): PermissionEvaluator {
+    private val membershipRepository: OrganisationMembershipRepository
+) : PermissionEvaluator {
     override fun hasPermission(authentication: Authentication?, targetDomainObject: Any?, permission: Any?): Boolean {
         throw NotImplementedError()
     }
@@ -24,14 +24,21 @@ class OrganisationPermissionEvaluator(
         permission: Any
     ): Boolean {
         authentication ?: return false
-        permission as String
+        val requiredRole = OrganisationMemberRole.valueOf(permission as String)
         val principal = authentication.principal
         if (principal is AuthenticatedOAuth2User) {
-            val organisation = organisationRepository.getWithMembership(targetId as Long, principal.accountId)!!
-            if (organisation.members.isEmpty()) return false
-            val membership = organisation.members[0]
-            return membership.status == ACTIVE && membership.role == OrganisationMemberRole.valueOf(permission)
+            val membership =
+                membershipRepository.findByOrganisationIdAndAccountId(targetId as Long, principal.accountId)
+                    ?: return false
+            return membership.status == ACTIVE && hasPermissionByRole(membership, requiredRole)
         }
         return false
     }
+
+    private fun hasPermissionByRole(
+        membership: OrganisationMembership,
+        requiredRole: OrganisationMemberRole
+    ) =
+        membership.role == requiredRole || (membership.role == OrganisationMemberRole.ADMIN && requiredRole == OrganisationMemberRole.MEMBER)
+
 }

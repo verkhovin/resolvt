@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import javax.servlet.http.HttpSession
 
 @Controller
 class IndexController(
@@ -15,8 +16,8 @@ class IndexController(
     fun index() = "index"
 
     @GetMapping("/dashboard")
-    fun dashboard(@AuthenticationPrincipal authentication: AuthenticatedOAuth2User, model: Model) = "dashboard".apply {
-        val organisations = organisationService.getByMemberAccountId(authentication.accountId)
-        model.addAttribute("organisations", organisations)
+    fun dashboard(@AuthenticationPrincipal authentication: AuthenticatedOAuth2User, model: Model, httpSession: HttpSession) = "dashboard".apply {
+        val org = organisationService.getById(httpSession.getAttribute("currentOrganisation.id") as Long)
+        model.addAttribute("org", org)
     }
 }
