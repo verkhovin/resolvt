@@ -30,6 +30,7 @@ class WebSecurityConfiguration(
     override fun configure(http: HttpSecurity) {
         http {
             authorizeRequests {
+                authorize("/error", permitAll)
                 authorize(anyRequest, authenticated)
             }
             oauth2Login {

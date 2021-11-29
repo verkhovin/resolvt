@@ -18,7 +18,7 @@ class PluginTokenManager(
 ) {
     fun issuePluginToken(accountId: Long): PluginToken {
         return PluginToken(
-            generateJwtToken(accountId, TokenType.ACCESS, 30),
+            generateJwtToken(accountId, TokenType.ACCESS, 3),
             generateJwtToken(accountId, TokenType.REFRESH, ONE_MONTH_IN_MINUTES),
         )
     }
@@ -43,7 +43,7 @@ class PluginTokenManager(
     private fun generateJwtToken(userId: Long, type: TokenType, expirationMinutes: Long) = Jwts.builder()
         .setSubject(userId.toString())
         .addClaims(mapOf("type" to type))
-        .setExpiration(Date.from(clock.instant().plus(expirationMinutes, ChronoUnit.MINUTES)))
+        .setExpiration(Date.from(clock.instant().plus(expirationMinutes, ChronoUnit.SECONDS)))
         .signWith(Keys.hmacShaKeyFor(jwtKey.toByteArray()))
         .compact()
 
