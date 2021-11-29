@@ -4,7 +4,9 @@ import dev.ithurts.exception.PluginAuthFailedException
 import dev.ithurts.model.Account
 import dev.ithurts.model.AuthCode
 import dev.ithurts.model.api.PluginToken
+import dev.ithurts.model.api.TokenType
 import dev.ithurts.repository.AuthCodeRepository
+import org.apache.tomcat.util.buf.HexUtils
 import org.springframework.stereotype.Service
 import java.security.MessageDigest
 import java.time.Clock
@@ -40,13 +42,17 @@ class PluginAuthService(
 
         authCode.used = true
 
-        return pluginTokenManager.issuePluginToken()
+        return pluginTokenManager.issuePluginToken(authCode.accountId)
     }
 
-    private fun buildCodeChallenge(codeVerifier: String): String = MessageDigest.getInstance("SHA-256")
-        .digest(codeVerifier.toByteArray()).let { hashedVerifier ->
-            Base64.getUrlEncoder().encodeToString(hashedVerifier)
-        }
+    fun refreshPluginToken(refreshToken: String): PluginToken {
+        val accountId = pluginTokenManager.validateToken(TokenType.REFRESH, refreshToken)
+        return pluginTokenManager.issuePluginToken(accountId)
+    }
+
+    private fun buildCodeChallenge(codeVerifier: String): String =
+        HexUtils.toHexString(MessageDigest.getInstance("SHA-256").digest(codeVerifier.toByteArray()))
+            .let { hashedVerifier -> Base64.getUrlEncoder().encodeToString(hashedVerifier.toByteArray()) }
 
     private fun createOrUpdateActualAuthCode(
         account: Account,

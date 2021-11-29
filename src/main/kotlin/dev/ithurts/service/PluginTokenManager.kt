@@ -1,5 +1,6 @@
 package dev.ithurts.service
 
+import dev.ithurts.exception.PluginAuthFailedException
 import dev.ithurts.model.api.PluginToken
 import dev.ithurts.model.api.TokenType
 import io.jsonwebtoken.Jwts
@@ -15,16 +16,33 @@ class PluginTokenManager(
     private val clock: Clock,
     @Value("\${ithurts.security.jwt.key}")private val jwtKey: String
 ) {
-    fun issuePluginToken(userId: Long): PluginToken {
+    fun issuePluginToken(accountId: Long): PluginToken {
         return PluginToken(
-            generateJwtToken(userId, TokenType.ACCESS, 30),
-            generateJwtToken(userId, TokenType.REFRESH, ONE_MONTH_IN_MINUTES),
+            generateJwtToken(accountId, TokenType.ACCESS, 30),
+            generateJwtToken(accountId, TokenType.REFRESH, ONE_MONTH_IN_MINUTES),
         )
+    }
+
+    fun validateToken(expectedType: TokenType, token: String): Long {
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(Keys.hmacShaKeyFor(jwtKey.toByteArray()))
+            .build()
+            .parseClaimsJws(token)
+            .body
+
+        val accountId = claims.subject.toLong()
+        val tokenType = claims.get("type", String::class.java)
+
+        if (tokenType != expectedType.name) {
+            throw PluginAuthFailedException("Invalid token type")
+        }
+
+        return accountId
     }
 
     private fun generateJwtToken(userId: Long, type: TokenType, expirationMinutes: Long) = Jwts.builder()
         .setSubject(userId.toString())
-        .setClaims(mapOf("type" to type))
+        .addClaims(mapOf("type" to type))
         .setExpiration(Date.from(clock.instant().plus(expirationMinutes, ChronoUnit.MINUTES)))
         .signWith(Keys.hmacShaKeyFor(jwtKey.toByteArray()))
         .compact()
