@@ -16,21 +16,28 @@ class AuthController(
     fun getAccessToken(
         @RequestParam(required = false) authorizationCode: String?,
         @RequestParam(required = false) refreshToken: String?,
-        @RequestParam codeVerifier: String,
+        @RequestParam(required = false) codeVerifier: String?,
         @RequestParam grantType: String
     ): PluginToken {
-        return if (grantType == "authorization_code") {
-            if (authorizationCode == null) {
-                throw IllegalArgumentException("authorizationCode is required")
+        return when (grantType) {
+            "authorization_code" -> {
+                if (authorizationCode == null) {
+                    throw IllegalArgumentException("authorizationCode is required")
+                }
+                if (codeVerifier == null) {
+                    throw IllegalArgumentException("codeVerifier is required")
+                }
+                pluginAuthService.issuePluginToken(authorizationCode, codeVerifier)
             }
-            pluginAuthService.issuePluginToken(authorizationCode, codeVerifier)
-        } else if (grantType == "refresh_token") {
-            if (refreshToken == null) {
-                throw IllegalArgumentException("refreshToken is required")
+            "refresh_token" -> {
+                if (refreshToken == null) {
+                    throw IllegalArgumentException("refreshToken is required")
+                }
+                pluginAuthService.refreshPluginToken(refreshToken)
             }
-            pluginAuthService.refreshPluginToken(refreshToken)
-        } else {
-            throw IllegalArgumentException("grantType must be either 'authorization_code' or 'refresh_token'")
+            else -> {
+                throw IllegalArgumentException("grantType must be either 'authorization_code' or 'refresh_token'")
+            }
         }
     }
 }

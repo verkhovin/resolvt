@@ -73,6 +73,9 @@ class ApiSecurityConfiguration(
                     accountRepository
                 )
             )
+            exceptionHandling {
+
+            }
 
         }
     }

@@ -18,7 +18,7 @@ class PluginTokenManager(
 ) {
     fun issuePluginToken(accountId: Long): PluginToken {
         return PluginToken(
-            generateJwtToken(accountId, TokenType.ACCESS, 3),
+            generateJwtToken(accountId, TokenType.ACCESS, 10),
             generateJwtToken(accountId, TokenType.REFRESH, ONE_MONTH_IN_MINUTES),
         )
     }
