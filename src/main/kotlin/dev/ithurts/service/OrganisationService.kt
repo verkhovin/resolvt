@@ -48,12 +48,6 @@ class OrganisationService(
             ?: throw EntityNotFoundException("membership", "organisationId/accountId", "$organisationId/$accountId");
     }
 
-//    fun getOrganisationMembership(organisationId: Long, accountId: Long): OrganisationMembership? {
-//        val organisation = (organisationRepository.getWithMembership(organisationId, accountId)
-//            ?: throw EntityNotFoundException("organisation", "id", organisationId.toString()))
-//        return if (organisation.members.isEmpty()) null else organisation.members[0]
-//    }
-
     @PreAuthorize("hasPermission(#currentOrganisationId, 'Organisation', 'ADMIN')")
     fun addMemberByEmail(currentOrganisationId: Long, email: String) {
         val account = accountRepository.findByEmail(email) ?: throw EntityNotFoundException("acccount", "email", email)

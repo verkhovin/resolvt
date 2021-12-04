@@ -1,6 +1,5 @@
 package dev.ithurts.service
 
-import dev.ithurts.exception.DebtReportFailedException
 import dev.ithurts.model.Account
 import dev.ithurts.model.SourceProvider
 import dev.ithurts.model.api.TechDebtReport
@@ -17,24 +16,16 @@ import org.springframework.stereotype.Service
 
 @Service
 class DebtService(
-    private val organisationRepository: OrganisationRepository,
     private val repositoryRepository: RepositoryRepository,
     private val debtRepository: DebtRepository,
     private val authenticationFacade: AuthenticationFacade
 ) {
-    fun createDebt(techDebtReport: TechDebtReport): Long {
-        val repositoryInfo: RepositoryInfo = parseRemoteUrl(techDebtReport.remoteUrl)
-        val organisation = organisationRepository.getBySourceProviderAndExternalId(
-            repositoryInfo.sourceProvider,
-            repositoryInfo.organisationName
-        ) ?: throw DebtReportFailedException("No organisation found for ${repositoryInfo.organisationName}")
-        return createDebt(techDebtReport, organisation, repositoryInfo)
-    }
 
-    @PreAuthorize("hasPermission(#organisation.id, 'Organisation', 'MEMBER')")
+    @PreAuthorize("hasPermission(#organisationId, 'Organisation', 'MEMBER')")
     fun createDebt(
         techDebtReport: TechDebtReport,
         organisation: Organisation,
+        organisationId: Long,
         repositoryInfo: RepositoryInfo
     ): Long {
         val repository = repositoryRepository.findByNameAndOrganisation(repositoryInfo.name, organisation)
@@ -42,6 +33,16 @@ class DebtService(
                 Repository(repositoryInfo.name, organisation)
             )
         return debtRepository.save(newDebt(techDebtReport, authenticationFacade.account, repository)).id!!
+    }
+
+    @PreAuthorize("hasPermission(#repository.organisation.id, 'Organisation', 'MEMBER')")
+    fun getDebts(repository: Repository): List<Debt> {
+        return debtRepository.findByRepositoryId(repository.id!!)
+    }
+
+    @PreAuthorize("hasPermission(#organisationId, 'Organisation', 'MEMBER')")
+    fun getDebtsForOrganisation(organisationId: Long): List<Debt> {
+        return debtRepository.findByOrganisationId(organisationId)
     }
 
     private fun newDebt(
@@ -60,21 +61,6 @@ class DebtService(
         repository
     )
 
-
-    private fun parseRemoteUrl(remoteUrl: String): RepositoryInfo {
-        val matchResult =
-            REMOTE_URL_REGEX.matchEntire(remoteUrl) ?: throw DebtReportFailedException("Failed to parse remote url")
-        val name = matchResult.groups["name"]?.value
-            ?: throw DebtReportFailedException("Failed to parse repo name out of remote url")
-        val organisationName = matchResult.groups["organisation"]?.value
-            ?: throw DebtReportFailedException("Failed to parse organisation name out of remote url")
-        return RepositoryInfo(name, organisationName, SourceProvider.BITBUCKET)
-    }
-
-    companion object {
-        private val REMOTE_URL_REGEX =
-            "(?<host>(git@|https://)([\\w.@]+)([/:]))(?<organisation>[\\w,\\-_]+)/(?<name>[\\w,\\-_]+)(.git)?((/)?)".toRegex()
-    }
 }
 
 data class RepositoryInfo(

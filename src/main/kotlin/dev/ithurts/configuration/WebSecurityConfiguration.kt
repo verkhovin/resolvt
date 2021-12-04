@@ -1,31 +1,28 @@
 package dev.ithurts.configuration
 
 import dev.ithurts.repository.AccountRepository
-import org.springframework.security.config.web.servlet.invoke
 import dev.ithurts.security.AccountPersistingOAuth2UserService
 import dev.ithurts.security.OrganisationPermissionEvaluator
 import dev.ithurts.security.api.PluginAuthenticationFilter
 import dev.ithurts.service.PluginTokenManager
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
-import org.springframework.http.HttpMethod
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
+import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Order(2)
 class WebSecurityConfiguration(
     private val accountPersistingOAuth2UserService: AccountPersistingOAuth2UserService,
-    private val organisationPermissionEvaluator: OrganisationPermissionEvaluator
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http {
@@ -40,19 +37,13 @@ class WebSecurityConfiguration(
             }
         }
     }
-
-    override fun configure(web: WebSecurity) {
-        web.expressionHandler(
-            DefaultWebSecurityExpressionHandler().also { it.setPermissionEvaluator(organisationPermissionEvaluator) }
-        )
-    }
 }
 
-@Configuration
+@EnableWebSecurity
 @Order(1)
 class ApiSecurityConfiguration(
     private val pluginTokenManager: PluginTokenManager,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http {
@@ -79,5 +70,15 @@ class ApiSecurityConfiguration(
 
         }
     }
+}
 
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+class MethodSecurityConfig(private val organisationPermissionEvaluator: OrganisationPermissionEvaluator) :
+    GlobalMethodSecurityConfiguration() {
+    override fun createExpressionHandler(): MethodSecurityExpressionHandler {
+        val expressionHandler = DefaultMethodSecurityExpressionHandler()
+        expressionHandler.setPermissionEvaluator(organisationPermissionEvaluator)
+        return expressionHandler
+    }
 }

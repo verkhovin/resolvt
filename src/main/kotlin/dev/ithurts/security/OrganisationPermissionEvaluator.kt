@@ -1,5 +1,6 @@
 package dev.ithurts.security
 
+import dev.ithurts.model.Account
 import dev.ithurts.model.organisation.OrganisationMemberRole
 import dev.ithurts.model.organisation.OrganisationMembership
 import dev.ithurts.model.organisation.OrganisationMemebershipStatus.ACTIVE
@@ -25,14 +26,15 @@ class OrganisationPermissionEvaluator(
     ): Boolean {
         authentication ?: return false
         val requiredRole = OrganisationMemberRole.valueOf(permission as String)
-        val principal = authentication.principal
-        if (principal is AuthenticatedOAuth2User) {
-            val membership =
-                membershipRepository.findByOrganisationIdAndAccountId(targetId as Long, principal.accountId)
-                    ?: return false
-            return membership.status == ACTIVE && hasPermissionByRole(membership, requiredRole)
+        val accountId = when (val principal = authentication.principal) {
+            is AuthenticatedOAuth2User -> principal.accountId
+            is Account -> principal.id!!
+            else -> return false
         }
-        return false
+        val membership =
+            membershipRepository.findByOrganisationIdAndAccountId(targetId as Long, accountId)
+                ?: return false
+        return membership.status == ACTIVE && hasPermissionByRole(membership, requiredRole)
     }
 
     private fun hasPermissionByRole(
