@@ -3,6 +3,7 @@ package dev.ithurts.service
 import dev.ithurts.exception.DebtReportFailedException
 import dev.ithurts.exception.EntityNotFoundException
 import dev.ithurts.model.SourceProvider
+import dev.ithurts.model.api.DebtDTO
 import dev.ithurts.model.api.TechDebtReport
 import dev.ithurts.model.debt.Debt
 import dev.ithurts.repository.OrganisationRepository
@@ -31,7 +32,7 @@ class DebtApiService(
         return debtService.getDebts(repository)
     }
 
-    fun getDebts(repositoryRemoteUrl: String): List<Debt> {
+    fun getDebts(repositoryRemoteUrl: String): List<DebtDTO> {
         val repositoryInfo = parseRemoteUrl(repositoryRemoteUrl)
         val organisation = organisationRepository.getBySourceProviderAndExternalId(
             repositoryInfo.sourceProvider,
@@ -39,7 +40,7 @@ class DebtApiService(
         ) ?: throw DebtReportFailedException("No organisation found for ${repositoryInfo.organisationName}")
         val repository = repositoryRepository.findByNameAndOrganisation(repositoryInfo.name, organisation)
             ?: throw DebtReportFailedException("No repository found for ${repositoryInfo.name}")
-        return debtService.getDebts(repository)
+        return debtService.getDebts(repository).map { DebtDTO.from(it) }
     }
 
     fun getDebtsForOrganisation(organisationId: Long): List<Debt> {

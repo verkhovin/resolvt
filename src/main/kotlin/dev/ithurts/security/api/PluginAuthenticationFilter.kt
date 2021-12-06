@@ -7,6 +7,7 @@ import dev.ithurts.model.api.TokenType
 import dev.ithurts.repository.AccountRepository
 import dev.ithurts.service.PluginTokenManager
 import io.jsonwebtoken.ExpiredJwtException
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -41,8 +42,6 @@ class PluginAuthenticationFilter(
             filterChain.doFilter(request, response)
         } catch (e: ExpiredJwtException) {
             response.writeError(ItHurtsError("token_expired", "Token expired"))
-        } catch (e: Exception) {
-            response.writeError(ItHurtsError("bad_token", e.message ?: "Invalid token"))
         }
     }
 
@@ -50,6 +49,10 @@ class PluginAuthenticationFilter(
         val errorJson = objectMapper.writeValueAsString(itHurtsError)
         this.writer.write(errorJson)
         this.status = 401
+    }
+
+    companion object {
+        val log = LoggerFactory.getLogger(PluginAuthenticationFilter::class.java)
     }
 
 }

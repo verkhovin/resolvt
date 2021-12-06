@@ -16,6 +16,11 @@
         <a th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{organisations/invite}">
             Invite teammates
         </a>
+        <ul>
+            <li th:each="debt : ${debts}">
+                <h2 th:text="${debt.title}"></h2>
+                <p th:text="${debt.description}"></p>
+            </li>
     </div>
 </div>
 </body>
