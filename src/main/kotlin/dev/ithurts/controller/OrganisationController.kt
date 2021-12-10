@@ -34,18 +34,18 @@ class OrganisationController(
             )
         }
 
-    @PostMapping
-    fun createOrganisationFromExternalOne(
-        @AuthenticationPrincipal authentication: AuthenticatedOAuth2User,
-        @ModelAttribute("creationRequest") creationRequest: OrganisationCreationRequest,
-        model: Model
-    ): String {
-        organisationService.createOrganisationFromExternalOne(
-            creationRequest.externalOrganisationId,
-            authentication.account
-        )
-        return "redirect:/dashboard"
-    }
+//    @PostMapping
+//    fun createOrganisationFromExternalOne(
+//        @AuthenticationPrincipal authentication: AuthenticatedOAuth2User,
+//        @ModelAttribute("creationRequest") creationRequest: OrganisationCreationRequest,
+//        model: Model
+//    ): String {
+//        organisationService.createOrganisationFromExternalOne(
+//            creationRequest.externalOrganisationId,
+//            authentication.account
+//        )
+//        return "redirect:/dashboard"
+//    }
 
     @GetMapping("/invite")
     fun memberInvitePage(model: Model) = "organisation/invite".apply {

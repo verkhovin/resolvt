@@ -3,6 +3,8 @@ package dev.ithurts.configuration
 import dev.ithurts.security.SessionEnrichingHandlerInterceptor
 import nz.net.ultraq.thymeleaf.LayoutDialect
 import nz.net.ultraq.thymeleaf.decorators.strategies.GroupingRespectLayoutTitleStrategy
+import org.springframework.boot.actuate.trace.http.HttpTraceRepository
+import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -20,5 +22,10 @@ class WebConfiguration(
     @Bean
     fun layoutDialect(): LayoutDialect? {
         return LayoutDialect(GroupingRespectLayoutTitleStrategy())
+    }
+
+    @Bean
+    fun httpTraceRepository(): HttpTraceRepository? {
+        return InMemoryHttpTraceRepository()
     }
 }

@@ -7,6 +7,7 @@ import dev.ithurts.security.api.PluginAuthenticationFilter
 import dev.ithurts.service.PluginTokenManager
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
+import org.springframework.http.HttpMethod
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -20,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @EnableWebSecurity
-@Order(2)
+@Order(3)
 class WebSecurityConfiguration(
     private val accountPersistingOAuth2UserService: AccountPersistingOAuth2UserService,
 ) : WebSecurityConfigurerAdapter() {
@@ -28,6 +29,8 @@ class WebSecurityConfiguration(
         http {
             authorizeRequests {
                 authorize("/error", permitAll)
+                authorize("/bitbucket-connect-descriptor.json", permitAll)
+                authorize("/actuator/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
             oauth2Login {
@@ -64,6 +67,29 @@ class ApiSecurityConfiguration(
                     accountRepository
                 )
             )
+            exceptionHandling {
+
+            }
+
+        }
+    }
+}
+
+@EnableWebSecurity
+@Order(2)
+class IntegrationApiSecurityConfiguration : WebSecurityConfigurerAdapter() {
+    override fun configure(http: HttpSecurity?) {
+        http {
+            securityMatcher(AntPathRequestMatcher("/bitbucket/**"))
+            csrf {
+                disable()
+            }
+            authorizeRequests {
+                authorize(anyRequest, permitAll)
+            }
+            sessionManagement {
+                sessionCreationPolicy = SessionCreationPolicy.STATELESS
+            }
             exceptionHandling {
 
             }

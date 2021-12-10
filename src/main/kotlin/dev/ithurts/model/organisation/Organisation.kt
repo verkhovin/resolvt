@@ -7,11 +7,17 @@ import dev.ithurts.model.organisation.OrganisationMemebershipStatus.*
 import javax.persistence.*
 
 @Entity
+@Table(indexes = [
+    Index(name = "unique_externalId_sourceProvider", columnList = "externalId, sourceProvider", unique = true)
+])
 class Organisation(
     val name: String,
     @Enumerated(EnumType.STRING)
     val sourceProvider: SourceProvider,
     val externalId: String,
+    var clientKey: String,
+    var secret: String,
+    var active: Boolean = true,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null

@@ -1,0 +1,21 @@
+{
+  "key": "it-hurts-app",
+  "name": "It Hurts",
+  "description": "It Hurts add-on for Bitbucket",
+  "vendor": {
+    "name": "Nikita Verkhovin"
+  },
+  "baseUrl": "https://ithurts.loca.lt",
+  "authentication": {
+    "type": "jwt"
+  },
+  "lifecycle": {
+    "installed": "/bitbucket/installed",
+    "uninstalled": "/bitbucket/uninstalled"
+  },
+  "modules": {
+
+  },
+  "scopes": ["account", "repository"],
+  "contexts": ["account"]
+}
