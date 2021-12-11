@@ -14,8 +14,18 @@
     "uninstalled": "/bitbucket/uninstalled"
   },
   "modules": {
-
+    "webhooks": [
+      {
+        "event": "repo:updated",
+        "url": "/bitbucket/webhook/repo/updated"
+      }
+    ]
   },
-  "scopes": ["account", "repository"],
-  "contexts": ["account"]
+  "scopes": [
+    "account",
+    "repository"
+  ],
+  "contexts": [
+    "account"
+  ]
 }

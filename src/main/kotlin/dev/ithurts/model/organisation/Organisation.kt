@@ -8,7 +8,8 @@ import javax.persistence.*
 
 @Entity
 @Table(indexes = [
-    Index(name = "unique_externalId_sourceProvider", columnList = "externalId, sourceProvider", unique = true)
+    Index(name = "unique_externalId_sourceProvider", columnList = "externalId, sourceProvider", unique = true),
+    Index(name = "clientKey", columnList = "clientKey")
 ])
 class Organisation(
     val name: String,

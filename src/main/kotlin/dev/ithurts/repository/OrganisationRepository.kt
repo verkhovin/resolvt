@@ -12,4 +12,5 @@ interface OrganisationRepository : CrudRepository<Organisation, Long> {
 
     fun getBySourceProviderAndExternalId(sourceProvider: SourceProvider, externalId: String): Organisation?
 
+    fun getByClientKey(clientKey: String): Organisation?
 }

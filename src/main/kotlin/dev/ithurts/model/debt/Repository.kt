@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 class Repository(
-    val name: String,
+    var name: String,
     @ManyToOne
     @JoinColumn(name = "organisation_id")
     val organisation: Organisation,

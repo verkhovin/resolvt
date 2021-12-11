@@ -1,8 +1,10 @@
 package dev.ithurts.configuration
 
 import dev.ithurts.repository.AccountRepository
+import dev.ithurts.repository.OrganisationRepository
 import dev.ithurts.security.AccountPersistingOAuth2UserService
 import dev.ithurts.security.OrganisationPermissionEvaluator
+import dev.ithurts.security.api.IntegrationApiSecurityFilter
 import dev.ithurts.security.api.PluginAuthenticationFilter
 import dev.ithurts.service.PluginTokenManager
 import org.springframework.context.annotation.Configuration
@@ -77,7 +79,9 @@ class ApiSecurityConfiguration(
 
 @EnableWebSecurity
 @Order(2)
-class IntegrationApiSecurityConfiguration : WebSecurityConfigurerAdapter() {
+class IntegrationApiSecurityConfiguration(
+    private val organisationRepository: OrganisationRepository
+) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http {
             securityMatcher(AntPathRequestMatcher("/bitbucket/**"))
@@ -90,6 +94,9 @@ class IntegrationApiSecurityConfiguration : WebSecurityConfigurerAdapter() {
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
+            addFilterBefore<UsernamePasswordAuthenticationFilter>(
+                IntegrationApiSecurityFilter(organisationRepository)
+            )
             exceptionHandling {
 
             }
