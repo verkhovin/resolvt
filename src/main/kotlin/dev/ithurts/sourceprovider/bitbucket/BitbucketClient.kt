@@ -42,6 +42,14 @@ class BitbucketClient(
         return workspaceToSourceProviderOrganisation(workspace)
     }
 
+    override fun getDiff(accessToken: String, organisation: String, repository: String, spec: String): String { return restTemplate.exchange(
+            "/repositories/${organisation}/${repository}/diff/${spec}?merge=false   ",
+            HttpMethod.GET,
+            noBody(accessToken),
+            String::class.java
+        ).body ?: ""
+    }
+
     fun getUserPrimaryEmail(accessToken: String): String {
         val emails: List<BitbucketUserEmailInfo> = restTemplate.exchange<Values<BitbucketUserEmailInfo>>(
             "/user/emails",
@@ -56,9 +64,9 @@ class BitbucketClient(
 
     private fun noBody(accessToken: String) = HttpEntity(null, authorizationHeader(accessToken))
 
-    private fun authorizationHeader(accessToken: String): HttpHeaders {
+    private fun authorizationHeader(value: String): HttpHeaders {
         val httpHeaders = HttpHeaders()
-        httpHeaders.setBearerAuth(accessToken ?: "")
+        httpHeaders.add("Authorization", "Bearer $value")
         return httpHeaders
     }
 }

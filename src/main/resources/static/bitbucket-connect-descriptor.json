@@ -18,6 +18,10 @@
       {
         "event": "repo:updated",
         "url": "/bitbucket/webhook/repo/updated"
+      },
+      {
+        "event": "repo:push",
+        "url": "/bitbucket/webhook/repo/push"
       }
     ]
   },

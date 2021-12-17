@@ -6,4 +6,5 @@ interface SourceProviderClient {
     val organisationOwnerRole: String
     fun getUserOrganisations(accessToken: String, role: String): List<SourceProviderOrganisation>
     fun getOrganisation(accessToken: String, organisationId: String): SourceProviderOrganisation
+    fun getDiff(accessToken: String, organisation: String, repository: String, spec: String): String
 }

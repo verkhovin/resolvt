@@ -9,4 +9,6 @@ interface DebtRepository: CrudRepository<Debt, Long> {
     fun findByRepositoryId(repositoryId: Long): List<Debt>
     @Query("SELECT d FROM Debt d JOIN d.repository r WHERE r.organisation.id = :organisationId")
     fun findByOrganisationId(organisationId: Long): List<Debt>
+    @Query("SELECT d FROM Debt d JOIN d.repository r WHERE r.organisation.id = :organisationId AND d.filePath in (:paths)")
+    fun findByOrganisationIdAndFilePathIn(organisationId: Long, paths: List<String>): List<Debt>
 }

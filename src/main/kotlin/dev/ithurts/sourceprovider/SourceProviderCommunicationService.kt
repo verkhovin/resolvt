@@ -1,46 +1,42 @@
 package dev.ithurts.sourceprovider
 
 import dev.ithurts.model.SourceProvider
+import dev.ithurts.model.SourceProvider.*
+import dev.ithurts.model.organisation.Organisation
+import dev.ithurts.sourceprovider.bitbucket.BitbucketAuthorizationProvider
 import dev.ithurts.sourceprovider.bitbucket.BitbucketClient
 import dev.ithurts.sourceprovider.model.SourceProviderOrganisation
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 
 @Service
 class SourceProviderCommunicationService(
     private val bitbucketClient: BitbucketClient,
-    private val clientService: OAuth2AuthorizedClientService
+    private val bitbucketAuthorizationProvider: BitbucketAuthorizationProvider
 ) {
     fun getOwnedExternalOrganisations(): List<SourceProviderOrganisation> =
-        client.getUserOrganisations(accessToken, client.organisationOwnerRole)
+        client.getUserOrganisations(getAccessToken(), client.organisationOwnerRole)
 
-    fun getCurrentSourceProvider(): SourceProvider =
-        SourceProvider.valueOf(authentication().authorizedClientRegistrationId.uppercase())
+    fun getDiff(organisation: String, repository: String, spec: String): String {
+        return client.getDiff(getAccessToken(), organisation, repository, spec)
+    }
 
-    fun getOrganisation(externalOrganisationId: String): SourceProviderOrganisation {
-        return client.getOrganisation(accessToken, externalOrganisationId)
+    fun getCurrentSourceProvider(): SourceProvider {
+        val authentication = SecurityContextHolder.getContext().authentication
+        return when {
+            authentication is OAuth2AuthenticationToken -> SourceProvider.valueOf(authentication.authorizedClientRegistrationId.uppercase())
+            authentication.principal is Organisation -> (authentication.principal as Organisation).sourceProvider
+            else -> throw IllegalStateException("Unknown authentication type")
+        }
     }
 
     private val client: SourceProviderClient
-        get() = when (SourceProvider.valueOf(authentication().authorizedClientRegistrationId.uppercase())) {
-            SourceProvider.BITBUCKET -> bitbucketClient
+        get() = when (getCurrentSourceProvider()) {
+            BITBUCKET -> bitbucketClient
         }
 
-    private val accessToken: String
-        get() {
-            val authentication = authentication()
-            val client: OAuth2AuthorizedClient = clientService.loadAuthorizedClient(
-                authentication.authorizedClientRegistrationId,
-                authentication.name
-            )
-
-            return client.accessToken.tokenValue
-        }
-
-    private fun authentication() = SecurityContextHolder
-        .getContext()
-        .authentication as OAuth2AuthenticationToken
+    private fun getAccessToken(): String = when (getCurrentSourceProvider()) {
+        BITBUCKET -> bitbucketAuthorizationProvider.getAuthorization()
+    }
 }

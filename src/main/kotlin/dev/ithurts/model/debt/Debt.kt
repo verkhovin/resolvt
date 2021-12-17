@@ -7,10 +7,10 @@ import javax.persistence.*
 class Debt(
     val title: String,
     val description: String,
-    val status: DebtStatus,
+    var status: DebtStatus,
     val filePath: String,
-    val startLine: Int,
-    val endLine: Int,
+    var startLine: Int,
+    var endLine: Int,
     val votes: Int,
     @ManyToOne
     @JoinColumn(name = "account_id")
@@ -26,5 +26,6 @@ class Debt(
 enum class DebtStatus {
     OPEN,
     RESOLVED,
-    PROBABLY_RESOLVED,
+    PROBABLY_RESOLVED_CODE_DELETED,
+    PROBABLY_RESOLVED_PARTLY_CHANGED,
 }
