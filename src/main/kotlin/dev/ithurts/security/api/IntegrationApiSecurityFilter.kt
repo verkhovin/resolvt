@@ -19,10 +19,13 @@ class IntegrationApiSecurityFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        val isInstall = request.requestURI.startsWith("/bitbucket/install")
+        if (isInstall) {
+            filterChain.doFilter(request, response)
+            return
+        }
         val authorizationHeader = request.getHeader("Authorization")
-        if ((authorizationHeader == null
-                    && !request.requestURI.startsWith("/bitbucket/install"))
-            || !authorizationHeader.startsWith("JWT ")
+        if ((authorizationHeader == null) || !authorizationHeader.startsWith("JWT ")
         ) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
             return
