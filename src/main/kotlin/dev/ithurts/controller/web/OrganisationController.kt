@@ -3,7 +3,7 @@ package dev.ithurts.controller.web
 import dev.ithurts.controller.web.dto.MemberInvitationRequest
 import dev.ithurts.controller.web.dto.OrganisationCreationRequest
 import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
-import dev.ithurts.service.core.OrganisationService
+import dev.ithurts.service.OrganisationApiService
 import dev.ithurts.service.web.SessionManager
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession
 @Controller
 @RequestMapping("organisations")
 class OrganisationController(
-    private val organisationService: OrganisationService,
+    private val organisationApiService: OrganisationApiService,
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
     private val sessionManager: SessionManager
 ) {
@@ -58,7 +58,7 @@ class OrganisationController(
         @PathVariable id: Long,
         session: HttpSession
     ): String {
-        val membership = organisationService.getMembership(id, authentication.accountId)
+        val membership = organisationApiService.getMembership(id, authentication.accountId)
         sessionManager.setCurrentOrganisation(session, membership.organisation.id!!, membership.role)
         return "redirect:/dashboard"
     }
@@ -68,7 +68,7 @@ class OrganisationController(
         @ModelAttribute("memberInvitationRequest") memberInvitationRequest: MemberInvitationRequest,
         httpSession: HttpSession
     ): String {
-        organisationService.addMemberByEmail(
+        organisationApiService.addMemberByEmail(
             httpSession.getAttribute("currentOrganisation.id") as Long,
             memberInvitationRequest.email
         )

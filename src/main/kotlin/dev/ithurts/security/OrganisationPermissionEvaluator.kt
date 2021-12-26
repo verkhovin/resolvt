@@ -1,6 +1,7 @@
 package dev.ithurts.security
 
 import dev.ithurts.model.Account
+import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.model.organisation.OrganisationMemberRole
 import dev.ithurts.model.organisation.OrganisationMembership
 import dev.ithurts.model.organisation.OrganisationMemebershipStatus.ACTIVE
@@ -30,6 +31,7 @@ class OrganisationPermissionEvaluator(
         val accountId = when (val principal = authentication.principal) {
             is AuthenticatedOAuth2User -> principal.accountId
             is Account -> principal.id!!
+            is Organisation -> return targetId == principal.id
             else -> return false
         }
         val membership =

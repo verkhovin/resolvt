@@ -31,15 +31,15 @@ class IntegrationApiSecurityFilter(
         val unsignedJwt = jwt.substringBeforeLast(".") + "."
         val claims = decodingParser.parseClaimsJwt(unsignedJwt)
         val clientKey = claims.body.issuer
-        val subject = organisationRepository.getByClientKey(clientKey)
-        if (subject == null) {
+        val subjectOrganisation = organisationRepository.getByClientKey(clientKey)
+        if (subjectOrganisation == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
             return
         }
-        val verificationParser = Jwts.parserBuilder().setSigningKey(subject.secret.toByteArray()).build()
+        val verificationParser = Jwts.parserBuilder().setSigningKey(subjectOrganisation.secret.toByteArray()).build()
         verificationParser.parseClaimsJws(jwt)
         // TODO check request hash
-        val authentication = UsernamePasswordAuthenticationToken(subject, null, emptyList())
+        val authentication = UsernamePasswordAuthenticationToken(subjectOrganisation, null, emptyList())
         SecurityContextHolder.getContext().authentication = authentication
 
         filterChain.doFilter(request, response)

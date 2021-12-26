@@ -5,7 +5,7 @@ import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.repository.AccountRepository
 import dev.ithurts.security.IntegrationAuthenticationFacade
 import dev.ithurts.service.diff.DiffHandlingService
-import dev.ithurts.service.core.OrganisationService
+import dev.ithurts.service.OrganisationApiService
 import dev.ithurts.service.core.RepositoryService
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 @Service
 class BitbucketWebhookHandler(
     private val accountRepository: AccountRepository,
-    private val organisationService: OrganisationService,
+    private val organisationApiService: OrganisationApiService,
     private val repositoryService: RepositoryService,
     private val authenticationFacade: IntegrationAuthenticationFacade,
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
@@ -30,7 +30,7 @@ class BitbucketWebhookHandler(
         ) ?: throw IllegalArgumentException("Actor is not It Hurts account")
 
         val organisation = bitbucketAppInstallation.principal
-        organisationService.createOrganisationFromExternalOne(
+        organisationApiService.createOrganisationFromExternalOne(
             SourceProviderOrganisation(
                 organisation.username,
                 organisation.displayName,
@@ -43,7 +43,7 @@ class BitbucketWebhookHandler(
     }
 
     fun appUninstalled(bitbucketAppInstallation: BitbucketAppInstallation) {
-        organisationService.deactivateOrganisation(
+        organisationApiService.deactivateOrganisation(
             SourceProvider.BITBUCKET,
             bitbucketAppInstallation.principal.username
         )

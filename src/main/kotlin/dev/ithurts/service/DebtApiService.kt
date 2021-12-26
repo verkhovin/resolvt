@@ -1,4 +1,4 @@
-package dev.ithurts.service.core
+package dev.ithurts.service
 
 import dev.ithurts.exception.DebtReportFailedException
 import dev.ithurts.exception.EntityNotFoundException
@@ -8,6 +8,8 @@ import dev.ithurts.controller.api.dto.TechDebtReport
 import dev.ithurts.model.debt.Debt
 import dev.ithurts.repository.OrganisationRepository
 import dev.ithurts.repository.RepositoryRepository
+import dev.ithurts.service.core.DebtService
+import dev.ithurts.service.core.RepositoryInfo
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 

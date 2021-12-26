@@ -9,9 +9,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 class AuthenticatedOAuth2User(val account: Account, private val delegate: OAuth2User): OAuth2User {
     val accountId = account.id!!
 
-    override fun getName() = delegate.name
+    override fun getName(): String = delegate.name
 
-    override fun getAttributes() = delegate.attributes
+    override fun getAttributes(): MutableMap<String, Any> = delegate.attributes
 
-    override fun getAuthorities() = delegate.authorities
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> = delegate.authorities
 }

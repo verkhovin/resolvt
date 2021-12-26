@@ -21,6 +21,11 @@ import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
+
+/**
+ * Security config for Web MVC based access. Authentication is occurred via OAuth2 using Source Provider.
+ * Authentication principal is [dev.ithurts.security.oauth2.AuthenticatedOAuth2User]
+ */
 @EnableWebSecurity
 @Order(3)
 class WebSecurityConfiguration(
