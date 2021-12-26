@@ -2,21 +2,17 @@ package dev.ithurts.security.api
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import dev.ithurts.exception.PluginAuthFailedException
-import dev.ithurts.model.api.ItHurtsError
-import dev.ithurts.model.api.TokenType
+import dev.ithurts.controller.api.dto.ItHurtsError
+import dev.ithurts.controller.api.dto.TokenType
 import dev.ithurts.repository.AccountRepository
 import dev.ithurts.service.PluginTokenManager
 import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
-import javax.servlet.Filter
 import javax.servlet.FilterChain
-import javax.servlet.ServletRequest
-import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 

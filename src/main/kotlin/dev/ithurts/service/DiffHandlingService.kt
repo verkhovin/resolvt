@@ -23,8 +23,8 @@ class DiffHandlingService(
         }
         val parsedDiffs: List<Diff> = diffParser.parse(diff.toByteArray())
 
-        val probablyAffectedDebts = debtService.getDebtsForFiles(parsedDiffs.map { it.fromFileName })
-        val diffsNeedToProcess = parsedDiffs.groupBy { it.fromFileName.substringAfter("/").substringBefore(" ") }
+        val probablyAffectedDebts = debtService.getDebtsForFiles(parsedDiffs.map { trimDiffFilepath(it.fromFileName) })
+        val diffsNeedToProcess = parsedDiffs.groupBy { trimDiffFilepath(it.fromFileName) }
 
         probablyAffectedDebts.forEach { debt ->
             val debtChanged = processDiff(debt, diffsNeedToProcess[debt.filePath] ?: emptyList())
@@ -43,15 +43,18 @@ class DiffHandlingService(
         return relatedDiffs.any { diff ->
             diff.hunks.any hunk@{ hunk ->
                 if (debt.endLine < hunk.fromFileRange.lineStart) {
+                    log.info("Debt is before hunk")
                     return@hunk false
                 }
                 if (debt.startLine > hunk.fromFileRange.lineEnd) {
+                    log.info("Debt is after hunk")
                     val offsetChange = hunk.toFileRange.lineCount - hunk.fromFileRange.lineCount
                     debt.startLine += offsetChange
                     debt.endLine += offsetChange
                     return@hunk true
                 }
                 if (debt.startLine < hunk.fromFileRange.lineStart && debt.endLine > hunk.fromFileRange.lineEnd) {
+                    log.info("Debt is around hunk")
                     val offsetChange = hunk.toFileRange.lineCount - hunk.fromFileRange.lineCount
                     debt.endLine += offsetChange
                     debt.status = DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED
@@ -61,6 +64,9 @@ class DiffHandlingService(
             }
         }
     }
+
+    private fun trimDiffFilepath(filePath: String) =
+        filePath.substringAfter("/").substringBefore(" ")
 
     companion object {
         private val log = LoggerFactory.getLogger(DiffHandlingService::class.java)

@@ -1,4 +1,4 @@
-package dev.ithurts.model.api
+package dev.ithurts.controller.api.dto
 
 import dev.ithurts.model.debt.Debt
 import dev.ithurts.model.debt.DebtStatus

@@ -1,10 +1,8 @@
-package dev.ithurts.api
+package dev.ithurts.controller.api
 
-import dev.ithurts.model.api.DebtDTO
-import dev.ithurts.model.api.TechDebtReport
-import dev.ithurts.model.debt.Debt
+import dev.ithurts.controller.api.dto.DebtDTO
+import dev.ithurts.controller.api.dto.TechDebtReport
 import dev.ithurts.service.DebtApiService
-import dev.ithurts.service.DebtService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI

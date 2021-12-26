@@ -1,4 +1,4 @@
-package dev.ithurts.sourceprovider.bitbucket.dto.webhook
+package dev.ithurts.controller.api.webhook.dto
 
 data class RepoUpdated(
     val changes: RepoUpdateChanges

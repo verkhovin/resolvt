@@ -1,10 +1,10 @@
-package dev.ithurts.api
+package dev.ithurts.controller.api.webhook
 
-import dev.ithurts.model.api.bitbucket.BitbucketAppInstallation
+import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.sourceprovider.bitbucket.BitbucketWebhookHandler
-import dev.ithurts.sourceprovider.bitbucket.dto.webhook.BitbucketWebhookEvent
-import dev.ithurts.sourceprovider.bitbucket.dto.webhook.ChangesPushed
-import dev.ithurts.sourceprovider.bitbucket.dto.webhook.RepoUpdated
+import dev.ithurts.controller.api.webhook.dto.BitbucketWebhookEvent
+import dev.ithurts.controller.api.webhook.dto.ChangesPushed
+import dev.ithurts.controller.api.webhook.dto.RepoUpdated
 import org.springframework.web.bind.annotation.*
 
 @RestController

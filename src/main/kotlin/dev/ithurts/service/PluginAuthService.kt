@@ -3,8 +3,8 @@ package dev.ithurts.service
 import dev.ithurts.exception.PluginAuthFailedException
 import dev.ithurts.model.Account
 import dev.ithurts.model.AuthCode
-import dev.ithurts.model.api.PluginToken
-import dev.ithurts.model.api.TokenType
+import dev.ithurts.controller.api.dto.PluginToken
+import dev.ithurts.controller.api.dto.TokenType
 import dev.ithurts.repository.AuthCodeRepository
 import org.apache.tomcat.util.buf.HexUtils
 import org.springframework.stereotype.Service

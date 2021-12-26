@@ -1,17 +1,17 @@
 package dev.ithurts.sourceprovider.bitbucket
 
 import dev.ithurts.model.SourceProvider
-import dev.ithurts.model.api.bitbucket.BitbucketAppInstallation
+import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.repository.AccountRepository
 import dev.ithurts.security.IntegrationAuthenticationFacade
 import dev.ithurts.service.DiffHandlingService
 import dev.ithurts.service.OrganisationService
 import dev.ithurts.service.RepositoryService
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
-import dev.ithurts.sourceprovider.bitbucket.dto.webhook.BitbucketWebhookEvent
-import dev.ithurts.sourceprovider.bitbucket.dto.webhook.ChangesPushed
-import dev.ithurts.sourceprovider.bitbucket.dto.webhook.RepoUpdated
+import dev.ithurts.controller.api.webhook.dto.ChangesPushed
+import dev.ithurts.controller.api.webhook.dto.RepoUpdated
 import dev.ithurts.sourceprovider.model.SourceProviderOrganisation
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -56,13 +56,18 @@ class BitbucketWebhookHandler(
 
     fun changesPushed(changesPushedEvent: ChangesPushed) {
         changesPushedEvent.push.changes.forEach { change ->
-            val diffSpec = "${change.old.target.hash}..${change.new.target.hash}"
+            val diffSpec = "${change.new.target.hash}..${change.old.target.hash}"
             val diff = sourceProviderCommunicationService.getDiff(
                 changesPushedEvent.repository.workspace.slug,
                 changesPushedEvent.repository.name,
                 diffSpec
             )
+            log.info(diff)
             diffHandlingService.handleDiff(diff)
         }
+    }
+
+    companion object {
+        val log = LoggerFactory.getLogger(BitbucketWebhookHandler::class.java)
     }
 }

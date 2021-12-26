@@ -1,4 +1,4 @@
-package dev.ithurts.controller
+package dev.ithurts.controller.web
 
 import dev.ithurts.security.AuthenticatedOAuth2User
 import dev.ithurts.service.DebtApiService

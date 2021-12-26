@@ -3,8 +3,8 @@ package dev.ithurts.service
 import dev.ithurts.exception.DebtReportFailedException
 import dev.ithurts.exception.EntityNotFoundException
 import dev.ithurts.model.SourceProvider
-import dev.ithurts.model.api.DebtDTO
-import dev.ithurts.model.api.TechDebtReport
+import dev.ithurts.controller.api.dto.DebtDTO
+import dev.ithurts.controller.api.dto.TechDebtReport
 import dev.ithurts.model.debt.Debt
 import dev.ithurts.repository.OrganisationRepository
 import dev.ithurts.repository.RepositoryRepository

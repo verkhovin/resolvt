@@ -1,6 +1,6 @@
-package dev.ithurts.api
+package dev.ithurts.controller.api
 
-import dev.ithurts.model.api.PluginToken
+import dev.ithurts.controller.api.dto.PluginToken
 import dev.ithurts.service.PluginAuthService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping

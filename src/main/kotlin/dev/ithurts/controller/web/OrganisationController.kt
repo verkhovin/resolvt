@@ -1,7 +1,7 @@
-package dev.ithurts.controller
+package dev.ithurts.controller.web
 
-import dev.ithurts.controller.dto.MemberInvitationRequest
-import dev.ithurts.controller.dto.OrganisationCreationRequest
+import dev.ithurts.controller.web.dto.MemberInvitationRequest
+import dev.ithurts.controller.web.dto.OrganisationCreationRequest
 import dev.ithurts.security.AuthenticatedOAuth2User
 import dev.ithurts.service.OrganisationService
 import dev.ithurts.service.web.SessionManager

@@ -2,13 +2,12 @@ package dev.ithurts.service
 
 import dev.ithurts.model.Account
 import dev.ithurts.model.SourceProvider
-import dev.ithurts.model.api.TechDebtReport
+import dev.ithurts.controller.api.dto.TechDebtReport
 import dev.ithurts.model.debt.Debt
 import dev.ithurts.model.debt.DebtStatus
 import dev.ithurts.model.debt.Repository
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.repository.DebtRepository
-import dev.ithurts.repository.OrganisationRepository
 import dev.ithurts.repository.RepositoryRepository
 import dev.ithurts.security.AuthenticationFacade
 import org.springframework.security.access.prepost.PreAuthorize

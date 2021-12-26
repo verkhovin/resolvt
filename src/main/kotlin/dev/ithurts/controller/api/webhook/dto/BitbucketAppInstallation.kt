@@ -1,4 +1,4 @@
-package dev.ithurts.model.api.bitbucket
+package dev.ithurts.controller.api.webhook.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

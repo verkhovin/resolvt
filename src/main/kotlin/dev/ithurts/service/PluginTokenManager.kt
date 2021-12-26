@@ -1,8 +1,8 @@
 package dev.ithurts.service
 
 import dev.ithurts.exception.PluginAuthFailedException
-import dev.ithurts.model.api.PluginToken
-import dev.ithurts.model.api.TokenType
+import dev.ithurts.controller.api.dto.PluginToken
+import dev.ithurts.controller.api.dto.TokenType
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value

@@ -1,11 +1,11 @@
-package dev.ithurts.sourceprovider.bitbucket.dto.webhook
+package dev.ithurts.controller.api.webhook.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ChangesPushed(
     val push: Push,
     val repository: Repository
-)
+): BitbucketWebhookEventData
 
 data class Push(
     val changes: List<Change>,

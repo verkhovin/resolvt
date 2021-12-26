@@ -1,4 +1,4 @@
-package dev.ithurts.model.api
+package dev.ithurts.controller.api.dto
 
 data class PluginToken(
     val accessToken: String,
