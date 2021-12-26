@@ -2,7 +2,7 @@ package dev.ithurts.controller.api
 
 import dev.ithurts.controller.api.dto.DebtDTO
 import dev.ithurts.controller.api.dto.TechDebtReport
-import dev.ithurts.service.DebtApiService
+import dev.ithurts.service.core.DebtApiService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI

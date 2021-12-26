@@ -2,6 +2,8 @@ package dev.ithurts.service
 
 import dev.ithurts.debtMock
 import dev.ithurts.model.debt.DebtStatus
+import dev.ithurts.service.diff.DiffHandlingService
+import dev.ithurts.service.diff.HunkResolvingStrategy
 import io.reflectoring.diffparser.api.UnifiedDiffParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

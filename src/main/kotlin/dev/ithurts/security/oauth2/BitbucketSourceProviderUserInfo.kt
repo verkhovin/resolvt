@@ -1,8 +1,8 @@
-package dev.ithurts.security
+package dev.ithurts.security.oauth2
 
 import dev.ithurts.model.SourceProvider
 
-class BitbucketSourceProviderUserInfo(private val attributes: Map<String, Any>) : SourceProviderUserInfo{
+class BitbucketSourceProviderUserInfo(private val attributes: Map<String, Any>) : SourceProviderUserInfo {
     override val id: String
         get() = attributes["uuid"] as String
     override val displayName: String

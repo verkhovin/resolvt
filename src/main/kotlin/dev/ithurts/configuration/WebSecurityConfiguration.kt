@@ -2,14 +2,13 @@ package dev.ithurts.configuration
 
 import dev.ithurts.repository.AccountRepository
 import dev.ithurts.repository.OrganisationRepository
-import dev.ithurts.security.AccountPersistingOAuth2UserService
+import dev.ithurts.security.oauth2.AccountPersistingOAuth2UserService
 import dev.ithurts.security.OrganisationPermissionEvaluator
 import dev.ithurts.security.api.IntegrationApiSecurityFilter
 import dev.ithurts.security.api.PluginAuthenticationFilter
-import dev.ithurts.service.PluginTokenManager
+import dev.ithurts.service.plugin.PluginTokenManager
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
-import org.springframework.http.HttpMethod
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity

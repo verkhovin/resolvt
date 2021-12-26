@@ -1,15 +1,13 @@
-package dev.ithurts.service
+package dev.ithurts.service.diff
 
 import dev.ithurts.model.debt.Debt
 import dev.ithurts.model.debt.DebtStatus
+import dev.ithurts.service.OrganisationAwareDebtService
 import io.reflectoring.diffparser.api.DiffParser
 import io.reflectoring.diffparser.api.model.Diff
-import io.reflectoring.diffparser.api.model.Hunk
-import io.reflectoring.diffparser.api.model.Line.LineType.*
 import io.reflectoring.diffparser.api.model.Range
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import kotlin.math.max
 
 @Service
 class DiffHandlingService(

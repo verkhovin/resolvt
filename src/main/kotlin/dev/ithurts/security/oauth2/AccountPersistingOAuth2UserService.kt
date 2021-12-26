@@ -1,4 +1,4 @@
-package dev.ithurts.security
+package dev.ithurts.security.oauth2
 
 import dev.ithurts.model.Account
 import dev.ithurts.repository.AccountRepository

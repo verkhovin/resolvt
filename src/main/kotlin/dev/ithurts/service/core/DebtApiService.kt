@@ -1,4 +1,4 @@
-package dev.ithurts.service
+package dev.ithurts.service.core
 
 import dev.ithurts.exception.DebtReportFailedException
 import dev.ithurts.exception.EntityNotFoundException

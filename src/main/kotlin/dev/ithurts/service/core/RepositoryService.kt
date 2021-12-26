@@ -1,4 +1,4 @@
-package dev.ithurts.service
+package dev.ithurts.service.core
 
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.repository.RepositoryRepository

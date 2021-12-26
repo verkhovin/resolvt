@@ -1,4 +1,4 @@
-package dev.ithurts.service
+package dev.ithurts.service.core
 
 import dev.ithurts.exception.EntityNotFoundException
 import dev.ithurts.model.Account
@@ -9,7 +9,6 @@ import dev.ithurts.model.organisation.OrganisationMembership
 import dev.ithurts.repository.AccountRepository
 import dev.ithurts.repository.OrganisationMembershipRepository
 import dev.ithurts.repository.OrganisationRepository
-import dev.ithurts.sourceprovider.SourceProviderCommunicationService
 import dev.ithurts.sourceprovider.model.SourceProviderOrganisation
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
@@ -70,7 +69,7 @@ class OrganisationService(
 
     fun getMembership(organisationId: Long, accountId: Long): OrganisationMembership {
         return organisationMembershipRepository.findByOrganisationIdAndAccountId(organisationId, accountId)
-            ?: throw EntityNotFoundException("membership", "organisationId/accountId", "$organisationId/$accountId");
+            ?: throw EntityNotFoundException("membership", "organisationId/accountId", "$organisationId/$accountId")
     }
 
     @PreAuthorize("hasPermission(#currentOrganisationId, 'Organisation', 'ADMIN')")

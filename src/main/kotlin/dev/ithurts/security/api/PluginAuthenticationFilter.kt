@@ -5,7 +5,7 @@ import dev.ithurts.exception.PluginAuthFailedException
 import dev.ithurts.controller.api.dto.ItHurtsError
 import dev.ithurts.controller.api.dto.TokenType
 import dev.ithurts.repository.AccountRepository
-import dev.ithurts.service.PluginTokenManager
+import dev.ithurts.service.plugin.PluginTokenManager
 import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull

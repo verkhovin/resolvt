@@ -1,4 +1,4 @@
-package dev.ithurts.service
+package dev.ithurts.service.diff
 
 import dev.ithurts.model.debt.Debt
 import dev.ithurts.model.debt.DebtStatus

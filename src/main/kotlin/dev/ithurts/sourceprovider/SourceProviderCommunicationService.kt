@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 
+// TODO 1
 @Service
 class SourceProviderCommunicationService(
     private val bitbucketClient: BitbucketClient,

@@ -5,6 +5,7 @@ import io.reflectoring.diffparser.api.UnifiedDiffParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import dev.ithurts.debtMock
+import dev.ithurts.service.diff.HunkResolvingStrategy
 
 class HunkResolvingStrategyTest {
 

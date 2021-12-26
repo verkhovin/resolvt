@@ -1,8 +1,8 @@
 package dev.ithurts.controller.web
 
-import dev.ithurts.security.AuthenticatedOAuth2User
-import dev.ithurts.service.DebtApiService
-import dev.ithurts.service.OrganisationService
+import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
+import dev.ithurts.service.core.DebtApiService
+import dev.ithurts.service.core.OrganisationService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model

@@ -1,6 +1,6 @@
 package dev.ithurts.configuration
 
-import dev.ithurts.security.SessionEnrichingHandlerInterceptor
+import dev.ithurts.controller.web.SessionEnrichingHandlerInterceptor
 import nz.net.ultraq.thymeleaf.LayoutDialect
 import nz.net.ultraq.thymeleaf.decorators.strategies.GroupingRespectLayoutTitleStrategy
 import org.springframework.boot.actuate.trace.http.HttpTraceRepository

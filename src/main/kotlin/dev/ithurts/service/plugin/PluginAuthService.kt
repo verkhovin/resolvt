@@ -1,4 +1,4 @@
-package dev.ithurts.service
+package dev.ithurts.service.plugin
 
 import dev.ithurts.exception.PluginAuthFailedException
 import dev.ithurts.model.Account

@@ -1,7 +1,7 @@
 package dev.ithurts.controller.web
 
-import dev.ithurts.security.AuthenticatedOAuth2User
-import dev.ithurts.service.PluginAuthService
+import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
+import dev.ithurts.service.plugin.PluginAuthService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model

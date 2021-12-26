@@ -4,9 +4,9 @@ import dev.ithurts.model.SourceProvider
 import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.repository.AccountRepository
 import dev.ithurts.security.IntegrationAuthenticationFacade
-import dev.ithurts.service.DiffHandlingService
-import dev.ithurts.service.OrganisationService
-import dev.ithurts.service.RepositoryService
+import dev.ithurts.service.diff.DiffHandlingService
+import dev.ithurts.service.core.OrganisationService
+import dev.ithurts.service.core.RepositoryService
 import dev.ithurts.sourceprovider.SourceProviderCommunicationService
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed
 import dev.ithurts.controller.api.webhook.dto.RepoUpdated

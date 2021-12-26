@@ -5,6 +5,7 @@ import dev.ithurts.model.organisation.OrganisationMemberRole
 import dev.ithurts.model.organisation.OrganisationMembership
 import dev.ithurts.model.organisation.OrganisationMemebershipStatus.ACTIVE
 import dev.ithurts.repository.OrganisationMembershipRepository
+import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
 import org.springframework.security.access.PermissionEvaluator
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component

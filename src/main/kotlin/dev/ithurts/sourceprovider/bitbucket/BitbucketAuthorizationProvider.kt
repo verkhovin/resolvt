@@ -1,7 +1,7 @@
 package dev.ithurts.sourceprovider.bitbucket
 
 import dev.ithurts.model.organisation.Organisation
-import dev.ithurts.security.AuthenticatedOAuth2User
+import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
 import dev.ithurts.sourceprovider.bitbucket.dto.Token
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys

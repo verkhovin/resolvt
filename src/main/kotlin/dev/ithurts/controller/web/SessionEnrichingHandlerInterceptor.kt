@@ -1,6 +1,7 @@
-package dev.ithurts.security
+package dev.ithurts.controller.web
 
 import dev.ithurts.repository.OrganisationMembershipRepository
+import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
 import dev.ithurts.service.web.SessionManager
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
