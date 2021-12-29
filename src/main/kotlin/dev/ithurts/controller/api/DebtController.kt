@@ -21,6 +21,6 @@ class DebtController(
 
     @GetMapping("/debts")
     fun getDebts(@RequestParam remoteUrl: String): List<DebtDTO> {
-        return debtApiService.getDebts(remoteUrl)
+        return debtApiService.getActiveDebts(remoteUrl)
     }
 }

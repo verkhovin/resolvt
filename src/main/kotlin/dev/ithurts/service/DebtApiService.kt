@@ -28,13 +28,13 @@ class DebtApiService(
         return debtService.createDebt(techDebtReport, organisation, organisation.id!!, repositoryInfo)
     }
 
-    fun getDebts(repositoryId: Long): List<Debt> {
+    fun getActiveDebts(repositoryId: Long): List<Debt> {
         val repository = repositoryRepository.findByIdOrNull(repositoryId)
             ?: throw EntityNotFoundException("repository", "id", repositoryId.toString())
-        return debtService.getDebts(repository)
+        return debtService.getActiveDebts(repository)
     }
 
-    fun getDebts(repositoryRemoteUrl: String): List<DebtDTO> {
+    fun getActiveDebts(repositoryRemoteUrl: String): List<DebtDTO> {
         val repositoryInfo = parseRemoteUrl(repositoryRemoteUrl)
         val organisation = organisationRepository.getBySourceProviderAndExternalId(
             repositoryInfo.sourceProvider,
@@ -42,11 +42,11 @@ class DebtApiService(
         ) ?: throw DebtReportFailedException("No organisation found for ${repositoryInfo.organisationName}")
         val repository = repositoryRepository.findByNameAndOrganisation(repositoryInfo.name, organisation)
             ?: throw DebtReportFailedException("No repository found for ${repositoryInfo.name}")
-        return debtService.getDebts(repository).map { DebtDTO.from(it) }
+        return debtService.getActiveDebts(repository).map { DebtDTO.from(it) }
     }
 
-    fun getDebtsForOrganisation(organisationId: Long): List<Debt> {
-        return debtService.getDebtsForOrganisation(organisationId)
+    fun getActiveDebtsForOrganisation(organisationId: Long): List<Debt> {
+        return debtService.getActiveDebtsForOrganisation(organisationId)
     }
 
     private fun parseRemoteUrl(remoteUrl: String): RepositoryInfo {

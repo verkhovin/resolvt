@@ -35,13 +35,13 @@ class DebtService(
     }
 
     @PreAuthorize("hasPermission(#repository.organisation.id, 'Organisation', 'MEMBER')")
-    fun getDebts(repository: Repository): List<Debt> {
-        return debtRepository.findByRepositoryId(repository.id!!)
+    fun getActiveDebts(repository: Repository): List<Debt> {
+        return debtRepository.findByRepositoryIdAndStatusNot(repository.id!!, DebtStatus.RESOLVED)
     }
 
     @PreAuthorize("hasPermission(#organisationId, 'Organisation', 'MEMBER')")
-    fun getDebtsForOrganisation(organisationId: Long): List<Debt> {
-        return debtRepository.findByOrganisationId(organisationId)
+    fun getActiveDebtsForOrganisation(organisationId: Long): List<Debt> {
+        return debtRepository.findByOrganisationIdAndStatusNot(organisationId, DebtStatus.RESOLVED)
     }
 
     private fun newDebt(

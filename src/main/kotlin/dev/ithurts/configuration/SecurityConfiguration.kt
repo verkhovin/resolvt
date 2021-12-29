@@ -14,6 +14,7 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -35,7 +36,8 @@ class WebSecurityConfiguration(
         http {
             authorizeRequests {
                 authorize("/error", permitAll)
-                authorize("/bitbucket-connect-descriptor.json", permitAll)
+                authorize("/", permitAll)
+                authorize("/public/**", permitAll)
                 authorize("/actuator/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
@@ -46,6 +48,7 @@ class WebSecurityConfiguration(
             }
         }
     }
+
 }
 
 @EnableWebSecurity

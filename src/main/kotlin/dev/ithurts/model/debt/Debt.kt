@@ -6,7 +6,9 @@ import javax.persistence.*
 @Entity
 class Debt(
     val title: String,
+    @Column(columnDefinition = "TEXT")
     val description: String,
+    @Enumerated(EnumType.STRING)
     var status: DebtStatus,
     val filePath: String,
     var startLine: Int,

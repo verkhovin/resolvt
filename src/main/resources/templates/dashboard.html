@@ -3,25 +3,30 @@
       layout:decorate="~{layout}">
 <body>
 <div layout:fragment="main">
-    <div th:if="${#session.getAttribute('currentOrganisation.role') == null}">
-        <h2>Nothing here yet..</h2>
-        <p>You can just wait your teammates to invite you to the organisation if ItHurts is already used in your
-            company</p>
-        <p> or </p>
-        <a th:href="@{organisations/new}">Create the organisation</a>
+    <div  class="row mt-3 mt-lg-5 align-items-center">
+        <div class="col-md-12 ">
+            <h6 th:if="${debts.isEmpty()}" class="text-center">Dashboard is empty for now</h6>
+            <div th:unless="${debts.isEmpty()}">
+                <p class="text-muted">Currently, the dashboard contains only a list of active debts. More advanced data displaying is coming soon.</p>
+                    <div th:each="debt : ${debts}">
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <h5 class="card-title"><span th:text="${debt.title}"></span></h5>
+                                <h6 th:if="${!debt.status.toString().equals('OPEN')}">
+                                    <span class="badge bg-dark">PROBABLY RESOLVED</span>
+                                </h6>
+                                <h6 th:if="${debt.status.toString().equals('OPEN')}">
+                                    <span class="badge bg-dark">OPEN</span>
+                                </h6>
+                                <pre th:text="${debt.description}"></pre>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
     </div>
-    <div th:else>
-        <h1 th:text="${org.name}"></h1>
-        <h2>Dashboard is empty for now</h2>
-        <a th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{organisations/invite}">
-            Invite teammates
-        </a>
-        <ul>
-            <li th:each="debt : ${debts}">
-                <h2 th:text="${debt.title}"></h2>
-                <p th:text="${debt.description}"></p>
-            </li>
-    </div>
+
+
 </div>
 </body>
 </html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="main">
+  <div class="row mt-3 mt-lg-5 align-items-center">
+    <div class="col-md-12 ">
+      <div class="text-center">
+        <h3>
+          Nothing here yet..
+        </h3>
+        <p>
+          You can just wait your teamates to invite you to the workspace if It Hurts is already used in your team
+        </p>
+        <div class="mt-4">
+          <p> or create a workspace connecting It Hurts to the codebase</p>
+          <a th:href="${@pageBuilderSupportService.getSourceProviderConnectLink()}" type="button" class="btn btn-primary">
+            Connect
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
