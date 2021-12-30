@@ -3,25 +3,32 @@
       layout:decorate="~{layout}">
 <body>
 <div layout:fragment="main">
-    <div  class="row mt-3 mt-lg-5 align-items-center">
+    <div class="row mt-3 mt-lg-5 align-items-center">
         <div class="col-md-12 ">
             <h6 th:if="${debts.isEmpty()}" class="text-center">Dashboard is empty for now</h6>
             <div th:unless="${debts.isEmpty()}">
-                <p class="text-muted">Currently, the dashboard contains only a list of active debts. More advanced data displaying is coming soon.</p>
-                    <div th:each="debt : ${debts}">
-                        <div class="card mt-2">
-                            <div class="card-body">
-                                <h5 class="card-title"><span th:text="${debt.title}"></span></h5>
-                                <h6 th:if="${!debt.status.toString().equals('OPEN')}">
-                                    <span class="badge bg-dark">PROBABLY RESOLVED</span>
-                                </h6>
-                                <h6 th:if="${debt.status.toString().equals('OPEN')}">
-                                    <span class="badge bg-dark">OPEN</span>
-                                </h6>
-                                <pre th:text="${debt.description}"></pre>
-                            </div>
+                <p class="text-muted">Currently, the dashboard contains only a list of active debts. More advanced data
+                    displaying is coming soon.</p>
+                <div th:each="debt : ${debts}">
+                    <div class="card mt-2">
+                        <div class="card-body">
+                            <h5 class="card-title"><span th:text="${debt.title}"></span></h5>
+                            <h6 th:if="${!debt.status.toString().equals('OPEN')}">
+                                <span class="badge bg-dark">PROBABLY RESOLVED</span>
+                            </h6>
+                            <h6 th:if="${debt.status.toString().equals('OPEN')}">
+                                <span class="badge bg-dark">OPEN</span> <span class="text-muted ps-2" th:text="${debt.votes} + ' people were hurt by this'"></span>
+                            </h6>
+                            <p class="text-muted">
+                                <span th:text="${debt.repository.name}"></span> /
+                                <a th:href="${@pageBuilderSupportService.getSourceProviderSourceLink(debt)}"
+                                   class="text-muted"
+                                   th:text="${@pageBuilderSupportService.getFileName(debt.filePath) + ':' + debt.startLine + (debt.startLine == debt.endLine ? '' : '-' + debt.endLine)}"></a>
+                            </p>
+                            <pre th:text="${debt.description}"></pre>
                         </div>
                     </div>
+                </div>
             </div>
         </div>
     </div>

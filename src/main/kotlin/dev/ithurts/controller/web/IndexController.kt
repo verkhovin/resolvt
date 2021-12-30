@@ -4,7 +4,7 @@ import dev.ithurts.exception.EntityNotFoundException
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
 import dev.ithurts.service.DebtApiService
-import dev.ithurts.service.core.OrganisationService
+import dev.ithurts.service.OrganisationApiService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession
 
 @Controller
 class IndexController(
-    private val organisationService: OrganisationService,
+    private val organisationApiService: OrganisationApiService,
     private val debtApiService: DebtApiService
 ) {
     @GetMapping("/")
@@ -30,9 +30,9 @@ class IndexController(
             return "init_dashboard"
         }
         val organisationId = httpSession.getAttribute("currentOrganisation.id") as Long
-        val org = organisationService.getById(organisationId)
-            ?: throw EntityNotFoundException("organisation", "id", organisationId.toString())
+        val org = organisationApiService.getById(organisationId)
         val debts = debtApiService.getActiveDebtsForOrganisation(org.id!!)
+            .sortedByDescending { it.votes }
         model.addAttribute("debts", debts)
         model.addAttribute("org", org)
         return "dashboard"

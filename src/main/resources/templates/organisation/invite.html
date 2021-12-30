@@ -3,13 +3,18 @@
       layout:decorate="~{layout}">
 <body>
 <div layout:fragment="main">
-<form th:object="${memberInvitationRequest}" th:action="@{/organisations/invite}" method="POST">
-    <label>
-        Email:
-        <input type="email" th:field="*{email}"/>
-    </label>
-    <input type="submit" value="Invite"/>
-</form>
+    <div class="row mt-3 mt-lg-5 align-items-center">
+        <div class="col-md">
+            <form th:object="${memberInvitationRequest}" th:action="@{/organisations/invite}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email:</label>
+                    <input type="email" th:field="*{email}" id="email" class="form-control"/>
+
+                </div>
+                <input class="btn btn-primary" type="submit" value="Send invitation"/>
+            </form>
+        </div>
+    </div>
 </div>
 </body>
 </html>

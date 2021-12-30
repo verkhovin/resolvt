@@ -1,11 +1,9 @@
 package dev.ithurts.controller.web
 
 import dev.ithurts.controller.web.dto.MemberInvitationRequest
-import dev.ithurts.controller.web.dto.OrganisationCreationRequest
 import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
 import dev.ithurts.service.OrganisationApiService
 import dev.ithurts.service.web.SessionManager
-import dev.ithurts.sourceprovider.SourceProviderCommunicationService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -16,39 +14,13 @@ import javax.servlet.http.HttpSession
 @RequestMapping("organisations")
 class OrganisationController(
     private val organisationApiService: OrganisationApiService,
-    private val sourceProviderCommunicationService: SourceProviderCommunicationService,
     private val sessionManager: SessionManager
 ) {
-    @GetMapping("/new")
-    fun newPage(@AuthenticationPrincipal authentication: AuthenticatedOAuth2User, model: Model) =
-        "organisation/new".apply {
-            val ownedExternalOrganisations = sourceProviderCommunicationService.getOwnedExternalOrganisations()
-            model.addAllAttributes(
-                mapOf(
-                    "externalOrganisations" to ownedExternalOrganisations,
-                    "creationRequest" to OrganisationCreationRequest(
-                        ownedExternalOrganisations[0].id,
-                        sourceProviderCommunicationService.getCurrentSourceProvider()
-                    )
-                )
-            )
-        }
-
-//    @PostMapping
-//    fun createOrganisationFromExternalOne(
-//        @AuthenticationPrincipal authentication: AuthenticatedOAuth2User,
-//        @ModelAttribute("creationRequest") creationRequest: OrganisationCreationRequest,
-//        model: Model
-//    ): String {
-//        organisationService.createOrganisationFromExternalOne(
-//            creationRequest.externalOrganisationId,
-//            authentication.account
-//        )
-//        return "redirect:/dashboard"
-//    }
-
     @GetMapping("/invite")
-    fun memberInvitePage(model: Model) = "organisation/invite".apply {
+    fun memberInvitePage(model: Model, httpSession: HttpSession) = "organisation/invite".apply {
+        val organisationId = httpSession.getAttribute("currentOrganisation.id") as Long
+        val org = organisationApiService.getById(organisationId)
+        model.addAttribute("org", org)
         model.addAttribute("memberInvitationRequest", MemberInvitationRequest(""))
     }
 

@@ -1,3 +1,7 @@
 nav {
     background-color: #ffb4b4;
 }
+
+pre {
+    white-space: pre-wrap;
+}

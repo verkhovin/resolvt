@@ -11,7 +11,8 @@ data class BitbucketAppInstallation(
 )
 
 data class BitbucketAppInstallationPrincipal(
-    val username: String, // workspace slug
+    val username: String?, // workspace slug
+    val nickname: String?, // workspace slug if personal worksapce
     @JsonProperty("display_name") val displayName: String // workspace name
 )
 

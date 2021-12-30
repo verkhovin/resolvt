@@ -32,7 +32,7 @@ class BitbucketWebhookHandler(
         val organisation = bitbucketAppInstallation.principal
         organisationApiService.createOrganisationFromExternalOne(
             SourceProviderOrganisation(
-                organisation.username,
+                organisation.username ?: organisation.nickname!!,
                 organisation.displayName,
                 SourceProvider.BITBUCKET
             ),
@@ -45,7 +45,7 @@ class BitbucketWebhookHandler(
     fun appUninstalled(bitbucketAppInstallation: BitbucketAppInstallation) {
         organisationApiService.deactivateOrganisation(
             SourceProvider.BITBUCKET,
-            bitbucketAppInstallation.principal.username
+            bitbucketAppInstallation.principal.username ?: bitbucketAppInstallation.principal.nickname!!
         )
     }
 
@@ -55,6 +55,8 @@ class BitbucketWebhookHandler(
     }
 
     fun changesPushed(changesPushedEvent: ChangesPushed) {
+        repositoryService.getRepository(authenticationFacade.organisation, changesPushedEvent.repository.name)
+            ?: return
         changesPushedEvent.push.changes.forEach { change ->
             val diffSpec = "${change.new.target.hash}..${change.old.target.hash}"
             val diff = sourceProviderCommunicationService.getDiff(

@@ -16,4 +16,6 @@ class RepositoryService(
         repository.name = newName
         repositoryRepository.save(repository)
     }
+
+    fun getRepository(organisation: Organisation, repositoryName: String) = repositoryRepository.findByNameAndOrganisation(repositoryName, organisation)
 }

@@ -23,6 +23,10 @@ class OrganisationApiService(
     private val accountRepository: AccountRepository,
 ) {
 
+    fun getById(id: Long) =
+        organisationService.getById(id) ?: throw EntityNotFoundException("Organisation", "id", id.toString())
+
+
     @Transactional
     fun createOrganisationFromExternalOne(
         sourceProviderOrganisation: SourceProviderOrganisation,
