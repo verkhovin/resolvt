@@ -20,7 +20,7 @@ class SessionEnrichingHandlerInterceptor(
         handler: Any,
     ): Boolean {
         request.getSession(false)?.let { session ->
-            if (session.getAttribute("currentOrganisation.id") == null) {
+            if ((request.parameterMap["sync"]?.firstOrNull()?.toBoolean() == true) || session.getAttribute("currentOrganisation.id") == null) {
                 SecurityContextHolder.getContext()?.authentication?.principal?.let { user ->
                     if (user is AuthenticatedOAuth2User) {
                         val memberships = organisationMembershipRepository.getByAccountId(user.accountId)

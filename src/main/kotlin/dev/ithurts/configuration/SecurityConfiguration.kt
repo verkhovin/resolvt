@@ -38,6 +38,7 @@ class WebSecurityConfiguration(
                 authorize("/error", permitAll)
                 authorize("/", permitAll)
                 authorize("/public/**", permitAll)
+                authorize("/bitbucket-connect-descriptor.json", permitAll)
                 authorize("/actuator/**", permitAll)
                 authorize(anyRequest, authenticated)
             }

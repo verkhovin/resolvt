@@ -23,7 +23,11 @@
         "event": "repo:push",
         "url": "/bitbucket/webhook/repo/push"
       }
-    ]
+    ],
+    "postInstallRedirect": {
+      "key": "redirect",
+      "url": "http://localhost:8080/dashboard?sync=true"
+    }
   },
   "scopes": [
     "account",
