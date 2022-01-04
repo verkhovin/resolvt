@@ -1,7 +1,9 @@
 package dev.ithurts.sourceprovider.bitbucket
 
+import dev.ithurts.model.SourceProvider
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
+import dev.ithurts.service.core.OrganisationService
 import dev.ithurts.sourceprovider.bitbucket.dto.Token
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -25,7 +27,8 @@ class BitbucketAuthorizationProvider(
     private val clientService: OAuth2AuthorizedClientService,
     @Qualifier("commonRestTemplate")
     private val restTemplate: RestTemplate,
-    private val clock: Clock
+    private val clock: Clock,
+    private val organisationService: OrganisationService
 ) {
     fun getAuthorization(): String {
         val authentication = SecurityContextHolder
@@ -36,10 +39,16 @@ class BitbucketAuthorizationProvider(
                 getAuthenticationOnBehalfOfAccount(authentication)
             }
             is Organisation -> {
-                getAuthenticationOnBehalfOfOrganisation(authentication)
+                getAuthenticationOnBehalfOfOrganisation(authentication.principal as Organisation)
             }
             else -> throw IllegalStateException("Unknown principal type")
         }
+    }
+
+    fun getAuthorizationUnsafe(organisationExternalId: String): String {
+        val organisation = organisationService.getByExternalId(SourceProvider.BITBUCKET, organisationExternalId)
+            ?: throw IllegalArgumentException("Organisation not found")
+        return getAuthenticationOnBehalfOfOrganisation(organisation)
     }
 
     private fun getAuthenticationOnBehalfOfAccount(authentication: Authentication?): String {
@@ -53,9 +62,9 @@ class BitbucketAuthorizationProvider(
     }
 
     private fun getAuthenticationOnBehalfOfOrganisation(
-        authentication: Authentication,
+        organistaion: Organisation,
     ): String {
-         val token = buildAddonJWT(authentication)
+        val token = buildAddonJWT(organistaion)
         val body = LinkedMultiValueMap<String, String>()
         body.add("grant_type", "urn:bitbucket:oauth2:jwt")
         val headers = HttpHeaders()
@@ -68,8 +77,7 @@ class BitbucketAuthorizationProvider(
         return response.body!!.accessToken
     }
 
-    private fun buildAddonJWT(authentication: Authentication): String? {
-        val subject = authentication.principal as Organisation
+    private fun buildAddonJWT(subject: Organisation): String? {
         val clientKey = subject.clientKey
         val secret = subject.secret
 

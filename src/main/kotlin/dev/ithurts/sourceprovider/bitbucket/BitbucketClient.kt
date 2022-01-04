@@ -1,11 +1,10 @@
 package dev.ithurts.sourceprovider.bitbucket
 
-import dev.ithurts.model.SourceProvider
 import dev.ithurts.sourceprovider.SourceProviderClient
+import dev.ithurts.sourceprovider.bitbucket.dto.BitbucketRepository
 import dev.ithurts.sourceprovider.bitbucket.dto.BitbucketUserEmailInfo
-import dev.ithurts.sourceprovider.bitbucket.dto.BitbucketWorkspace
 import dev.ithurts.sourceprovider.bitbucket.dto.Values
-import dev.ithurts.sourceprovider.model.SourceProviderOrganisation
+import dev.ithurts.sourceprovider.model.SourceProviderRepository
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -20,34 +19,21 @@ class BitbucketClient(
 ) : SourceProviderClient {
     override val organisationOwnerRole: String = "owner"
 
-    override fun getUserOrganisations(accessToken: String, role: String): List<SourceProviderOrganisation> {
-        val workspaces = restTemplate.exchange<Values<BitbucketWorkspace>>(
-            "/workspaces?role={role}",
-            HttpMethod.GET,
-            noBody(accessToken),
-            role
-        ).body!!.values
-        return workspaces.map { workspace ->
-            workspaceToSourceProviderOrganisation(workspace)
-        }
-    }
-
-    override fun getOrganisation(accessToken: String, organisationId: String): SourceProviderOrganisation {
-        val workspace = restTemplate.exchange<BitbucketWorkspace>(
-            "/workspaces/{id}",
-            HttpMethod.GET,
-            noBody(accessToken),
-            organisationId
-        ).body!!
-        return workspaceToSourceProviderOrganisation(workspace)
-    }
-
     override fun getDiff(accessToken: String, organisation: String, repository: String, spec: String): String { return restTemplate.exchange(
-            "/repositories/${organisation}/${repository}/diff/${spec}?merge=false   ",
+            "/repositories/${organisation}/${repository}/diff/${spec}?merge=false",
             HttpMethod.GET,
             noBody(accessToken),
             String::class.java
         ).body ?: ""
+    }
+
+    override fun getRepository(accessToken: String, organisation: String, repositoryName: String): SourceProviderRepository {
+        val bitbucketRepository = restTemplate.exchange<BitbucketRepository>(
+            "/repositories/${organisation}/${repositoryName}",
+            HttpMethod.GET,
+            noBody(accessToken)
+        ).body!!
+        return SourceProviderRepository(bitbucketRepository.name, bitbucketRepository.mainbranch.name)
     }
 
     fun getUserPrimaryEmail(accessToken: String): String {
@@ -58,9 +44,6 @@ class BitbucketClient(
         ).body!!.values
         return (emails.firstOrNull { it.isPrimary } ?: emails[0]).email
     }
-
-    private fun workspaceToSourceProviderOrganisation(workspace: BitbucketWorkspace) =
-        SourceProviderOrganisation(workspace.slug, workspace.name, SourceProvider.BITBUCKET)
 
     private fun noBody(accessToken: String) = HttpEntity(null, authorizationHeader(accessToken))
 

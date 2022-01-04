@@ -18,7 +18,7 @@ class PageBuilderSupportService(
     fun getSourceProviderSourceLink(debt: Debt): String {
         return when (authenticationFacade.account.sourceProvider) {
             //TODO in general it is not always /src/main
-            SourceProvider.BITBUCKET -> "https://bitbucket.org/${debt.repository.organisation.externalId}/${debt.repository.name}/src/main/${debt.filePath}#lines-${debt.startLine}:${debt.endLine}"
+            SourceProvider.BITBUCKET -> "https://bitbucket.org/${debt.repository.organisation.externalId}/${debt.repository.name}/src/${debt.repository.mainBranch}/${debt.filePath}#lines-${debt.startLine}:${debt.endLine}"
         }
     }
 

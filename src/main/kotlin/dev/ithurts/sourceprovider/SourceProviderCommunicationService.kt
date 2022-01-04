@@ -1,23 +1,21 @@
 package dev.ithurts.sourceprovider
 
+import dev.ithurts.model.Account
 import dev.ithurts.model.SourceProvider
 import dev.ithurts.model.SourceProvider.*
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.sourceprovider.bitbucket.BitbucketAuthorizationProvider
 import dev.ithurts.sourceprovider.bitbucket.BitbucketClient
-import dev.ithurts.sourceprovider.model.SourceProviderOrganisation
+import dev.ithurts.sourceprovider.model.SourceProviderRepository
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 
-// TODO 1
 @Service
 class SourceProviderCommunicationService(
     private val bitbucketClient: BitbucketClient,
     private val bitbucketAuthorizationProvider: BitbucketAuthorizationProvider
 ) {
-    fun getOwnedExternalOrganisations(): List<SourceProviderOrganisation> =
-        client.getUserOrganisations(getAccessToken(), client.organisationOwnerRole)
 
     fun getDiff(organisation: String, repository: String, spec: String): String {
         return client.getDiff(getAccessToken(), organisation, repository, spec)
@@ -28,8 +26,13 @@ class SourceProviderCommunicationService(
         return when {
             authentication is OAuth2AuthenticationToken -> SourceProvider.valueOf(authentication.authorizedClientRegistrationId.uppercase())
             authentication.principal is Organisation -> (authentication.principal as Organisation).sourceProvider
+            authentication.principal is Account -> (authentication.principal as Account).sourceProvider
             else -> throw IllegalStateException("Unknown authentication type")
         }
+    }
+
+    fun getRepository(organisationExternalId: String, repository: String): SourceProviderRepository {
+        return client.getRepository(getAccessTokenUnsafe(organisationExternalId), organisationExternalId, repository)
     }
 
     private val client: SourceProviderClient
@@ -39,5 +42,9 @@ class SourceProviderCommunicationService(
 
     private fun getAccessToken(): String = when (getCurrentSourceProvider()) {
         BITBUCKET -> bitbucketAuthorizationProvider.getAuthorization()
+    }
+
+    private fun getAccessTokenUnsafe(organisationExternalId: String) = when (getCurrentSourceProvider()) {
+        BITBUCKET -> bitbucketAuthorizationProvider.getAuthorizationUnsafe(organisationExternalId)
     }
 }

@@ -10,7 +10,7 @@ import dev.ithurts.model.organisation.Organisation
 
 fun debtMock(startLine: Int, endLine: Int): Debt {
     val account = Account("", "", SourceProvider.BITBUCKET, "1")
-    val repository = Repository("", Organisation("", SourceProvider.BITBUCKET, "", "", ""))
+    val repository = Repository("", "main", Organisation("", SourceProvider.BITBUCKET, "", "", ""))
     return Debt(
         "",
         "",

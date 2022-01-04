@@ -22,6 +22,7 @@
                             <p class="text-muted">
                                 <span th:text="${debt.repository.name}"></span> /
                                 <a th:href="${@pageBuilderSupportService.getSourceProviderSourceLink(debt)}"
+                                   target="_blank"
                                    class="text-muted"
                                    th:text="${@pageBuilderSupportService.getFileName(debt.filePath) + ':' + debt.startLine + (debt.startLine == debt.endLine ? '' : '-' + debt.endLine)}"></a>
                             </p>

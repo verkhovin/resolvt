@@ -8,14 +8,13 @@ import dev.ithurts.model.debt.DebtStatus
 import dev.ithurts.model.debt.Repository
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.repository.DebtRepository
-import dev.ithurts.repository.RepositoryRepository
 import dev.ithurts.security.AuthenticationFacade
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 
 @Service
 class DebtService(
-    private val repositoryRepository: RepositoryRepository,
+    private val repositoryService: RepositoryService,
     private val debtRepository: DebtRepository,
     private val authenticationFacade: AuthenticationFacade
 ) {
@@ -27,10 +26,8 @@ class DebtService(
         organisationId: Long,
         repositoryInfo: RepositoryInfo
     ): Long {
-        val repository = repositoryRepository.findByNameAndOrganisation(repositoryInfo.name, organisation)
-            ?: repositoryRepository.save(
-                Repository(repositoryInfo.name, organisation)
-            )
+        val repository = repositoryService.getRepository(organisation, repositoryInfo.name)
+            ?: repositoryService.save(organisation, repositoryInfo.name)
         return debtRepository.save(newDebt(techDebtReport, authenticationFacade.account, repository)).id!!
     }
 
