@@ -1,11 +1,12 @@
 {
   "key": "it-hurts-app",
   "name": "It Hurts",
-  "description": "It Hurts add-on for Bitbucket",
+  "description": "It Hurts is a technical debt manager for development teams",
   "vendor": {
-    "name": "Nikita Verkhovin"
+    "name": "Nikita Verkhovin / It Hurts",
+    "url": "https://ithurts.dev"
   },
-  "baseUrl": "https://ithurts.loca.lt",
+  "baseUrl": "https://ithurts.dev",
   "authentication": {
     "type": "jwt"
   },
@@ -26,7 +27,7 @@
     ],
     "postInstallRedirect": {
       "key": "redirect",
-      "url": "http://localhost:8080/dashboard?sync=true"
+      "url": "https://ithurts.dev:8080/dashboard?sync=true"
     }
   },
   "scopes": [

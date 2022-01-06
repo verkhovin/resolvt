@@ -14,7 +14,8 @@
         <div class="col-12">
             <nav class="navbar navbar-expand-lg navbar-light navbar-light mt-3 rounded-3">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="#">It Hurts</a>
+                    <a class="navbar-brand" href="#">
+                        <img class="logo" th:src="@{/public/imgs/logo.svg}" width="30"> It Hurts</a>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                             <li class="nav-item">
@@ -32,28 +33,31 @@
             </nav>
         </div>
     </div>
-    <div class="row mt-3 mt-lg-5 align-items-center">
-        <div class="col-md">
-            <div class="align-middle">
-                <h3>
-                    Technical Debt Manager
-                </h3>
-                <p>
-                    <b>It Hurts</b> is a tool that helps you to collect, keep track, <b>manage technical debt</b> across
-                    your
-                    applications,
-                    and does encourage your team to <b>take care of the codebase</b>
-                </p>
-                <div class="text-center mt-4">
-                    <p>Getting started</p>
-                    <a th:href="@{/dashboard}" type="button" class="btn btn-primary">
-                        Continue with Bitbucket
-                    </a>
+    <div class="container">
+        <div class="row mt-3 mt-lg-5 align-items-center">
+            <div class="col-md">
+                <div class="align-middle">
+                    <h3>
+                        Technical Debt Manager
+                    </h3>
+                    <p>
+                        <b>It Hurts</b> is a tool that helps you to collect, keep track, <b>manage technical debt</b>
+                        across
+                        your
+                        applications,
+                        and does encourage your team to <b>take care of the codebase</b>
+                    </p>
+                    <div class="text-center mt-4">
+                        <p>Getting started</p>
+                        <a th:href="@{/dashboard}" type="button" class="btn btn-primary">
+                            Continue with Bitbucket
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md mt-3">
-            <img class="img-fluid float-end rounded" th:src="@{/public/imgs/dashboard.png}"/>
+            <div class="col-md mt-3">
+                <img class="img-fluid float-end rounded" th:src="@{/public/imgs/dashboard.png}"/>
+            </div>
         </div>
     </div>
 

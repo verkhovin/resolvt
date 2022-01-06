@@ -41,7 +41,8 @@ class HunkResolvingStrategy {
                     log.info("Marking as probably resolved: code deleted")
                     debt.status = DebtStatus.PROBABLY_RESOLVED_CODE_DELETED
                     needSave = true
-                } else if (leftCursor != rightCursor) {
+                }
+                if (leftCursor != rightCursor) {
                     log.info("Setting offset for start")
                     startOffset = rightCursor - leftCursor
                     needSave = true
