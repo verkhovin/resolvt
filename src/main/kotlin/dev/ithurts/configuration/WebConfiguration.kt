@@ -7,8 +7,12 @@ import org.springframework.boot.actuate.trace.http.HttpTraceRepository
 import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.CacheControl
+import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import java.util.concurrent.TimeUnit
 
 
 @Configuration
@@ -27,5 +31,17 @@ class WebConfiguration(
     @Bean
     fun httpTraceRepository(): HttpTraceRepository? {
         return InMemoryHttpTraceRepository()
+    }
+}
+
+@Configuration
+@EnableWebMvc
+class MvcConfiguration: WebMvcConfigurer{
+    override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
+        registry.addResourceHandler("/public")
+            .addResourceLocations("classpath:/static/public")
+            .setCacheControl(CacheControl.maxAge(31, TimeUnit.DAYS))
+        registry.addResourceHandler("/**")
+            .addResourceLocations("classpath:/static/");
     }
 }

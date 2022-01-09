@@ -34,11 +34,18 @@ class WebSecurityConfiguration(
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http {
+            headers {
+                cacheControl {
+                    disable()
+                }
+            }
             authorizeRequests {
                 authorize("/error", permitAll)
                 authorize("/", permitAll)
                 authorize("/public/**", permitAll)
+                authorize("/favicon.ico", permitAll)
                 authorize("/bitbucket-connect-descriptor.json", permitAll)
+                authorize("/bitbucket-connect-descriptor-dev.json", permitAll)
                 authorize("/actuator/**", permitAll)
                 authorize(anyRequest, authenticated)
             }

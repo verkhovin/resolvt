@@ -7,22 +7,23 @@
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
     <link th:href="@{/public/styles/styles.css}" rel="stylesheet"/>
+    <title>It Hurts - Manage technical debt</title>
 </head>
 <body>
-<div class="container">
+<div id="home" class="container">
     <div class="row">
         <div class="col-12">
             <nav class="navbar navbar-expand-lg navbar-light navbar-light mt-3 rounded-3">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="#">
-                        <img class="logo" th:src="@{/public/imgs/logo.svg}" width="30"> It Hurts</a>
+                    <a class="navbar-brand" href="/">
+                        <img class="logo" th:src="@{/public/imgs/logo.svg}" width="150"></a>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                                <a class="nav-link active" aria-current="page" href="/">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Features</a>
+                                <a class="nav-link" href="#how-it-works">How it works</a>
                             </li>
                             <!--                            <li class="nav-item">-->
                             <!--                                <a class="nav-link disabled">How to</a>-->
@@ -34,7 +35,7 @@
         </div>
     </div>
     <div class="container">
-        <div class="row mt-3 mt-lg-5 align-items-center">
+        <div class="row mt-3 mt-lg-3 align-items-center">
             <div class="col-md">
                 <div class="align-middle">
                     <h3>
@@ -48,15 +49,56 @@
                         and does encourage your team to <b>take care of the codebase</b>
                     </p>
                     <div class="text-center mt-4">
-                        <p>Getting started</p>
-                        <a th:href="@{/dashboard}" type="button" class="btn btn-primary">
-                            Continue with Bitbucket
+                        <p>Getting started:</p>
+                        <a th:href="@{/dashboard}" type="button" class="btn bitbucket-button">
+                            <img th:src="@{/public/imgs/bitbucket-logo.svg}"/> <span>Continue with Bitbucket</span>
                         </a>
                     </div>
                 </div>
             </div>
             <div class="col-md mt-3">
-                <img class="img-fluid float-end rounded" th:src="@{/public/imgs/dashboard.png}"/>
+                <img class="img-fluid float-end screen-img" th:src="@{/public/imgs/index-img.png}"/>
+            </div>
+        </div>
+        <div class="row mt-3 mt-lg-5 align-itmes-center howto">
+            <div class="row">
+                <h2 id="how-it-works" class="text-center">How it works</h2>
+            </div>
+            <div class="row mt-3 mt-lg-3">
+                <div class="col-md step">
+                    <h2 class="text-center text-muted">01</h2>
+                    <h5 class="text-center">Integrate It Hurts with your codebase</h5>
+                    <p class="text-justify">
+                        Create a workspace by connecting <span class="text-nowrap">It Hurts</span> to your source repositories.
+                    </p>
+                    <p class="text-muted d-md-none">Supported: Bitbucket<br/>Coming soon: GitHub, Gitlab</p>
+                </div>
+                <div class="col-md step">
+                    <h2 class="text-center text-muted">02</h2>
+                    <h5 class="text-center">Install an IDE plugin</h5>
+                    <p class="">
+                        It Hurts plugin makes technical debt always visible while you are working with the code.
+                        There is no need to leave the IDE to browse and report on technical debt.
+                    </p>
+                    <p class="text-muted d-md-none">Supported: Intellij<br/>Coming soon: Visual Studio Code</p>
+                </div>
+                <div class="col-md step">
+                    <h2 class="text-center text-muted">03</h2>
+                    <h5 class="text-center">That's it</h5>
+                    <p class="">
+                        It Hurts is keeping track of your repositories events and automatically updates the debt records,
+                        trying to keep everything up-to-date.
+                    </p>
+                </div>
+            </div>
+            <div class="row d-none d-md-flex">
+                <div class="col-md">
+                    <p class="text-muted">Supported: Bitbucket<br/>Coming soon: GitHub, Gitlab</p>
+                </div>
+                <div class="col-md">
+                    <p class="text-muted">Supported: Intellij<br/>Coming soon: Visual Studio Code</p>
+                </div>
+                <div class="col-md"></div>
             </div>
         </div>
     </div>

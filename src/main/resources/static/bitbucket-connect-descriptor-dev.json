@@ -1,12 +1,12 @@
 {
-  "key": "it-hurts-app",
-  "name": "It Hurts",
-  "description": "It Hurts is a technical debt manager for development teams",
+  "key": "it-hurts-app-dev",
+  "name": "[DEV] It Hurts",
+  "description": "Go away!",
   "vendor": {
     "name": "Nikita Verkhovin / It Hurts",
-    "url": "https://ithurts.dev"
+    "url": "https://ithurts.loca.lt"
   },
-  "baseUrl": "https://ithurts.dev",
+  "baseUrl": "https://ithurts.loca.lt",
   "authentication": {
     "type": "jwt"
   },
@@ -27,7 +27,7 @@
     ],
     "postInstallRedirect": {
       "key": "redirect",
-      "url": "https://ithurts.dev/dashboard?sync=true"
+      "url": "http://localhost:8080/dashboard?sync=true"
     }
   },
   "scopes": [
