@@ -6,6 +6,8 @@
     <div class="row mt-3 mt-lg-3 align-items-center">
         <div class="col-md-12 ">
             <h6 th:if="${debts.isEmpty()}" class="text-center">Dashboard is empty for now</h6>
+            <p class="text-center"><small th:if="${debts.isEmpty()}" ><a target="_blank" href="https://ithurtsdev.github.io/public/">Checkout
+                Getting Started guide</a></small></p>
             <div th:unless="${debts.isEmpty()}">
                 <p class="text-muted">Currently, the dashboard contains only a list of active debts. More advanced data
                     displaying is coming soon.</p>
@@ -17,7 +19,8 @@
                                 <span class="badge bg-dark">PROBABLY RESOLVED</span>
                             </h6>
                             <h6 th:if="${debt.status.toString().equals('OPEN')}">
-                                <span class="badge bg-dark">OPEN</span> <span class="text-muted ps-2" th:text="${debt.votes} + ' people were hurt by this'"></span>
+                                <span class="badge bg-dark">OPEN</span> <span class="text-muted ps-2"
+                                                                              th:text="${debt.votes} + ' people were hurt by this'"></span>
                             </h6>
                             <p class="text-muted">
                                 <span th:text="${debt.repository.name}"></span> /

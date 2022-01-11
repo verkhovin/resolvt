@@ -1,7 +1,5 @@
 package dev.ithurts.controller.web
 
-import dev.ithurts.controller.web.page.DashboardPage
-import dev.ithurts.exception.EntityNotFoundException
 import dev.ithurts.model.organisation.Organisation
 import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
 import dev.ithurts.service.DebtApiService
@@ -19,7 +17,10 @@ class IndexController(
     private val debtApiService: DebtApiService
 ) {
     @GetMapping("/")
-    fun index() = "index"
+    fun index() = "static/index"
+
+    @GetMapping("/guide")
+    fun guide() = "static/guide"
 
     @GetMapping("/dashboard")
     fun dashboard(
