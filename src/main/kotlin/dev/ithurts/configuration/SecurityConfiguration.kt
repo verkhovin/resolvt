@@ -42,7 +42,6 @@ class WebSecurityConfiguration(
             authorizeRequests {
                 authorize("/error", permitAll)
                 authorize("/", permitAll)
-                authorize("/guide", permitAll)
                 authorize("/public/**", permitAll)
                 authorize("/favicon.ico", permitAll)
                 authorize("/bitbucket-connect-descriptor.json", permitAll)

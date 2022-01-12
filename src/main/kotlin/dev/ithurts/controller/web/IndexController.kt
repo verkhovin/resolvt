@@ -19,9 +19,6 @@ class IndexController(
     @GetMapping("/")
     fun index() = "static/index"
 
-    @GetMapping("/guide")
-    fun guide() = "static/guide"
-
     @GetMapping("/dashboard")
     fun dashboard(
         @AuthenticationPrincipal authentication: AuthenticatedOAuth2User,
