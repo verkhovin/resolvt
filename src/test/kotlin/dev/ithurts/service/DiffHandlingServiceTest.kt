@@ -2,6 +2,7 @@ package dev.ithurts.service
 
 import dev.ithurts.debtMock
 import dev.ithurts.model.debt.DebtStatus
+import dev.ithurts.model.debt.ResolutionReason
 import dev.ithurts.service.diff.DiffHandlingService
 import dev.ithurts.service.diff.HunkResolvingStrategy
 import io.reflectoring.diffparser.api.UnifiedDiffParser
@@ -49,7 +50,8 @@ class DiffHandlingServiceTest {
         diffHandlingService.handleDiff(DIFF_6DELETE_1ADD)
         assertEquals(5, debt.startLine)
         assertEquals(31, debt.endLine)
-        assertEquals(DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED, debt.status)
+        assertEquals(DebtStatus.PROBABLY_RESOLVED, debt.status)
+        assertEquals(ResolutionReason.PARTLY_CHANGED, debt.resolutionReason)
         then(hunkResolvingStrategy).should(never()).processHunk(anyOrNull(), anyOrNull())
     }
 

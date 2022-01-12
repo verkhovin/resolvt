@@ -16,6 +16,6 @@ fun debtMock(startLine: Int, endLine: Int): Debt {
         "",
         DebtStatus.OPEN,
         "src/main/java/ru/verkhovin/poker/model/Room.java",
-        startLine, endLine, 0, account, repository, 0
+        startLine, endLine, 0, account, repository, null, 0
     )
 }

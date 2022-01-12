@@ -1,10 +1,11 @@
 package dev.ithurts.service
 
-import dev.ithurts.model.debt.DebtStatus
 import io.reflectoring.diffparser.api.UnifiedDiffParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import dev.ithurts.debtMock
+import dev.ithurts.model.debt.DebtStatus.*
+import dev.ithurts.model.debt.ResolutionReason.*
 import dev.ithurts.service.diff.HunkResolvingStrategy
 
 class HunkResolvingStrategyTest {
@@ -34,7 +35,8 @@ class HunkResolvingStrategyTest {
         strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
         assertEquals(26, debt.startLine)
         assertEquals(26, debt.endLine)
-        assertEquals(debt.status, DebtStatus.PROBABLY_RESOLVED_CODE_DELETED)
+        assertEquals(debt.status, PROBABLY_RESOLVED)
+        assertEquals(debt.resolutionReason, CODE_DELETED)
     }
 
     @Test
@@ -43,7 +45,8 @@ class HunkResolvingStrategyTest {
         strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
         assertEquals(24, debt.startLine)
         assertEquals(29, debt.endLine)
-        assertEquals(debt.status, DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED)
+        assertEquals(debt.status, PROBABLY_RESOLVED)
+        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
     }
 
     @Test
@@ -52,7 +55,8 @@ class HunkResolvingStrategyTest {
         strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
         assertEquals(24, debt.startLine)
         assertEquals(35, debt.endLine)
-        assertEquals(debt.status, DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED)
+        assertEquals(debt.status, PROBABLY_RESOLVED)
+        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
     }
 
     @Test
@@ -61,7 +65,7 @@ class HunkResolvingStrategyTest {
         strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
         assertEquals(29, debt.startLine)
         assertEquals(35, debt.endLine)
-        assertEquals(debt.status, DebtStatus.OPEN)
+        assertEquals(debt.status, OPEN)
     }
 
     @Test
@@ -70,7 +74,8 @@ class HunkResolvingStrategyTest {
         strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
         assertEquals(26, debt.startLine)
         assertEquals(29, debt.endLine)
-        assertEquals(debt.status, DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED)
+        assertEquals(debt.status, PROBABLY_RESOLVED)
+        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
     }
 
     @Test
@@ -79,7 +84,8 @@ class HunkResolvingStrategyTest {
         strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
         assertEquals(26, debt.startLine)
         assertEquals(35, debt.endLine)
-        assertEquals(debt.status, DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED)
+        assertEquals(debt.status, PROBABLY_RESOLVED)
+        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
     }
 
     private fun hunk(diff: String) = diffParser.parse(diff.toByteArray())[0].hunks[0]

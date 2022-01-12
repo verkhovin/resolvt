@@ -39,7 +39,7 @@ class HunkResolvingStrategy {
                 log.info("Found start of debt at line $leftCursor")
                 if (line.lineType == Line.LineType.FROM) {
                     log.info("Marking as probably resolved: code deleted")
-                    debt.status = DebtStatus.PROBABLY_RESOLVED_CODE_DELETED
+                    debt.codeDeleted()
                     needSave = true
                 }
                 if (leftCursor != rightCursor) {
@@ -61,13 +61,13 @@ class HunkResolvingStrategy {
 
                 if (line.lineType == Line.LineType.FROM) {
                     log.info("Marking as probably resolved: code deleted")
-                    debt.status = DebtStatus.PROBABLY_RESOLVED_CODE_DELETED
+                    debt.codeDeleted()
                     needSave = true
                 }
 
                 if (line.lineType == Line.LineType.NEUTRAL && hadChangesAbove) {
                     log.info("Marking as probably resolved: partly changed")
-                    debt.status = DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED
+                    debt.partlyChanged()
                     needSave = true
                 }
             }
@@ -86,7 +86,7 @@ class HunkResolvingStrategy {
             // we assume that the debt was resolved partly
             if (hadChangesAbove) {
                 log.info("Marking as probably resolved: partly changed")
-                debt.status = DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED
+                debt.partlyChanged()
             }
             needSave = true
         }

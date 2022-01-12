@@ -20,14 +20,35 @@ class Debt(
     @ManyToOne
     @JoinColumn(name = "organisation_id")
     val repository: Repository,
+    var resolutionReason: ResolutionReason? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
-)
+) {
+    fun codeDeleted() {
+        status = DebtStatus.PROBABLY_RESOLVED
+        resolutionReason = ResolutionReason.CODE_DELETED
+    }
+    
+    fun partlyChanged() {
+        status = DebtStatus.PROBABLY_RESOLVED
+        resolutionReason = ResolutionReason.PARTLY_CHANGED
+    }
+    
+    fun manuallyResolved() {
+        status = DebtStatus.RESOLVED
+        resolutionReason = ResolutionReason.MANUAL
+    }
+}
 
 enum class DebtStatus {
     OPEN,
-    RESOLVED,
-    PROBABLY_RESOLVED_CODE_DELETED,
-    PROBABLY_RESOLVED_PARTLY_CHANGED,
+    PROBABLY_RESOLVED,
+    RESOLVED
+}
+
+enum class ResolutionReason {
+    CODE_DELETED,
+    PARTLY_CHANGED,
+    MANUAL
 }

@@ -55,7 +55,7 @@ class DiffHandlingService(
                     log.info("Debt is around hunk")
                     val offsetChange = hunk.toFileRange.lineCount - hunk.fromFileRange.lineCount
                     debt.endLine += offsetChange
-                    debt.status = DebtStatus.PROBABLY_RESOLVED_PARTLY_CHANGED
+                    debt.partlyChanged()
                     return@hunk true
                 }
                 hunkResolvingStrategy.processHunk(debt, hunk)
