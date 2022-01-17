@@ -1,7 +1,7 @@
 package dev.ithurts.controller.api
 
-import dev.ithurts.controller.api.dto.Me
-import dev.ithurts.security.AuthenticationFacade
+import dev.ithurts.application.dto.Me
+import dev.ithurts.application.security.AuthenticationFacade
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController

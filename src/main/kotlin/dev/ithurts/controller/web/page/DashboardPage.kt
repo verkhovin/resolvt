@@ -1,8 +1,8 @@
 package dev.ithurts.controller.web.page
 
-import dev.ithurts.model.organisation.Organisation
+import dev.ithurts.domain.workspace.Workspace
 
 data class DashboardPage(
-    override val org: Organisation,
-    override val orgs: List<Organisation>
+    override val org: Workspace,
+    override val orgs: List<Workspace>
 ): SessionAwarePage()

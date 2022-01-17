@@ -1,7 +1,7 @@
 package dev.ithurts.controller.api.webhook
 
 import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
-import dev.ithurts.sourceprovider.bitbucket.BitbucketWebhookHandler
+import dev.ithurts.application.sourceprovider.bitbucket.BitbucketWebhookHandler
 import dev.ithurts.controller.api.webhook.dto.BitbucketWebhookEvent
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed
 import dev.ithurts.controller.api.webhook.dto.RepoUpdated

@@ -1,6 +1,6 @@
 package dev.ithurts.controller.web.dto
 
-import dev.ithurts.model.SourceProvider
+import dev.ithurts.domain.SourceProvider
 
 class OrganisationCreationRequest (
     val externalOrganisationId: String,

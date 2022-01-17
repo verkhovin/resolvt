@@ -1,12 +1,12 @@
 package dev.ithurts.configuration
 
-import dev.ithurts.repository.AccountRepository
-import dev.ithurts.repository.OrganisationRepository
-import dev.ithurts.security.oauth2.AccountPersistingOAuth2UserService
-import dev.ithurts.security.OrganisationPermissionEvaluator
-import dev.ithurts.security.api.IntegrationApiSecurityFilter
-import dev.ithurts.security.api.PluginAuthenticationFilter
-import dev.ithurts.service.plugin.PluginTokenManager
+import dev.ithurts.domain.account.AccountRepository
+import dev.ithurts.domain.workspace.WorkspaceRepository
+import dev.ithurts.application.security.oauth2.AccountPersistingOAuth2UserService
+import dev.ithurts.application.security.OrganisationPermissionEvaluator
+import dev.ithurts.application.security.api.IntegrationApiSecurityFilter
+import dev.ithurts.application.security.api.PluginAuthenticationFilter
+import dev.ithurts.application.service.plugin.PluginTokenManager
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler
@@ -14,7 +14,6 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -95,7 +94,7 @@ class ApiSecurityConfiguration(
 @EnableWebSecurity
 @Order(2)
 class IntegrationApiSecurityConfiguration(
-    private val organisationRepository: OrganisationRepository
+    private val workspaceRepository: WorkspaceRepository
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http {
@@ -110,7 +109,7 @@ class IntegrationApiSecurityConfiguration(
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(
-                IntegrationApiSecurityFilter(organisationRepository)
+                IntegrationApiSecurityFilter(workspaceRepository)
             )
             exceptionHandling {
 

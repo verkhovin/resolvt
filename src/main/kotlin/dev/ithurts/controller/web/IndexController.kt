@@ -1,9 +1,12 @@
 package dev.ithurts.controller.web
 
-import dev.ithurts.model.organisation.Organisation
-import dev.ithurts.security.oauth2.AuthenticatedOAuth2User
-import dev.ithurts.service.DebtApiService
-import dev.ithurts.service.OrganisationApiService
+import dev.ithurts.application.query.DebtQueryRepository
+import dev.ithurts.domain.workspace.Workspace
+import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
+import dev.ithurts.application.query.DebtQueryService
+import dev.ithurts.application.service.WorkspaceApplicationService
+import dev.ithurts.domain.workspace.WorkspaceRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -13,8 +16,8 @@ import javax.servlet.http.HttpSession
 
 @Controller
 class IndexController(
-    private val organisationApiService: OrganisationApiService,
-    private val debtApiService: DebtApiService
+    private val workspaceRepository: WorkspaceRepository,
+    private val debtQueryRepository: DebtQueryRepository
 ) {
     @GetMapping("/")
     fun index() = "static/index"
@@ -30,16 +33,16 @@ class IndexController(
         if (sync) {
             return "redirect:/dashboard"
         }
-        val organisations = httpSession.getAttribute("organisations") as List<Organisation>?
-        if (organisations == null || organisations.isEmpty()) {
+        val workspaces = httpSession.getAttribute("organisations") as List<Workspace>?
+        if (workspaces == null || workspaces.isEmpty()) {
             return "init_dashboard"
         }
-        val organisationId = httpSession.getAttribute("currentOrganisation.id") as Long
-        val org = organisationApiService.getById(organisationId)
-        val debts = debtApiService.getActiveDebtsForOrganisation(org.id!!)
+        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as Long
+        val workspace = workspaceRepository.findByIdOrNull(workspaceId)!!
+        val debts = debtQueryRepository.queryWorkspaceActiveDebts(workspaceId)
             .sortedByDescending { it.votes }
         model.addAttribute("debts", debts)
-        model.addAttribute("org", org)
+        model.addAttribute("org", workspace)
         return "dashboard"
     }
 }
