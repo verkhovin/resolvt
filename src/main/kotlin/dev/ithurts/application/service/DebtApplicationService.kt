@@ -22,16 +22,16 @@ class DebtApplicationService(
         val repositoryInfo: RepositoryInfo = repositoryInfoService.parseRemoteUrl(techDebtReport.remoteUrl)
         val workspace = workspaceRepository.findBySourceProviderAndExternalId(
             repositoryInfo.sourceProvider,
-            repositoryInfo.organisationName
-        ) ?: throw DebtReportFailedException("No organisation found for ${repositoryInfo.organisationName}")
+            repositoryInfo.workspaceExternalId
+        ) ?: throw DebtReportFailedException("No organisation found for ${repositoryInfo.workspaceExternalId}")
 
-        val repository = repositoryRepository.findByNameAndWorkspaceId(repositoryInfo.name, workspace.id)
+        val repository = repositoryRepository.findByNameAndWorkspaceId(repositoryInfo.name, workspace.identity)
             ?: repositoryService.acknowledgeExternalRepositoryByWorkspace(workspace, repositoryInfo.name).let {
                 repositoryRepository.save(it)
             }
 
-        val debt = repository.reportDebt(techDebtReport, authenticationFacade.account.id)
-        return debtRepository.save(debt).id
+        val debt = repository.reportDebt(techDebtReport, authenticationFacade.account.identity)
+        return debtRepository.save(debt).identity
     }
 
 }

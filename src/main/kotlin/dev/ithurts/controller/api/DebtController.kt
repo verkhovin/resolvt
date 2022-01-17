@@ -2,8 +2,9 @@ package dev.ithurts.controller.api
 
 import dev.ithurts.application.dto.DebtDTO
 import dev.ithurts.application.dto.TechDebtReport
+import dev.ithurts.application.query.DebtQueryRepository
 import dev.ithurts.application.service.DebtApplicationService
-import dev.ithurts.application.query.DebtQueryService
+import dev.ithurts.application.service.RepositoryInfoService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
@@ -12,7 +13,8 @@ import java.net.URI
 @RequestMapping("api")
 class DebtController(
     private val debtApplicationService: DebtApplicationService,
-    private val debtQueryService: DebtQueryService
+    private val debtQueryRepository: DebtQueryRepository,
+    private val repositoryInfoService: RepositoryInfoService
 ) {
     @PostMapping("/debts")
     fun reportDebt(@RequestBody techDebtReport: TechDebtReport): ResponseEntity<Any> {
@@ -23,6 +25,7 @@ class DebtController(
 
     @GetMapping("/debts")
     fun getDebts(@RequestParam remoteUrl: String): List<DebtDTO> {
-        return debtQueryService.getActiveDebts(remoteUrl)
+        val repositoryInfo = repositoryInfoService.parseRemoteUrl(remoteUrl)
+        return debtQueryRepository.queryRepositoryActiveDebts(repositoryInfo)
     }
 }

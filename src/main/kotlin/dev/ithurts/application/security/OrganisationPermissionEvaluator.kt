@@ -29,8 +29,8 @@ class OrganisationPermissionEvaluator(
         val requiredRole = WorkspaceMemberRole.valueOf(permission as String)
         val accountId = when (val principal = authentication.principal) {
             is AuthenticatedOAuth2User -> principal.accountId
-            is Account -> principal.id
-            is Workspace -> return targetId == principal.id
+            is Account -> principal.identity
+            is Workspace -> return targetId == principal.identity
             else -> return false
         }
         val workspace = workspaceRepository.findByIdOrNull(targetId as Long) ?:

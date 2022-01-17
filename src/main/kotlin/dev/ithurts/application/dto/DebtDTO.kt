@@ -1,10 +1,7 @@
 package dev.ithurts.application.dto
 
-import dev.ithurts.domain.account.Account
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
-import dev.ithurts.domain.repository.Repository
-import dev.ithurts.domain.workspace.Workspace
 
 data class DebtDTO(
     val id: Long,
@@ -22,7 +19,7 @@ data class DebtDTO(
     companion object {
         fun from(debt: Debt, sourceLink: SourceLink, repositoryDTO: RepositoryDTO, accountDTO: AccountDTO): DebtDTO {
             return DebtDTO(
-                debt.id,
+                debt.identity,
                 debt.title,
                 debt.description,
                 debt.status,

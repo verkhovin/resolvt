@@ -32,7 +32,7 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                             <li th:if="${#session.getAttribute('organisations') == null}" class="nav-item">
-                                <a class="nav-link" th:href="${@pageBuilderSupportService.getSourceProviderConnectLink()}">Create workspace</a>
+                                <a class="nav-link" th:href="${@sourceProviderService.getSourceProviderConnectLink()}">Create workspace</a>
                             </li>
                             <li th:unless="${#session.getAttribute('organisations') == null}" class="nav-item dropdown">
                                 <a class="nav-link" th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{organisations/invite}">
@@ -47,7 +47,7 @@
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <a class="dropdown-item" th:href="${@pageBuilderSupportService.getSourceProviderConnectLink()}">Create workspace</a>
+                                        <a class="dropdown-item" th:href="${@sourceProviderService.getSourceProviderConnectLink()}">Create workspace</a>
                                     </li>
                                 </ul>
                             </li>

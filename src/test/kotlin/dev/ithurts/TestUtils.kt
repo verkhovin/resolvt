@@ -9,13 +9,14 @@ import dev.ithurts.domain.workspace.Workspace
 
 
 fun debtMock(startLine: Int, endLine: Int): Debt {
-    val account = Account("", "", SourceProvider.BITBUCKET, "1")
-    val repository = Repository("", "main", Workspace("", SourceProvider.BITBUCKET, "", "", ""))
+//    val account = Account("", "", SourceProvider.BITBUCKET, "1")
+//    val repository = Repository("", "main", Workspace("", SourceProvider.BITBUCKET, "", "", ""))
+//    val repository = Repository("", "main", 1)
     return Debt(
         "",
         "",
         DebtStatus.OPEN,
         "src/main/java/ru/verkhovin/poker/model/Room.java",
-        startLine, endLine, 0, account, repository, null, 0
+        startLine, endLine, 0, 1, 1, null
     )
 }

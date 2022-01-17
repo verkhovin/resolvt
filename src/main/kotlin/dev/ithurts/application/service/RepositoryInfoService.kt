@@ -25,6 +25,6 @@ class RepositoryInfoService {
 
 data class RepositoryInfo(
     val name: String,
-    val organisationName: String,
+    val workspaceExternalId: String,
     val sourceProvider: SourceProvider
 )

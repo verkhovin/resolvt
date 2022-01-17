@@ -1,7 +1,10 @@
 package dev.ithurts.domain
 
+import javax.persistence.Transient
+
 interface DomainEntity {
-    val _id: Long?
-    val id: Long
-        get() = _id!!
+    val id: Long?
+    @get:Transient
+    val identity: Long
+        get() = id!!
 }

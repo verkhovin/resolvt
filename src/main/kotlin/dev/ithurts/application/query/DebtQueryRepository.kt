@@ -1,19 +1,21 @@
 package dev.ithurts.application.query
 
-
 import dev.ithurts.application.dto.AccountDTO
 import dev.ithurts.application.dto.DebtDTO
 import dev.ithurts.application.dto.RepositoryDTO
 import dev.ithurts.application.dto.SourceLink
+import dev.ithurts.application.service.RepositoryInfo
 import dev.ithurts.application.service.SourceProviderService
 import dev.ithurts.domain.account.Account
 import dev.ithurts.domain.debt.Debt
+import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.workspace.Workspace
 import javax.persistence.EntityManager
 import javax.persistence.Tuple
+import org.springframework.stereotype.Repository as SpringRepository
 
-@org.springframework.stereotype.Repository
+@SpringRepository
 class DebtQueryRepository(
     private val entityManager: EntityManager,
     private val sourceProviderService: SourceProviderService
@@ -22,12 +24,32 @@ class DebtQueryRepository(
     fun queryRepositoryActiveDebts(repositoryId: Long): List<DebtDTO> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
-                    "LEFT JOIN Repository r ON r._id = d.repositoryId " +
-                    "LEFT JOIN Workspace w ON w._id = r.workspaceId " +
-                    "LEFT JOIN Account a ON a._id = d.creatorAccountId " +
-                    "WHERE r._id = :repositoryId",
+                    "LEFT JOIN Repository r ON r.id = d.repositoryId " +
+                    "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
+                    "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
+                    "WHERE r.id = :repositoryId " +
+                    "AND d.status <> :debtStatus",
             Tuple::class.java
-        ).setParameter("repositoryId", repositoryId).resultList
+        ).setParameter("repositoryId", repositoryId)
+            .setParameter("debtStatus", DebtStatus.RESOLVED).resultList
+
+        return resultList.map(::toDto)
+    }
+
+    fun queryRepositoryActiveDebts(repositoryInfo: RepositoryInfo): List<DebtDTO> {
+        val resultList = entityManager.createQuery(
+            "SELECT d, r, w, a FROM Debt d " +
+                    "LEFT JOIN Repository r ON r.id = d.repositoryId " +
+                    "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
+                    "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
+                    "WHERE r.name = :repositoryName AND w.externalId = :workspaceExternalId AND w.sourceProvider = :sourceProvider " +
+                    "AND d.status <> :debtStatus",
+            Tuple::class.java
+        ).setParameter("repositoryName", repositoryInfo.name)
+            .setParameter("workspaceExternalId", repositoryInfo.workspaceExternalId)
+            .setParameter("sourceProvider", repositoryInfo.sourceProvider)
+
+            .setParameter("debtStatus", DebtStatus.RESOLVED).resultList
 
         return resultList.map(::toDto)
     }
@@ -35,12 +57,14 @@ class DebtQueryRepository(
     fun queryWorkspaceActiveDebts(workspaceId: Long): List<DebtDTO> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
-                    "LEFT JOIN Repository r ON r._id = d.repositoryId " +
-                    "LEFT JOIN Workspace w ON w._id = r.workspaceId " +
-                    "LEFT JOIN Account a ON a._id = d.creatorAccountId " +
-                    "WHERE r._id = :workspaceId",
+                    "LEFT JOIN Repository r ON r.id = d.repositoryId " +
+                    "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
+                    "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
+                    "WHERE r.id = :workspaceId " +
+                    "AND d.status <> :debtStatus",
             Tuple::class.java
-        ).setParameter("workspaceId", workspaceId).resultList
+        ).setParameter("workspaceId", workspaceId)
+            .setParameter("debtStatus", DebtStatus.RESOLVED).resultList
 
         return resultList.map(::toDto)
     }

@@ -3,8 +3,6 @@ package dev.ithurts.controller.web
 import dev.ithurts.application.query.DebtQueryRepository
 import dev.ithurts.domain.workspace.Workspace
 import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
-import dev.ithurts.application.query.DebtQueryService
-import dev.ithurts.application.service.WorkspaceApplicationService
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.annotation.AuthenticationPrincipal

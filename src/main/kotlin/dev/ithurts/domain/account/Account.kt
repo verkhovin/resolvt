@@ -14,6 +14,6 @@ class Account (
 ): DomainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val _id: Long? = null
+    override val id: Long? = null
 
 }

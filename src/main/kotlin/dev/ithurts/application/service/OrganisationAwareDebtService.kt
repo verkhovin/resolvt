@@ -12,7 +12,7 @@ class OrganisationAwareDebtService(
 ) {
     fun getDebtsForFiles(paths: List<String>): List<Debt> {
         val organisation = integrationAuthenticationFacade.workspace
-        return debtRepository.findByOrganisationIdAndFilePathIn(organisation.id!!, paths)
+        return debtRepository.findByOrganisationIdAndFilePathIn(organisation.identity!!, paths)
     }
 
     fun saveDebt(debt: Debt) {

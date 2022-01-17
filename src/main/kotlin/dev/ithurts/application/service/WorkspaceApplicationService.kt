@@ -20,7 +20,7 @@ class WorkspaceApplicationService(
             "id",
             workspaceId.toString()
         )
-        workspace.addMember(account.id, WorkspaceMemberRole.MEMBER, WorkspaceMemberStatus.ACTIVE)
+        workspace.addMember(account.identity, WorkspaceMemberRole.MEMBER, WorkspaceMemberStatus.ACTIVE)
         workspaceRepository.save(workspace)
     }
 }

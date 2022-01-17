@@ -21,7 +21,7 @@ class Debt(
 ): DomainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val _id: Long? = null
+    override val id: Long? = null
 
     fun codeDeleted() {
         status = DebtStatus.PROBABLY_RESOLVED

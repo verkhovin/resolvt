@@ -14,7 +14,7 @@ class Repository(
 ): DomainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val _id: Long? = null
+    override val id: Long? = null
 
     fun rename(newName: String) {
         name = newName
@@ -30,7 +30,7 @@ class Repository(
             techDebtReport.endLine,
             1,
             reportedByAccountId,
-            this.id,
+            this.identity,
         )
     }
 }

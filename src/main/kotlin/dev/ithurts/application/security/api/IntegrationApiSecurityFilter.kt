@@ -34,7 +34,7 @@ class IntegrationApiSecurityFilter(
         val unsignedJwt = jwt.substringBeforeLast(".") + "."
         val claims = decodingParser.parseClaimsJwt(unsignedJwt)
         val clientKey = claims.body.issuer
-        val subjectOrganisation = workspaceRepository.getByClientKey(clientKey)
+        val subjectOrganisation = workspaceRepository.getBySourceProviderApplicationCredentials_ClientKey(clientKey)
         if (subjectOrganisation == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
             return

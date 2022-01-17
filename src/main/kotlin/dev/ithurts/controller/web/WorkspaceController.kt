@@ -4,6 +4,8 @@ import dev.ithurts.controller.web.dto.MemberInvitationRequest
 import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
 import dev.ithurts.application.service.WorkspaceApplicationService
 import dev.ithurts.application.service.web.SessionManager
+import dev.ithurts.domain.workspace.WorkspaceRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -14,12 +16,13 @@ import javax.servlet.http.HttpSession
 @RequestMapping("organisations")
 class WorkspaceController(
     private val workspaceApplicationService: WorkspaceApplicationService,
+    private val workspaceRepository: WorkspaceRepository,
     private val sessionManager: SessionManager
 ) {
     @GetMapping("/invite")
     fun memberInvitePage(model: Model, httpSession: HttpSession) = "organisation/invite".apply {
-        val organisationId = httpSession.getAttribute("currentOrganisation.id") as Long
-        val org = workspaceApplicationService.getById(organisationId)
+        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as Long
+        val org = workspaceRepository.findByIdOrNull(workspaceId)
         model.addAttribute("org", org)
         model.addAttribute("memberInvitationRequest", MemberInvitationRequest(""))
     }
@@ -30,8 +33,10 @@ class WorkspaceController(
         @PathVariable id: Long,
         session: HttpSession
     ): String {
-        val membership = workspaceApplicationService.getMembership(id, authentication.accountId)
-        sessionManager.setCurrentOrganisation(session, membership.organisation.id!!, membership.role)
+        val workspace = workspaceRepository.findByIdOrNull(id)!!
+        workspace.getMember(authentication.accountId)?.let {member ->
+            sessionManager.setCurrentOrganisation(session, id, member.role)
+        }
         return "redirect:/dashboard"
     }
 

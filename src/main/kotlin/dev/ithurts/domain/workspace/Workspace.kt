@@ -1,9 +1,12 @@
 package dev.ithurts.domain.workspace
 
+import dev.ithurts.domain.DomainEntity
 import dev.ithurts.domain.SourceProvider
 import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.workspace.WorkspaceMemberRole.*
 import dev.ithurts.domain.workspace.WorkspaceMemberStatus.*
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import javax.persistence.*
 
 @Entity
@@ -19,13 +22,15 @@ class Workspace(
     @Embedded
     var sourceProviderApplicationCredentials: SourceProviderApplicationCredentials,
     var active: Boolean = true,
+
+): DomainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val _id: Long? = null
-) {
+    override val id: Long? = null
+
     @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.JOIN)
     val members: MutableList<WorkspaceMember> = mutableListOf()
-    val id = _id ?: throw IllegalStateException("Accessing Id of not persisted entity")
 
     fun addMember(
         account: Long,

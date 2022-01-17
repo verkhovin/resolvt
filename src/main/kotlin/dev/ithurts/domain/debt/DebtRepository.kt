@@ -11,7 +11,7 @@ interface DebtRepository : CrudRepository<Debt, Long> {
 
     @Query(
         "SELECT d FROM Debt d " +
-                "JOIN Repository r ON d.repositoryId = r._id " +
+                "JOIN Repository r ON d.repositoryId = r.id " +
                 "JOIN Workspace o ON r.workspaceId = o.id " +
                 "WHERE o.id = :workspaceId AND d.status <> :excludeWithStatus"
     )
@@ -19,7 +19,7 @@ interface DebtRepository : CrudRepository<Debt, Long> {
 
     @Query(
         "SELECT d FROM Debt d " +
-                "JOIN Repository r ON d.repositoryId = r._id " +
+                "JOIN Repository r ON d.repositoryId = r.id " +
                 "JOIN Workspace o ON r.workspaceId = o.id " +
                 "WHERE o.id = :organisationId AND d.filePath in (:paths) AND d.status <> :excludeWithStatus"
     )
