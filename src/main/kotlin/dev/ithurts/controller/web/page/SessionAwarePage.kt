@@ -1,8 +1,8 @@
 package dev.ithurts.controller.web.page
 
-import dev.ithurts.model.organisation.Organisation
+import dev.ithurts.domain.workspace.Workspace
 
 abstract class SessionAwarePage {
-    abstract val org: Organisation
-    abstract val orgs: List<Organisation>
+    abstract val org: Workspace
+    abstract val orgs: List<Workspace>
 }

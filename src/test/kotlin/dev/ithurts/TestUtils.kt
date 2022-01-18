@@ -1,21 +1,22 @@
 package dev.ithurts
 
-import dev.ithurts.model.Account
-import dev.ithurts.model.SourceProvider
-import dev.ithurts.model.debt.Debt
-import dev.ithurts.model.debt.DebtStatus
-import dev.ithurts.model.debt.Repository
-import dev.ithurts.model.organisation.Organisation
+import dev.ithurts.domain.account.Account
+import dev.ithurts.domain.SourceProvider
+import dev.ithurts.domain.debt.Debt
+import dev.ithurts.domain.debt.DebtStatus
+import dev.ithurts.domain.repository.Repository
+import dev.ithurts.domain.workspace.Workspace
 
 
 fun debtMock(startLine: Int, endLine: Int): Debt {
-    val account = Account("", "", SourceProvider.BITBUCKET, "1")
-    val repository = Repository("", "main", Organisation("", SourceProvider.BITBUCKET, "", "", ""))
+//    val account = Account("", "", SourceProvider.BITBUCKET, "1")
+//    val repository = Repository("", "main", Workspace("", SourceProvider.BITBUCKET, "", "", ""))
+//    val repository = Repository("", "main", 1)
     return Debt(
         "",
         "",
         DebtStatus.OPEN,
         "src/main/java/ru/verkhovin/poker/model/Room.java",
-        startLine, endLine, 0, account, repository, null, 0
+        startLine, endLine, 0, 1, null
     )
 }
