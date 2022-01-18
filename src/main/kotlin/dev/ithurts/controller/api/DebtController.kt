@@ -39,7 +39,7 @@ class DebtController(
 
     @PostMapping("/{debtId}/downVote")
     fun downVote(@PathVariable debtId: Long): ResponseEntity<Any> {
-        debtApplicationService.vote(debtId)
+        debtApplicationService.downVote(debtId)
         return ResponseEntity.ok().build()
     }
 }

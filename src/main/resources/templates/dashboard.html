@@ -27,8 +27,8 @@
                                 <span class="badge bg-dark">PROBABLY RESOLVED</span>
                             </h6>
                             <h6 th:if="${debt.status.toString().equals('OPEN')}">
-                                <span class="badge bg-dark">OPEN</span> <span class="text-muted ps-2"
-                                                                              th:text="${debt.votes} + ' people were hurt by this'"></span>
+                                <span class="badge bg-dark">OPEN</span>
+                                <span th:id="${debt.id}+'-votes'" class="text-muted ps-2 pe-1" th:text="${debt.votes}"></span><span class="text-muted">people were hurt by this</span>
                             </h6>
                             <p class="text-muted">
                                 <span th:text="${debt.repository.name}"></span> /
