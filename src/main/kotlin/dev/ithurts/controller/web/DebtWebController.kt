@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
-@RequestMapping("/debt")
-class DebtController(private val debtApplicationService: DebtApplicationService) {
+@RequestMapping("/debts")
+class DebtWeb4Controller(private val debtApplicationService: DebtApplicationService) {
     @PostMapping("/{debtId}/vote")
     fun vote(@PathVariable debtId: Long): ResponseEntity<Any> {
         debtApplicationService.vote(debtId)
@@ -18,7 +18,7 @@ class DebtController(private val debtApplicationService: DebtApplicationService)
 
     @PostMapping("/{debtId}/downVote")
     fun downVote(@PathVariable debtId: Long): ResponseEntity<Any> {
-        debtApplicationService.vote(debtId)
+        debtApplicationService.downVote(debtId)
         return ResponseEntity.ok().build()
     }
 }

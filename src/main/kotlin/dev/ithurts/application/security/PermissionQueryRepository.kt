@@ -44,12 +44,10 @@ class PermissionQueryRepository(
 
     fun getWorkspaceMemberByRepositoryInfo(repository: RepositoryInfo, accountId: Long): WorkspaceMember? {
         val result = entityManager.createQuery(
-            "SELECT w FROM Repository r " +
-                    "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
-                    "WHERE r.name = :repositoryName AND w.externalId = :workspaceExternalId AND w.sourceProvider = :sourceProvider",
+            "SELECT w FROM Workspace w " +
+                    "WHERE w.externalId = :workspaceExternalId AND w.sourceProvider = :sourceProvider",
             Tuple::class.java
-        ).setParameter("repositoryName", repository.name)
-            .setParameter("workspaceExternalId", repository.workspaceExternalId)
+        ).setParameter("workspaceExternalId", repository.workspaceExternalId)
             .setParameter("sourceProvider", repository.sourceProvider).singleResult
 
         return result.get(0, Workspace::class.java).members.firstOrNull { accountId == it.accountId }

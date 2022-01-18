@@ -30,6 +30,6 @@ class Repository(
             techDebtReport.endLine,
             reportedByAccountId,
             this.identity,
-        )
+        ).also { it.vote(reportedByAccountId) }
     }
 }
