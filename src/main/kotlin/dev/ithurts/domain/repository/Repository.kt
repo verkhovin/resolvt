@@ -28,7 +28,6 @@ class Repository(
             techDebtReport.filePath,
             techDebtReport.startLine,
             techDebtReport.endLine,
-            1,
             reportedByAccountId,
             this.identity,
         )

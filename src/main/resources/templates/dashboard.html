@@ -24,10 +24,10 @@
                             </h6>
                             <p class="text-muted">
                                 <span th:text="${debt.repository.name}"></span> /
-                                <a th:href="debt.sourceLink.url"
+                                <a th:href="${debt.sourceLink.url}"
                                    target="_blank"
                                    class="text-muted"
-                                   th:text="debt.sourceLink.text"></a>
+                                   th:text="${debt.sourceLink.text}"></a>
                             </p>
                             <pre th:text="${debt.description}"></pre>
                         </div>

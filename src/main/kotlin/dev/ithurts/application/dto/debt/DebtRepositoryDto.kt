@@ -1,5 +1,5 @@
 package dev.ithurts.application.dto.debt
 
-data class DebtRepositoryDTO(
+data class DebtRepositoryDto(
     val name: String
 )

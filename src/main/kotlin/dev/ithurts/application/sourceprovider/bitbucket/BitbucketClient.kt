@@ -27,9 +27,9 @@ class BitbucketClient(
         ).body ?: ""
     }
 
-    override fun getRepository(accessToken: String, organisation: String, repositoryName: String): SourceProviderRepository {
+    override fun getRepository(accessToken: String, organisation: String, repository: String): SourceProviderRepository {
         val bitbucketRepository = restTemplate.exchange<BitbucketRepository>(
-            "/repositories/${organisation}/${repositoryName}",
+            "/repositories/${organisation}/${repository}",
             HttpMethod.GET,
             noBody(accessToken)
         ).body!!

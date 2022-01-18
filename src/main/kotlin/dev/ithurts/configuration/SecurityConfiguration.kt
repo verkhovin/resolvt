@@ -3,7 +3,7 @@ package dev.ithurts.configuration
 import dev.ithurts.domain.account.AccountRepository
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import dev.ithurts.application.security.oauth2.AccountPersistingOAuth2UserService
-import dev.ithurts.application.security.OrganisationPermissionEvaluator
+import dev.ithurts.application.security.WorkspacePermissionEvaluator
 import dev.ithurts.application.security.api.IntegrationApiSecurityFilter
 import dev.ithurts.application.security.api.PluginAuthenticationFilter
 import dev.ithurts.application.service.plugin.PluginTokenManager
@@ -121,11 +121,11 @@ class IntegrationApiSecurityConfiguration(
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-class MethodSecurityConfig(private val organisationPermissionEvaluator: OrganisationPermissionEvaluator) :
+class MethodSecurityConfig(private val workspacePermissionEvaluator: WorkspacePermissionEvaluator) :
     GlobalMethodSecurityConfiguration() {
     override fun createExpressionHandler(): MethodSecurityExpressionHandler {
         val expressionHandler = DefaultMethodSecurityExpressionHandler()
-        expressionHandler.setPermissionEvaluator(organisationPermissionEvaluator)
+        expressionHandler.setPermissionEvaluator(workspacePermissionEvaluator)
         return expressionHandler
     }
 }

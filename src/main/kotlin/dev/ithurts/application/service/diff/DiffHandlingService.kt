@@ -1,7 +1,8 @@
 package dev.ithurts.application.service.diff
 
+import dev.ithurts.application.security.IntegrationAuthenticationFacade
 import dev.ithurts.domain.debt.Debt
-import dev.ithurts.application.service.OrganisationAwareDebtService
+import dev.ithurts.domain.debt.DebtRepository
 import io.reflectoring.diffparser.api.DiffParser
 import io.reflectoring.diffparser.api.model.Diff
 import io.reflectoring.diffparser.api.model.Range
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Service
 class DiffHandlingService(
     private val hunkResolvingStrategy: HunkResolvingStrategy,
     private val diffParser: DiffParser,
-    private val debtService: OrganisationAwareDebtService
+    private val debtRepository: DebtRepository,
+    private val integrationAuthenticationFacade: IntegrationAuthenticationFacade
 ) {
     fun handleDiff(diff: String) {
         if (diff.isBlank()) {
@@ -20,7 +22,9 @@ class DiffHandlingService(
         }
         val parsedDiffs: List<Diff> = diffParser.parse(diff.toByteArray())
 
-        val probablyAffectedDebts = debtService.getDebtsForFiles(parsedDiffs.map { trimDiffFilepath(it.fromFileName) })
+        val probablyAffectedDebts = debtRepository.findByWorkspaceIdAndFilePaths(
+            integrationAuthenticationFacade.workspace.identity,
+            parsedDiffs.map { trimDiffFilepath(it.fromFileName) })
         val diffsNeedToProcess = parsedDiffs.groupBy { trimDiffFilepath(it.fromFileName) }
 
         probablyAffectedDebts.forEach { debt ->
@@ -30,7 +34,7 @@ class DiffHandlingService(
                     log.error("Debt start line is greater than end line: $debt")
                     debt.startLine = debt.endLine
                 }
-                debtService.saveDebt(debt)
+                debtRepository.save(debt)
             }
         }
 

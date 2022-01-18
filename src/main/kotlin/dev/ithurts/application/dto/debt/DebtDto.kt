@@ -3,7 +3,7 @@ package dev.ithurts.application.dto.debt
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 
-data class DebtDTO(
+data class DebtDto(
     val id: Long,
     val title: String,
     val description: String,
@@ -12,13 +12,17 @@ data class DebtDTO(
     val startLine: Int,
     val endLine: Int,
     val votes: Int,
+    val voted: Boolean,
     val sourceLink: SourceLink,
-    val repository: DebtRepositoryDTO,
-    val debtAccountDTO: DebtAccountDTO
+    val repository: DebtRepositoryDto,
+    val debtReporterAccount: DebtAccountDto
 ) {
     companion object {
-        fun from(debt: Debt, sourceLink: SourceLink, debtRepositoryDTO: DebtRepositoryDTO, debtAccountDTO: DebtAccountDTO): DebtDTO {
-            return DebtDTO(
+        fun from(
+            debt: Debt, sourceLink: SourceLink, debtRepositoryDTO: DebtRepositoryDto, debtReportedAccount: DebtAccountDto,
+            currentUserVoted: Boolean
+        ): DebtDto {
+            return DebtDto(
                 debt.identity,
                 debt.title,
                 debt.description,
@@ -26,10 +30,11 @@ data class DebtDTO(
                 debt.filePath,
                 debt.startLine,
                 debt.endLine,
-                debt.votes,
+                debt.votes.size,
+                currentUserVoted,
                 sourceLink,
                 debtRepositoryDTO,
-                debtAccountDTO
+                debtReportedAccount
             )
         }
     }

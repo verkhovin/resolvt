@@ -1,4 +1,4 @@
-package dev.ithurts.application.sourceprovider.bitbucket
+package dev.ithurts.application.service
 
 import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed

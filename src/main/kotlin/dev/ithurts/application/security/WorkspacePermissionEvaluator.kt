@@ -8,15 +8,13 @@ import dev.ithurts.domain.workspace.WorkspaceMember
 import dev.ithurts.domain.workspace.WorkspaceMemberRole
 import dev.ithurts.domain.workspace.WorkspaceMemberRole.*
 import dev.ithurts.domain.workspace.WorkspaceRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.PermissionEvaluator
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import java.io.Serializable
 
 @Component
-class OrganisationPermissionEvaluator(
-    private val workspaceRepository: WorkspaceRepository,
+class WorkspacePermissionEvaluator(
     private val permissionQueryRepository: PermissionQueryRepository
 ) : PermissionEvaluator {
     override fun hasPermission(authentication: Authentication?, targetDomainObject: Any?, permission: Any?): Boolean {
@@ -37,11 +35,21 @@ class OrganisationPermissionEvaluator(
             is Workspace -> return target == principal.identity
             else -> return false
         }
-         return when (targetType) {
+        return when (targetType) {
             "Workspace" -> evaluatePermissionToWorkspace(target, accountId, requiredRole)
             "Repository" -> evaluatePermissionToRepository(target, accountId, requiredRole)
-                else -> false
+            "Debt" -> evaluatePermissionToDebt(target, accountId, requiredRole)
+            else -> false
         }
+    }
+
+    private fun evaluatePermissionToDebt(
+        target: Serializable,
+        accountId: Long,
+        requiredRole: WorkspaceMemberRole
+    ): Boolean {
+        val member = permissionQueryRepository.getWorkspaceMemberByDebtId(target as Long, accountId) ?: return false
+        return checkMemberPermission(member, requiredRole)
     }
 
     private fun evaluatePermissionToRepository(
@@ -51,12 +59,14 @@ class OrganisationPermissionEvaluator(
     ): Boolean {
         when (target) {
             is Long -> {
-                val member = permissionQueryRepository.getWorkspaceMemberByRepositoryId(target, accountId) ?: return false
+                val member =
+                    permissionQueryRepository.getWorkspaceMemberByRepositoryId(target, accountId) ?: return false
                 return checkMemberPermission(member, requiredRole)
             }
             is RepositoryInfo -> {
-                val memberRole = permissionQueryRepository.getWorkspaceMemberByRepositoryInfo(target, accountId) ?: return false
-                return checkMemberPermission(memberRole, requiredRole)
+                val member =
+                    permissionQueryRepository.getWorkspaceMemberByRepositoryInfo(target, accountId) ?: return false
+                return checkMemberPermission(member, requiredRole)
             }
             else -> return false
         }
@@ -72,7 +82,7 @@ class OrganisationPermissionEvaluator(
         accountId: Long,
         requiredRole: WorkspaceMemberRole
     ): Boolean {
-        val workspace = workspaceRepository.findByIdOrNull(targetId as Long) ?: return false
-        return workspace.checkAccountHasPermission(accountId, requiredRole)
+        val member = permissionQueryRepository.getWorkspaceMemberByWorkspaceId(targetId as Long, accountId) ?: return false
+        return checkMemberPermission(member, requiredRole)
     }
 }

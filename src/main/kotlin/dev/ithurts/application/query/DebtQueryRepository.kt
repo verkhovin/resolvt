@@ -1,9 +1,10 @@
 package dev.ithurts.application.query
 
-import dev.ithurts.application.dto.debt.DebtAccountDTO
-import dev.ithurts.application.dto.debt.DebtDTO
-import dev.ithurts.application.dto.debt.DebtRepositoryDTO
+import dev.ithurts.application.dto.debt.DebtAccountDto
+import dev.ithurts.application.dto.debt.DebtDto
+import dev.ithurts.application.dto.debt.DebtRepositoryDto
 import dev.ithurts.application.dto.debt.SourceLink
+import dev.ithurts.application.security.AuthenticationFacade
 import dev.ithurts.application.service.RepositoryInfo
 import dev.ithurts.application.service.SourceProviderService
 import dev.ithurts.domain.account.Account
@@ -19,11 +20,12 @@ import org.springframework.stereotype.Repository as SpringRepository
 @SpringRepository
 class DebtQueryRepository(
     private val entityManager: EntityManager,
-    private val sourceProviderService: SourceProviderService
+    private val sourceProviderService: SourceProviderService,
+    private val authenticationFacade: AuthenticationFacade,
 ) {
 
     @PreAuthorize("hasPermission(#repositoryId, 'Repository', 'MEMBER')")
-    fun queryRepositoryActiveDebts(repositoryId: Long): List<DebtDTO> {
+    fun queryRepositoryActiveDebts(repositoryId: Long): List<DebtDto> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
                     "LEFT JOIN Repository r ON r.id = d.repositoryId " +
@@ -39,7 +41,7 @@ class DebtQueryRepository(
     }
 
     @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
-    fun queryRepositoryActiveDebts(repositoryInfo: RepositoryInfo): List<DebtDTO> {
+    fun queryRepositoryActiveDebts(repositoryInfo: RepositoryInfo): List<DebtDto> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
                     "LEFT JOIN Repository r ON r.id = d.repositoryId " +
@@ -58,7 +60,7 @@ class DebtQueryRepository(
     }
 
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
-    fun queryWorkspaceActiveDebts(workspaceId: Long): List<DebtDTO> {
+    fun queryWorkspaceActiveDebts(workspaceId: Long): List<DebtDto> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
                     "LEFT JOIN Repository r ON r.id = d.repositoryId " +
@@ -73,12 +75,12 @@ class DebtQueryRepository(
         return resultList.map(::toDto)
     }
 
-    private fun toDto(it: Tuple): DebtDTO {
+    private fun toDto(it: Tuple): DebtDto {
         val debt = it.get(0, Debt::class.java)
         val repo = it.get(1, Repository::class.java)
         val workspace = it.get(2, Workspace::class.java)
-        val account = it.get(3, Account::class.java)
-        return DebtDTO.from(
+        val reporter = it.get(3, Account::class.java)
+        return DebtDto.from(
             it.get(0, Debt::class.java),
             SourceLink(
                 sourceProviderService.getSourceUrl(
@@ -89,8 +91,9 @@ class DebtQueryRepository(
                 ),
                 getFileName(debt.filePath)
             ),
-            DebtRepositoryDTO(repo.name),
-            DebtAccountDTO(account?.name ?: "Unknown")
+            DebtRepositoryDto(repo.name),
+            DebtAccountDto(reporter?.name ?: "Unknown"),
+            debt.accountVoted(authenticationFacade.account.identity)
         )
     }
 
