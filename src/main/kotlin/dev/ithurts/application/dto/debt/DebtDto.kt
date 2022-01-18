@@ -15,7 +15,8 @@ data class DebtDto(
     val voted: Boolean,
     val sourceLink: SourceLink,
     val repository: DebtRepositoryDto,
-    val debtReporterAccount: DebtAccountDto
+    val debtReporterAccount: DebtAccountDto,
+    val test: String = "AAAA"
 ) {
     companion object {
         fun from(
