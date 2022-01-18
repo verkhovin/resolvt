@@ -1,9 +1,9 @@
 package dev.ithurts.application.query
 
-import dev.ithurts.application.dto.AccountDTO
-import dev.ithurts.application.dto.DebtDTO
-import dev.ithurts.application.dto.RepositoryDTO
-import dev.ithurts.application.dto.SourceLink
+import dev.ithurts.application.dto.debt.DebtAccountDTO
+import dev.ithurts.application.dto.debt.DebtDTO
+import dev.ithurts.application.dto.debt.DebtRepositoryDTO
+import dev.ithurts.application.dto.debt.SourceLink
 import dev.ithurts.application.service.RepositoryInfo
 import dev.ithurts.application.service.SourceProviderService
 import dev.ithurts.domain.account.Account
@@ -11,6 +11,7 @@ import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.workspace.Workspace
+import org.springframework.security.access.prepost.PreAuthorize
 import javax.persistence.EntityManager
 import javax.persistence.Tuple
 import org.springframework.stereotype.Repository as SpringRepository
@@ -21,6 +22,7 @@ class DebtQueryRepository(
     private val sourceProviderService: SourceProviderService
 ) {
 
+    @PreAuthorize("hasPermission(#repositoryId, 'Repository', 'MEMBER')")
     fun queryRepositoryActiveDebts(repositoryId: Long): List<DebtDTO> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
@@ -36,6 +38,7 @@ class DebtQueryRepository(
         return resultList.map(::toDto)
     }
 
+    @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
     fun queryRepositoryActiveDebts(repositoryInfo: RepositoryInfo): List<DebtDTO> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
@@ -54,6 +57,7 @@ class DebtQueryRepository(
         return resultList.map(::toDto)
     }
 
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
     fun queryWorkspaceActiveDebts(workspaceId: Long): List<DebtDTO> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
@@ -85,8 +89,8 @@ class DebtQueryRepository(
                 ),
                 getFileName(debt.filePath)
             ),
-            RepositoryDTO(repo.name),
-            AccountDTO(account?.name ?: "Unknown")
+            DebtRepositoryDTO(repo.name),
+            DebtAccountDTO(account?.name ?: "Unknown")
         )
     }
 

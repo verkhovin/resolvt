@@ -3,6 +3,7 @@ package dev.ithurts.application.service
 import dev.ithurts.domain.SourceProvider
 import dev.ithurts.exception.DebtReportFailedException
 import org.springframework.stereotype.Service
+import java.io.Serializable
 
 @Service
 class RepositoryInfoService {
@@ -27,4 +28,4 @@ data class RepositoryInfo(
     val name: String,
     val workspaceExternalId: String,
     val sourceProvider: SourceProvider
-)
+): Serializable

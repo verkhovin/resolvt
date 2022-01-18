@@ -1,6 +1,6 @@
 package dev.ithurts.controller.api
 
-import dev.ithurts.application.dto.DebtDTO
+import dev.ithurts.application.dto.debt.DebtDTO
 import dev.ithurts.application.dto.TechDebtReport
 import dev.ithurts.application.query.DebtQueryRepository
 import dev.ithurts.application.service.DebtApplicationService

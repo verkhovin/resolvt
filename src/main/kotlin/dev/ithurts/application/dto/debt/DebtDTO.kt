@@ -1,4 +1,4 @@
-package dev.ithurts.application.dto
+package dev.ithurts.application.dto.debt
 
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
@@ -13,11 +13,11 @@ data class DebtDTO(
     val endLine: Int,
     val votes: Int,
     val sourceLink: SourceLink,
-    val repository: RepositoryDTO,
-    val accountDTO: AccountDTO
+    val repository: DebtRepositoryDTO,
+    val debtAccountDTO: DebtAccountDTO
 ) {
     companion object {
-        fun from(debt: Debt, sourceLink: SourceLink, repositoryDTO: RepositoryDTO, accountDTO: AccountDTO): DebtDTO {
+        fun from(debt: Debt, sourceLink: SourceLink, debtRepositoryDTO: DebtRepositoryDTO, debtAccountDTO: DebtAccountDTO): DebtDTO {
             return DebtDTO(
                 debt.identity,
                 debt.title,
@@ -28,8 +28,8 @@ data class DebtDTO(
                 debt.endLine,
                 debt.votes,
                 sourceLink,
-                repositoryDTO,
-                accountDTO
+                debtRepositoryDTO,
+                debtAccountDTO
             )
         }
     }
