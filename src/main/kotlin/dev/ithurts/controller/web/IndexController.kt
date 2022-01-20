@@ -1,8 +1,9 @@
 package dev.ithurts.controller.web
 
 import dev.ithurts.application.query.DebtQueryRepository
-import dev.ithurts.domain.workspace.Workspace
 import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
+import dev.ithurts.domain.debt.DebtStatus
+import dev.ithurts.domain.workspace.Workspace
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,7 +27,7 @@ class IndexController(
         model: Model,
         httpSession: HttpSession,
         @RequestParam("sync", required = false) sync: Boolean = false
-    ):String {
+    ): String {
         // if sync, then new organisation was created and request can contain jwt or other sensitive info
         if (sync) {
             return "redirect:/dashboard"
@@ -37,8 +38,17 @@ class IndexController(
         }
         val workspaceId = httpSession.getAttribute("currentOrganisation.id") as Long
         val workspace = workspaceRepository.findByIdOrNull(workspaceId)!!
-        val debts = debtQueryRepository.queryWorkspaceActiveDebts(workspaceId)
-            .sortedByDescending { it.votes }
+        val debts = debtQueryRepository.queryWorkspaceDebts(workspaceId)
+            .sortedWith { d1, d2 ->
+                when {
+                    d1.status == d2.status -> d2.votes - d1.votes
+                    d1.status == DebtStatus.PROBABLY_RESOLVED -> -1
+                    d1.status == DebtStatus.OPEN && d2.status == DebtStatus.RESOLVED -> -1
+                    d1.status == DebtStatus.OPEN && d2.status == DebtStatus.PROBABLY_RESOLVED -> 1
+                    d1.status == DebtStatus.RESOLVED  -> 1
+                    else -> 0
+                }
+            }
         model.addAttribute("debts", debts)
         model.addAttribute("org", workspace)
         return "dashboard"

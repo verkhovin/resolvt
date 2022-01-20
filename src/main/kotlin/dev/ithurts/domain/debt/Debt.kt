@@ -7,12 +7,12 @@ import javax.persistence.*
 
 @Entity
 class Debt(
-    val title: String,
+    var title: String,
     @Column(columnDefinition = "TEXT")
-    val description: String,
+    var description: String,
     @Enumerated(EnumType.STRING)
     var status: DebtStatus,
-    val filePath: String,
+    var filePath: String,
     var startLine: Int,
     var endLine: Int,
     val creatorAccountId: Long,
@@ -27,6 +27,25 @@ class Debt(
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(FetchMode.JOIN)
     val votes: MutableList<DebtVote> = mutableListOf()
+
+    fun update(
+        title: String,
+        description: String,
+        status: DebtStatus,
+        filePath: String,
+        startLine: Int,
+        endLine: Int
+    ) {
+        if (status == DebtStatus.PROBABLY_RESOLVED) {
+            throw IllegalArgumentException("${DebtStatus.PROBABLY_RESOLVED} can't be set by manual update")
+        }
+        this.title = title
+        this.description = description
+        this.status = status
+        this.filePath = filePath
+        this.startLine = startLine
+        this.endLine = endLine
+    }
 
     fun vote(accountId: Long) {
         val vote = DebtVote(accountId)

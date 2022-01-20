@@ -40,3 +40,9 @@ h2 {
 .vote-button {
     color: #81aa6f;
 }
+
+#filePath {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

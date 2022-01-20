@@ -3,6 +3,7 @@ package dev.ithurts.application.service
 import dev.ithurts.application.security.AuthenticationFacade
 import dev.ithurts.exception.DebtReportFailedException
 import dev.ithurts.application.dto.TechDebtReport
+import dev.ithurts.controller.web.page.DebtEditForm
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import dev.ithurts.domain.repository.RepositoryRepository
 import dev.ithurts.domain.debt.DebtRepository
@@ -36,12 +37,29 @@ class DebtApplicationService(
         return debtRepository.save(debt).identity
     }
 
+    @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
+    fun edit(debtId: Long, changes: DebtEditForm) {
+        val (start, end) = changes.linesSpec.split(':', limit = 2).map { it.toInt() }
+        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId.toString())
+        debt.update(
+            changes.title,
+            changes.description,
+            changes.status!!,
+            changes.filePath,
+            start,
+            end
+        )
+        debtRepository.save(debt)
+    }
+
+    @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun vote(debtId: Long) {
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId.toString())
         debt.vote(authenticationFacade.account.identity)
         debtRepository.save(debt)
     }
 
+    @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun downVote(debtId: Long) {
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId.toString())
         debt.downVote(authenticationFacade.account.identity)

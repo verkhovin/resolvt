@@ -12,8 +12,10 @@ import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.workspace.Workspace
+import dev.ithurts.exception.EntityNotFoundException
 import org.springframework.security.access.prepost.PreAuthorize
 import javax.persistence.EntityManager
+import javax.persistence.NoResultException
 import javax.persistence.Tuple
 import org.springframework.stereotype.Repository as SpringRepository
 
@@ -23,6 +25,24 @@ class DebtQueryRepository(
     private val sourceProviderService: SourceProviderService,
     private val authenticationFacade: AuthenticationFacade,
 ) {
+
+    fun queryDebt(debtId: Long): DebtDto {
+        val result = try {
+            entityManager.createQuery(
+                "SELECT d, r, w, a FROM Debt d " +
+                        "LEFT JOIN Repository r ON r.id = d.repositoryId " +
+                        "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
+                        "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
+                        "WHERE d.id = :debtId",
+                Tuple::class.java
+            ).setParameter("debtId", debtId).singleResult
+        } catch (e: NoResultException) {
+            throw EntityNotFoundException("Debt", "id", debtId.toString())
+        }
+
+        return toDto(result)
+    }
+
 
     @PreAuthorize("hasPermission(#repositoryId, 'Repository', 'MEMBER')")
     fun queryRepositoryActiveDebts(repositoryId: Long): List<DebtDto> {
@@ -60,28 +80,26 @@ class DebtQueryRepository(
     }
 
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
-    fun queryWorkspaceActiveDebts(workspaceId: Long): List<DebtDto> {
+    fun queryWorkspaceDebts(workspaceId: Long): List<DebtDto> {
         val resultList = entityManager.createQuery(
             "SELECT d, r, w, a FROM Debt d " +
                     "LEFT JOIN Repository r ON r.id = d.repositoryId " +
                     "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
                     "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
-                    "WHERE r.id = :workspaceId " +
-                    "AND d.status <> :debtStatus",
+                    "WHERE w.id = :workspaceId",
             Tuple::class.java
-        ).setParameter("workspaceId", workspaceId)
-            .setParameter("debtStatus", DebtStatus.RESOLVED).resultList
+        ).setParameter("workspaceId", workspaceId).resultList
 
         return resultList.map(::toDto)
     }
 
-    private fun toDto(it: Tuple): DebtDto {
-        val debt = it.get(0, Debt::class.java)
-        val repo = it.get(1, Repository::class.java)
-        val workspace = it.get(2, Workspace::class.java)
-        val reporter = it.get(3, Account::class.java)
+    private fun toDto(selectResult: Tuple): DebtDto {
+        val debt = selectResult.get(0, Debt::class.java)
+        val repo = selectResult.get(1, Repository::class.java)
+        val workspace = selectResult.get(2, Workspace::class.java)
+        val reporter = selectResult.get(3, Account::class.java)
         return DebtDto.from(
-            it.get(0, Debt::class.java),
+            selectResult.get(0, Debt::class.java),
             SourceLink(
                 sourceProviderService.getSourceUrl(
                     debt,
