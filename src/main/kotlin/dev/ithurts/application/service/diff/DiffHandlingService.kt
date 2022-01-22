@@ -16,8 +16,7 @@ class DiffHandlingService(
     private val debtRepository: DebtRepository,
     private val integrationAuthenticationFacade: IntegrationAuthenticationFacade
 ) {
-    fun handleDiff(diff: String) {
-        if (diff.isBlank()) {
+    fun handleDiff(diff: String) { if (diff.isBlank()) {
             return
         }
         val parsedDiffs: List<Diff> = diffParser.parse(diff.toByteArray())
@@ -42,7 +41,8 @@ class DiffHandlingService(
 
     private fun processDiff(debt: Debt, relatedDiffs: List<Diff>): Boolean {
         return relatedDiffs.any { diff ->
-            diff.hunks.any hunk@{ hunk ->
+            var debtChanged: Boolean
+            debtChanged = diff.hunks.any hunk@{ hunk ->
                 if (debt.endLine < hunk.fromFileRange.lineStart) {
                     log.info("Debt is before hunk")
                     return@hunk false
@@ -63,6 +63,12 @@ class DiffHandlingService(
                 }
                 hunkResolvingStrategy.processHunk(debt, hunk)
             }
+
+            if (trimDiffFilepath(diff.fromFileName) != trimDiffFilepath(diff.toFileName)) {
+                debt.filePath = trimDiffFilepath(diff.toFileName)
+                debtChanged = true
+            }
+            debtChanged
         }
     }
 

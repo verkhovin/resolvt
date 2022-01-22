@@ -21,7 +21,7 @@
                     <select th:field="*{status}" id="status" class="form-select"
                             th:disabled="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}">
                         <option th:value="${T(dev.ithurts.domain.debt.DebtStatus).OPEN}">Open</option>
-                        <option th:value="${T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}">Probably
+                        <option th:if="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}" th:value="${T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}">Probably
                             resolved
                         </option>
                         <option th:value="${T(dev.ithurts.domain.debt.DebtStatus).RESOLVED}">Resolved</option>

@@ -17,6 +17,7 @@ class Debt(
     var endLine: Int,
     val creatorAccountId: Long,
     val repositoryId: Long,
+    @Enumerated(EnumType.STRING)
     var resolutionReason: ResolutionReason? = null,
 
     ) : DomainEntity {
