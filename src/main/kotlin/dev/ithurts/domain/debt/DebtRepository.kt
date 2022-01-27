@@ -18,9 +18,10 @@ interface DebtRepository : CrudRepository<Debt, Long> {
 
     @Query(
         "SELECT d FROM Debt d " +
+                "JOIN d.bindings b " +
                 "JOIN Repository r ON d.repositoryId = r.id " +
                 "JOIN Workspace o ON r.workspaceId = o.id " +
-                "WHERE o.id = :workspaceId AND d.filePath in (:paths) AND d.status <> :excludeWithStatus"
+                "WHERE o.id = :workspaceId AND b.filePath in (:paths) AND d.status <> :excludeWithStatus"
     )
     fun findByWorkspaceIdAndFilePaths(
         workspaceId: Long,

@@ -2,6 +2,7 @@ package dev.ithurts
 
 import dev.ithurts.domain.account.Account
 import dev.ithurts.domain.SourceProvider
+import dev.ithurts.domain.debt.Binding
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.domain.repository.Repository
@@ -16,7 +17,10 @@ fun debtMock(startLine: Int, endLine: Int): Debt {
         "",
         "",
         DebtStatus.OPEN,
-        "src/main/java/ru/verkhovin/poker/model/Room.java",
-        startLine, endLine, 0, 1, null
+        0,
+        1,
+        mutableListOf(Binding("src/main/java/ru/verkhovin/poker/model/Room.java", startLine, endLine, null)),
+        null
+
     )
 }

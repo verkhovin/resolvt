@@ -18,7 +18,8 @@ class SourceProviderService(
 
     fun getSourceUrl(debt: Debt, repositoryName: String, mainBranch: String, workspaceExternalId: String): String {
         return when (authenticationFacade.account.sourceProvider) {
-            SourceProvider.BITBUCKET -> "https://bitbucket.org/${workspaceExternalId}/${repositoryName}/src/${mainBranch}/${debt.filePath}#lines-${debt.startLine}:${debt.endLine}"
+            SourceProvider.BITBUCKET -> "https://bitbucket.org/${workspaceExternalId}/${repositoryName}/src/${mainBranch}/" +
+                    "${debt.bindings[0].filePath}#lines-${debt.bindings[0].startLine}:${debt.bindings[0].endLine}"
         }
     }
 }

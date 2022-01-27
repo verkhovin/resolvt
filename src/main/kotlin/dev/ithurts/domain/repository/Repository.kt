@@ -4,14 +4,17 @@ import dev.ithurts.application.dto.TechDebtReport
 import dev.ithurts.domain.DomainEntity
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
 
 @Entity
 class Repository(
     var name: String,
     var mainBranch: String,
     val workspaceId: Long,
-): DomainEntity {
+) : DomainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override val id: Long? = null
@@ -25,11 +28,9 @@ class Repository(
             techDebtReport.title,
             techDebtReport.description,
             DebtStatus.OPEN,
-            techDebtReport.filePath,
-            techDebtReport.startLine,
-            techDebtReport.endLine,
             reportedByAccountId,
             this.identity,
+            techDebtReport.bindings.map { it.toDomain() }.toMutableList()
         ).also { it.vote(reportedByAccountId) }
     }
 }

@@ -12,22 +12,40 @@ class Debt(
     var description: String,
     @Enumerated(EnumType.STRING)
     var status: DebtStatus,
-    var filePath: String,
-    var startLine: Int,
-    var endLine: Int,
     val creatorAccountId: Long,
     val repositoryId: Long,
+    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @JoinColumn(name = "debt_id")
+    val bindings: MutableList<Binding>,
     @Enumerated(EnumType.STRING)
-    var resolutionReason: ResolutionReason? = null,
-
-    ) : DomainEntity {
+    var resolutionReason: ResolutionReason? = null
+) : DomainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     override val id: Long? = null
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.JOIN)
+    @Fetch(FetchMode.SUBSELECT)
     val votes: MutableList<DebtVote> = mutableListOf()
+
+    /// TODO REMOVE
+    var startLine: Int
+        get() = bindings.first().startLine
+        set(value) {
+            bindings.first().startLine = value
+        }
+    var endLine: Int
+        get() = bindings.first().endLine
+        set(value) {
+            bindings.first().endLine = value
+        }
+    var filePath: String
+        get() = bindings.first().filePath
+        set(value) {
+            bindings.first().filePath = value
+        }
+    ///
 
     fun update(
         title: String,
@@ -43,9 +61,22 @@ class Debt(
         this.title = title
         this.description = description
         this.status = status
-        this.filePath = filePath
-        this.startLine = startLine
-        this.endLine = endLine
+        val binding = this.bindings[0].copy(
+            filePath = filePath,
+            startLine = startLine,
+            endLine = endLine,
+        )
+        bindings[0] = binding
+    }
+
+    fun updateBinding(id: Long, filePath: String, startLine: Int, endLine: Int) {
+        val binding = bindings.find { it.id == id } ?: return
+        val newBinding = binding.copy(
+            filePath = filePath,
+            startLine = startLine,
+            endLine = endLine,
+        )
+        bindings[bindings.indexOf(binding)] = newBinding
     }
 
     fun vote(accountId: Long) {
