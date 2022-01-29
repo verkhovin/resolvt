@@ -19,7 +19,8 @@ class BitbucketClient(
 ) : SourceProviderClient {
     override val organisationOwnerRole: String = "owner"
 
-    override fun getDiff(accessToken: String, organisation: String, repository: String, spec: String): String { return restTemplate.exchange(
+    override fun getDiff(accessToken: String, organisation: String, repository: String, spec: String): String {
+        return restTemplate.exchange(
             "/repositories/${organisation}/${repository}/diff/${spec}?merge=false",
             HttpMethod.GET,
             noBody(accessToken),
@@ -27,13 +28,31 @@ class BitbucketClient(
         ).body ?: ""
     }
 
-    override fun getRepository(accessToken: String, organisation: String, repository: String): SourceProviderRepository {
+    override fun getRepository(
+        accessToken: String,
+        organisation: String,
+        repository: String
+    ): SourceProviderRepository {
         val bitbucketRepository = restTemplate.exchange<BitbucketRepository>(
             "/repositories/${organisation}/${repository}",
             HttpMethod.GET,
             noBody(accessToken)
         ).body!!
         return SourceProviderRepository(bitbucketRepository.name, bitbucketRepository.mainbranch.name)
+    }
+
+    override fun getFile(
+        accessToken: String,
+        workspace: String,
+        repository: String,
+        filePath: String,
+        commitHash: String
+    ): String {
+        return restTemplate.exchange<String>(
+            "/repositories/${workspace}/${repository}/src/${commitHash}/${filePath}",
+            HttpMethod.GET,
+            noBody(accessToken)
+        ).body!!
     }
 
     fun getUserPrimaryEmail(accessToken: String): String {
