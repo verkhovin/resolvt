@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class HunkResolvingStrategy {
-    fun processHunk(mutator: LineRangeMutator, hunk: Hunk): Boolean {
+    fun processHunk(mutator: LineRangeMutator, hunk: Hunk, direction: Direction = Direction.DIRECT): Boolean {
         var needSave = false
         var leftCursor = hunk.fromFileRange.lineStart - 1
         var rightCursor = hunk.fromFileRange.lineStart - 1
@@ -17,10 +17,10 @@ class HunkResolvingStrategy {
 //        var hadChangesAbove = false
         for (line in hunk.lines) {
             when (line.lineType) {
-                Line.LineType.FROM ->  {
+                direction.FROM ->  {
                     leftCursor++
                 }
-                Line.LineType.TO -> {
+                direction.TO -> {
                     rightCursor++
                     continue
                 }
@@ -36,7 +36,7 @@ class HunkResolvingStrategy {
 
             if (leftCursor == mutator.start) {
 //                log.info("Found start of debt at line $leftCursor")
-//                if (line.lineType == Line.LineType.FROM) {
+//                if (line.lineType == direction.FROM) {
 //                    log.info("Marking as probably resolved: code deleted")
 //                    mutator.codeDeleted()
 //                    needSave = true
@@ -58,7 +58,7 @@ class HunkResolvingStrategy {
                     needSave = true
                 }
 
-//                if (line.lineType == Line.LineType.FROM) {
+//                if (line.lineType == direction.FROM) {
 //                    log.info("Marking as probably resolved: code deleted")
 //                    mutator.codeDeleted()
 //                    needSave = true
@@ -71,7 +71,7 @@ class HunkResolvingStrategy {
 //                }
             }
 
-//            if (line.lineType == Line.LineType.FROM) {
+//            if (line.lineType == direction.FROM) {
 //                hadChangesAbove = true
 //            }
         }
@@ -95,4 +95,12 @@ class HunkResolvingStrategy {
     companion object {
         val log: Logger = LoggerFactory.getLogger(HunkResolvingStrategy::class.java)
     }
+}
+
+enum class Direction(
+    val FROM: Line.LineType,
+    val TO: Line.LineType
+) {
+    DIRECT(Line.LineType.FROM, Line.LineType.TO),
+    REVERSE(Line.LineType.TO, Line.LineType.FROM)
 }

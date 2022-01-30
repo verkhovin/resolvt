@@ -13,31 +13,35 @@ class AdvancedBindingAdjustmentService(
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
     private val languageSpecificBindingServices: Map<Language, LanguageSpecificBindingService>
 ) {
-    fun adjustBinding(binding: Binding, diffsByFile: Map<String, List<Diff>>, pushInfo: PushInfo) {
+    /**
+     * @return true if the binding was adjusted, false otherwise / remove after adding debt events
+     */
+
+    fun adjustBinding(binding: Binding, diffsByFile: Map<String, List<Diff>>, pushInfo: PushInfo): Boolean {
         if (!binding.isAdvanced()) {
             throw IllegalArgumentException("Binding is not advanced")
         }
-        val bindingRelatedDiffs: List<Diff> = diffsByFile[binding.filePath] ?: return
+        val bindingRelatedDiffs: List<Diff> = diffsByFile[binding.filePath] ?: return false
         val pathToFileBindingCurrentlyLocated = trimDiffFilepath(bindingRelatedDiffs.last().toFileName)
         val fileContent = downloadFileContent(pushInfo, pathToFileBindingCurrentlyLocated)
         val advancedBinding = binding.advancedBinding!!
 
         val bindingLineRange = languageSpecificBindingServices[advancedBinding.language]?.lookupBindingLocation(
-            advancedBinding,
-            fileContent
+            advancedBinding, fileContent
         ) ?: throw IllegalArgumentException("Language not supported")
 
-        binding.update(pathToFileBindingCurrentlyLocated, bindingLineRange.start, bindingLineRange.end)
+        // todo consider as changed if there were change in a diff
+        if (binding.filePath != pathToFileBindingCurrentlyLocated || binding.startLine != bindingLineRange.start || binding.endLine != bindingLineRange.end) {
+            binding.update(pathToFileBindingCurrentlyLocated, bindingLineRange.start, bindingLineRange.end)
+            return binding.endLine - binding.startLine != bindingLineRange.end - bindingLineRange.start
+        }
+        return false
     }
 
     private fun downloadFileContent(
-        pushInfo: PushInfo,
-        filePath: String
+        pushInfo: PushInfo, filePath: String
     ) = sourceProviderCommunicationService.getFile(
-        pushInfo.workspaceExternalId,
-        pushInfo.repositoryExternalId,
-        filePath,
-        pushInfo.commitHash
+        pushInfo.workspaceExternalId, pushInfo.repositoryExternalId, filePath, pushInfo.commitHash
     )
 
 }

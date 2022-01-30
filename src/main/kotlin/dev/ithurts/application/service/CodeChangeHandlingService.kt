@@ -37,24 +37,32 @@ class CodeChangeHandlingService(
 
     private fun applyDiffs(debt: Debt, diffsByFile: Map<String, List<Diff>>, pushInfo: PushInfo) {
         debt.bindings.forEach { binding ->
-            if (binding.isAdvanced()) {
+            val probablyResolved = if (binding.isAdvanced()) {
                 advancedBindingAdjustmentService.adjustBinding(binding, diffsByFile, pushInfo)
             } else {
                 adjustBasicBinding(binding, diffsByFile)
             }
+            if (probablyResolved) {
+                debt.partlyChanged()
+            }
         }
     }
 
-    private fun adjustBasicBinding(binding: Binding, diffsByFile: Map<String, List<Diff>>) {
-        val bindingRelatedDiffs: List<Diff> = diffsByFile[binding.filePath] ?: return
+    /**
+     * @return true if the binding was adjusted, false otherwise / remove after adding debt events
+     */
+    private fun adjustBasicBinding(binding: Binding, diffsByFile: Map<String, List<Diff>>): Boolean {
+        val bindingRelatedDiffs: List<Diff> = diffsByFile[binding.filePath] ?: return false
 
         val currentBindingPosition = LineRange(binding.startLine, binding.endLine)
-        val newPosition = gitDiffAnalyzer.calculateSelectionMovement(currentBindingPosition, bindingRelatedDiffs)
+        val selectionChange = gitDiffAnalyzer.lookupSelectionChange(currentBindingPosition, bindingRelatedDiffs)
         val newFilePath = trimDiffFilepath(bindingRelatedDiffs.last().toFileName)
-
-        if (newFilePath != binding.filePath || currentBindingPosition != newPosition) {
-            binding.update(newFilePath, newPosition.start, newPosition.end)
+        val newBindingPosition: LineRange = selectionChange.position
+        if (newFilePath != binding.filePath || currentBindingPosition != newBindingPosition) {
+            binding.update(newFilePath, newBindingPosition.start, newBindingPosition.end)
+            return currentBindingPosition.end - currentBindingPosition.start != newBindingPosition.end - newBindingPosition.start
         }
+        return false
     }
 
 

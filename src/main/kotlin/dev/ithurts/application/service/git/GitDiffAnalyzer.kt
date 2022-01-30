@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 class GitDiffAnalyzer(
     private val hunkResolvingStrategy: HunkResolvingStrategy
 ) {
-    fun calculateSelectionMovement(initialPosition: LineRange, diffs: List<Diff>): LineRange {
+    fun lookupSelectionChange(initialPosition: LineRange, diffs: List<Diff>): SelectionChangeLookupResult {
         val mutator = LineRangeMutator.of(initialPosition)
         diffs.forEach { diff ->
             diff.hunks.forEach hunk@{ hunk ->
@@ -30,7 +30,7 @@ class GitDiffAnalyzer(
                 hunkResolvingStrategy.processHunk(mutator, hunk)
             }
         }
-        return mutator.toLineRange()
+        return SelectionChangeLookupResult(mutator.toLineRange(), false)
     }
 }
 

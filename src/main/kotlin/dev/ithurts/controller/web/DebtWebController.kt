@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession
 
 @Controller
 @RequestMapping("/debts")
-class DebtWebController( //TODO typo
+class DebtWebController(
     private val debtApplicationService: DebtApplicationService,
     private val debtQueryRepository: DebtQueryRepository,
     private val workspaceRepository: WorkspaceRepository
