@@ -1,8 +1,10 @@
-package dev.ithurts.application.service.codechange
+package dev.ithurts.application.service
 
 import dev.ithurts.application.LineRange
 import dev.ithurts.application.dto.PushInfo
 import dev.ithurts.application.security.IntegrationAuthenticationFacade
+import dev.ithurts.application.service.advancedbinding.AdvancedBindingAdjustmentService
+import dev.ithurts.application.service.codechange.trimDiffFilepath
 import dev.ithurts.application.service.git.GitDiffAnalyzer
 import dev.ithurts.domain.debt.Binding
 import dev.ithurts.domain.debt.Debt
@@ -43,7 +45,7 @@ class CodeChangeHandlingService(
         }
     }
 
-    fun adjustBasicBinding(binding: Binding, diffsByFile: Map<String, List<Diff>>) {
+    private fun adjustBasicBinding(binding: Binding, diffsByFile: Map<String, List<Diff>>) {
         val bindingRelatedDiffs: List<Diff> = diffsByFile[binding.filePath] ?: return
 
         val currentBindingPosition = LineRange(binding.startLine, binding.endLine)
@@ -54,6 +56,7 @@ class CodeChangeHandlingService(
             binding.update(newFilePath, newPosition.start, newPosition.end)
         }
     }
+
 
     private fun debtsForChangedFiles(parsedDiffs: List<Diff>): List<Debt> {
         val changedFilePaths = parsedDiffs.map { trimDiffFilepath(it.fromFileName) }

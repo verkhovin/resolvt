@@ -1,4 +1,4 @@
-package dev.ithurts.application.service.code
+package dev.ithurts.application.service.advancedbinding.code
 
 import dev.ithurts.application.LineRange
 

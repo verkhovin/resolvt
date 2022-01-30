@@ -2,7 +2,6 @@ package dev.ithurts.application.service
 
 import dev.ithurts.application.dto.PushInfo
 import dev.ithurts.application.security.IntegrationAuthenticationFacade
-import dev.ithurts.application.service.codechange.CodeChangeHandlingService
 import dev.ithurts.application.sourceprovider.SourceProviderCommunicationService
 import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed
