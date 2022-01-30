@@ -2,7 +2,7 @@ package dev.ithurts.application.service
 
 import dev.ithurts.application.dto.PushInfo
 import dev.ithurts.application.security.IntegrationAuthenticationFacade
-import dev.ithurts.application.service.diff.DiffHandlingService
+import dev.ithurts.application.service.codechange.CodeChangeHandlingService
 import dev.ithurts.application.sourceprovider.SourceProviderCommunicationService
 import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed
@@ -25,7 +25,7 @@ class BitbucketWebhookHandler(
     private val repositoryRepository: RepositoryRepository,
     private val authenticationFacade: IntegrationAuthenticationFacade,
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
-    private val diffHandlingService: DiffHandlingService
+    private val codeChangeHandlingService: CodeChangeHandlingService
 ) {
     fun appInstalled(bitbucketAppInstallation: BitbucketAppInstallation) {
         val actorAccount = accountRepository.findByExternalIdAndSourceProvider(
@@ -91,7 +91,7 @@ class BitbucketWebhookHandler(
                 changesPushedEvent.repository.name,
                 diffSpec
             )
-            diffHandlingService.handleDiff(
+            codeChangeHandlingService.handleDiff(
                 diff,
                 PushInfo(
                     change.new.target.hash,
