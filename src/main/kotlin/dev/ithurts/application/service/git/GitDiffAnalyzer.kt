@@ -11,6 +11,7 @@ class GitDiffAnalyzer(
 ) {
     fun lookupSelectionChange(initialPosition: LineRange, diffs: List<Diff>): SelectionChangeLookupResult {
         val mutator = LineRangeMutator.of(initialPosition)
+        var selectionChanded = false
         diffs.forEach { diff ->
             diff.hunks.forEach hunk@{ hunk ->
                 if (mutator.end < hunk.fromFileRange.lineStart) {
@@ -25,12 +26,13 @@ class GitDiffAnalyzer(
                 if (mutator.start < hunk.fromFileRange.lineStart && mutator.end > hunk.fromFileRange.lineEnd) {
                     val offsetChange = hunk.toFileRange.lineCount - hunk.fromFileRange.lineCount
                     mutator.end += offsetChange
+                    selectionChanded = true
                     return@hunk
                 }
                 hunkResolvingStrategy.processHunk(mutator, hunk)
             }
         }
-        return SelectionChangeLookupResult(mutator.toLineRange(), false)
+        return SelectionChangeLookupResult(mutator.toLineRange(), selectionChanded)
     }
 }
 

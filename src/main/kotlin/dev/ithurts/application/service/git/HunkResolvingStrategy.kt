@@ -8,13 +8,17 @@ import org.springframework.stereotype.Component
 
 @Component
 class HunkResolvingStrategy {
+    /**
+     * Mutates lines in a [mutator] according to changes in the [hunk]
+     * Diff can be reversed by setting [direction] to [Direction.REVERSE]
+     * @return true if there is changes in the lines covered by [mutator] lines
+     */
     fun processHunk(mutator: LineRangeMutator, hunk: Hunk, direction: Direction = Direction.DIRECT): Boolean {
-        var needSave = false
         var leftCursor = hunk.fromFileRange.lineStart - 1
         var rightCursor = hunk.fromFileRange.lineStart - 1
         var startOffset = 0
         var hadEndInTheHunk = false
-//        var hadChangesAbove = false
+        var hadChangesAbove = false
         for (line in hunk.lines) {
             when (line.lineType) {
                 direction.FROM ->  {
@@ -42,11 +46,9 @@ class HunkResolvingStrategy {
 //                    needSave = true
 //                }
                 if (leftCursor != rightCursor) {
-//                    log.info("Setting offset for start")
                     startOffset = rightCursor - leftCursor
-                    needSave = true
                 }
-//                hadChangesAbove = false
+                hadChangesAbove = line.lineType != Line.LineType.NEUTRAL
             }
 
             if (leftCursor == mutator.end) {
@@ -55,8 +57,9 @@ class HunkResolvingStrategy {
                 if (leftCursor != rightCursor) {
                     log.info("Setting offset for end")
                     mutator.end += rightCursor - leftCursor
-                    needSave = true
                 }
+
+                break
 
 //                if (line.lineType == direction.FROM) {
 //                    log.info("Marking as probably resolved: code deleted")
@@ -71,9 +74,9 @@ class HunkResolvingStrategy {
 //                }
             }
 
-//            if (line.lineType == direction.FROM) {
-//                hadChangesAbove = true
-//            }
+            if (line.lineType != Line.LineType.NEUTRAL) {
+                hadChangesAbove = true
+            }
         }
         mutator.start += startOffset
 
@@ -87,9 +90,8 @@ class HunkResolvingStrategy {
 //                log.info("Marking as probably resolved: partly changed")
 //                mutator.partlyChanged()
 //            }
-            needSave = true
         }
-        return needSave
+        return hadChangesAbove
     }
 
     companion object {
