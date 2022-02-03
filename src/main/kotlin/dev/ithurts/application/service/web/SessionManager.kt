@@ -7,7 +7,7 @@ import javax.servlet.http.HttpSession
 
 @Service
 class SessionManager {
-    fun setCurrentOrganisation(session: HttpSession, workspaceId: Long, workspaceMemberRole: WorkspaceMemberRole) {
+    fun setCurrentOrganisation(session: HttpSession, workspaceId: String, workspaceMemberRole: WorkspaceMemberRole) {
         session.setAttribute("currentOrganisation.id", workspaceId)
         session.setAttribute("currentOrganisation.role", workspaceMemberRole.toString())
     }

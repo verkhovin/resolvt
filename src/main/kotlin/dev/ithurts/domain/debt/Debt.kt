@@ -1,33 +1,24 @@
 package dev.ithurts.domain.debt
 
-import dev.ithurts.domain.DomainEntity
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import javax.persistence.*
+import org.bson.codecs.pojo.annotations.BsonId
+import org.springframework.data.mongodb.core.mapping.Document
 
-@Entity
-class Debt(
+@Document(collection = "debts")
+data class Debt(
     var title: String,
-    @Column(columnDefinition = "TEXT")
     var description: String,
-    @Enumerated(EnumType.STRING)
     var status: DebtStatus,
-    val creatorAccountId: Long,
-    val repositoryId: Long,
-    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinColumn(name = "debt_id")
+    val creatorAccountId: String,
+    val repositoryId: String,
+    val workspaceId: String,
     val bindings: MutableList<Binding>,
-    @Enumerated(EnumType.STRING)
-    var resolutionReason: ResolutionReason? = null
-) : DomainEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val id: Long? = null
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    val votes: MutableList<DebtVote> = mutableListOf()
+    val votes: MutableList<DebtVote> = mutableListOf(),
+    var resolutionReason: ResolutionReason? = null,
+    @BsonId
+    val _id: String? = null
+) {
+    val id: String
+        get() = _id!!
 
     /// TODO REMOVE
     var startLine: Int
@@ -69,7 +60,7 @@ class Debt(
         bindings[0] = binding
     }
 
-    fun updateBinding(id: Long, filePath: String, startLine: Int, endLine: Int) {
+    fun updateBinding(id: String, filePath: String, startLine: Int, endLine: Int) {
         val binding = bindings.find { it.id == id } ?: return
         val newBinding = binding.copy(
             filePath = filePath,
@@ -79,19 +70,19 @@ class Debt(
         bindings[bindings.indexOf(binding)] = newBinding
     }
 
-    fun vote(accountId: Long) {
+    fun vote(accountId: String) {
         val vote = DebtVote(accountId)
         if (!votes.contains(vote)) {
             votes.add(vote)
         }
     }
 
-    fun downVote(accountId: Long) {
+    fun downVote(accountId: String) {
         val vote = DebtVote(accountId)
         votes.remove(vote)
     }
 
-    fun accountVoted(accountId: Long) = this.votes.contains(DebtVote(accountId))
+    fun accountVoted(accountId: String) = this.votes.contains(DebtVote(accountId))
 
     fun codeDeleted() {
         status = DebtStatus.PROBABLY_RESOLVED

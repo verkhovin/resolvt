@@ -59,7 +59,7 @@ class PluginAuthService(
         authCodeValue: String,
         codeChallenge: String,
         expiresAt: Instant
-    ) = authCodeRepository.getByAccountIdAndExpiresAtAfterAndUsedIsFalse(account.identity!!, clock.instant())
+    ) = authCodeRepository.getByAccountIdAndExpiresAtAfterAndUsedIsFalse(account.id, clock.instant())
         ?.also { authCode ->
             authCode.authCode = authCodeValue
             authCode.codeChallenge = codeChallenge
@@ -67,7 +67,7 @@ class PluginAuthService(
         } ?: AuthCode(
         authCodeValue,
         codeChallenge,
-        account.identity,
+        account.id,
         expiresAt
     )
 }

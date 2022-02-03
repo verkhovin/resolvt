@@ -26,9 +26,9 @@ class SessionEnrichingHandlerInterceptor(
                 SecurityContextHolder.getContext()?.authentication?.principal?.let { user ->
                     if (user is AuthenticatedOAuth2User) {
                         val workspaces = workspaceRepository.getByMembers_accountId(user.accountId)
-                        workspaces.minByOrNull { it.identity }?.let { firstWorkspace ->
+                        workspaces.minByOrNull { it.id }?.let { firstWorkspace ->
                             val member = firstWorkspace.getMember(user.accountId)!!
-                            sessionManager.setCurrentOrganisation(session, firstWorkspace.identity, member.role)
+                            sessionManager.setCurrentOrganisation(session, firstWorkspace.id, member.role)
                             sessionManager.setOrganisations(session, workspaces) // TODO workspace to dto
                         }
                     }

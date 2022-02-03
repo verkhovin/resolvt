@@ -47,7 +47,7 @@ class BitbucketWebhookHandler(
             workspaceRepository.save(workspace)
         } else {
             WorkspaceFactory.fromBitbucketWorkspace(
-                actorAccount.identity, SourceProviderWorkspace(
+                actorAccount.id, SourceProviderWorkspace(
                     bitbucketWorkspace.username ?: bitbucketWorkspace.nickname!!,
                     bitbucketWorkspace.displayName,
                     SourceProvider.BITBUCKET
@@ -71,7 +71,7 @@ class BitbucketWebhookHandler(
         val workspace = authenticationFacade.workspace
         val oldName = data.changes.slug.old
         val newName = data.changes.slug.new
-        repositoryRepository.findByNameAndWorkspaceId(oldName, workspace.identity)?.let { repository ->
+        repositoryRepository.findByNameAndWorkspaceId(oldName, workspace.id)?.let { repository ->
             repository.rename(newName)
             repositoryRepository.save(repository)
         }
@@ -80,7 +80,7 @@ class BitbucketWebhookHandler(
     fun changesPushed(changesPushedEvent: ChangesPushed) {
         repositoryRepository.findByNameAndWorkspaceId(
             changesPushedEvent.repository.name,
-            authenticationFacade.workspace.identity
+            authenticationFacade.workspace.id
         )
             ?: return
         changesPushedEvent.push.changes.forEach { change ->

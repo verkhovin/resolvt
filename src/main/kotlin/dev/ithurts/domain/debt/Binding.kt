@@ -1,22 +1,12 @@
 package dev.ithurts.domain.debt
 
-import dev.ithurts.domain.DomainEntity
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import javax.persistence.*
-
-@Entity
 data class Binding(
     var filePath: String,
     var startLine: Int,
     var endLine: Int,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, optional = true)
-    @Fetch(FetchMode.JOIN)
     val advancedBinding: AdvancedBinding?
-) : DomainEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val id: Long? = null
+) {
+    val id: String? = null
 
     fun isAdvanced(): Boolean {
         return advancedBinding != null
@@ -28,7 +18,7 @@ data class Binding(
         this.endLine = if (startLine < endLine) {
             endLine
         } else {
-            log.error("startLine < endLine for binding $id")
+//            log.error("startLine < endLine for binding $id")
             startLine
         }
     }

@@ -4,7 +4,7 @@ import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 
 data class DebtDto(
-    val id: Long,
+    val id: String,
     val title: String,
     val description: String,
     val status: DebtStatus,
@@ -24,7 +24,7 @@ data class DebtDto(
             currentUserVoted: Boolean
         ): DebtDto {
             return DebtDto(
-                debt.identity,
+                debt.id,
                 debt.title,
                 debt.description,
                 debt.status,

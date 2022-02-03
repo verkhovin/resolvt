@@ -36,7 +36,7 @@ class IndexController(
         if (workspaces == null || workspaces.isEmpty()) {
             return "init_dashboard"
         }
-        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as Long
+        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as String
         val workspace = workspaceRepository.findByIdOrNull(workspaceId)!!
         val debts = debtQueryRepository.queryWorkspaceDebts(workspaceId)
             .sortedWith { d1, d2 ->

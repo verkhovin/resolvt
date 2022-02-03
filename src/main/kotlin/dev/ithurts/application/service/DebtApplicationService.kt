@@ -22,25 +22,25 @@ class DebtApplicationService(
     private val authenticationFacade: AuthenticationFacade,
 ) {
     @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
-    fun createDebt(techDebtReport: TechDebtReport, repositoryInfo: RepositoryInfo): Long {
+    fun createDebt(techDebtReport: TechDebtReport, repositoryInfo: RepositoryInfo): String {
         val workspace = workspaceRepository.findBySourceProviderAndExternalId(
             repositoryInfo.sourceProvider,
             repositoryInfo.workspaceExternalId
         ) ?: throw DebtReportFailedException("No organisation found for ${repositoryInfo.workspaceExternalId}")
 
-        val repository = repositoryRepository.findByNameAndWorkspaceId(repositoryInfo.name, workspace.identity)
+        val repository = repositoryRepository.findByNameAndWorkspaceId(repositoryInfo.name, workspace.id)
             ?: repositoryService.acknowledgeExternalRepositoryByWorkspace(workspace, repositoryInfo.name).let {
                 repositoryRepository.save(it)
             }
 
-        val debt = repository.reportDebt(techDebtReport, authenticationFacade.account.identity)
-        return debtRepository.save(debt).identity
+        val debt = repository.reportDebt(techDebtReport, authenticationFacade.account.id)
+        return debtRepository.save(debt).id
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
-    fun edit(debtId: Long, changes: DebtEditForm) {
+    fun edit(debtId: String, changes: DebtEditForm) {
         val (start, end) = changes.linesSpec.split(':', limit = 2).map { it.toInt() }
-        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId.toString())
+        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
         debt.update(
             changes.title,
             changes.description,
@@ -53,16 +53,16 @@ class DebtApplicationService(
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
-    fun vote(debtId: Long) {
-        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId.toString())
-        debt.vote(authenticationFacade.account.identity)
+    fun vote(debtId: String) {
+        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
+        debt.vote(authenticationFacade.account.id)
         debtRepository.save(debt)
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
-    fun downVote(debtId: Long) {
-        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId.toString())
-        debt.downVote(authenticationFacade.account.identity)
+    fun downVote(debtId: String) {
+        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
+        debt.downVote(authenticationFacade.account.id)
         debtRepository.save(debt)
     }
 

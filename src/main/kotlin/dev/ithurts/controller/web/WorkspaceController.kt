@@ -21,7 +21,7 @@ class WorkspaceController(
 ) {
     @GetMapping("/invite")
     fun memberInvitePage(model: Model, httpSession: HttpSession) = "organisation/invite".apply {
-        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as Long
+        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as String
         val org = workspaceRepository.findByIdOrNull(workspaceId)
         model.addAttribute("org", org)
         model.addAttribute("memberInvitationRequest", MemberInvitationRequest(""))
@@ -30,7 +30,7 @@ class WorkspaceController(
     @GetMapping("{id}/select")
     fun selectCurrentOrganisation(
         @AuthenticationPrincipal authentication: AuthenticatedOAuth2User,
-        @PathVariable id: Long,
+        @PathVariable id: String,
         session: HttpSession
     ): String {
         val workspace = workspaceRepository.findByIdOrNull(id)!!
@@ -46,7 +46,7 @@ class WorkspaceController(
         httpSession: HttpSession
     ): String {
         workspaceApplicationService.addMemberByEmail(
-            httpSession.getAttribute("currentOrganisation.id") as Long,
+            httpSession.getAttribute("currentOrganisation.id") as String,
             memberInvitationRequest.email
         )
         return "redirect:/dashboard"

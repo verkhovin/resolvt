@@ -1,13 +1,8 @@
 package dev.ithurts.domain.workspace
 
-import javax.persistence.*
-
-@Embeddable
 class WorkspaceMember(
-    val accountId: Long,
-    @Enumerated(EnumType.STRING)
+    val accountId: String,
     val role: WorkspaceMemberRole,
-    @Enumerated(EnumType.STRING)
     val status: WorkspaceMemberStatus
 ) {
     val isActive: Boolean

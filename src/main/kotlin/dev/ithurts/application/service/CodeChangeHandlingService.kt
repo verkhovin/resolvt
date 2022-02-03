@@ -68,8 +68,8 @@ class CodeChangeHandlingService(
 
     private fun debtsForChangedFiles(parsedDiffs: List<Diff>): List<Debt> {
         val changedFilePaths = parsedDiffs.map { trimDiffFilepath(it.fromFileName) }
-        return debtRepository.findByWorkspaceIdAndFilePaths(
-            integrationAuthenticationFacade.workspace.identity,
+        return debtRepository.findByWorkspaceIdAndBindingsFilePathInAndStatusNot(
+            integrationAuthenticationFacade.workspace.id,
             changedFilePaths
         )
     }

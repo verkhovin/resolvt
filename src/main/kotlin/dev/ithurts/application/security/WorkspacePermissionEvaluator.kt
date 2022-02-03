@@ -7,7 +7,6 @@ import dev.ithurts.domain.workspace.Workspace
 import dev.ithurts.domain.workspace.WorkspaceMember
 import dev.ithurts.domain.workspace.WorkspaceMemberRole
 import dev.ithurts.domain.workspace.WorkspaceMemberRole.*
-import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.security.access.PermissionEvaluator
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
@@ -31,8 +30,8 @@ class WorkspacePermissionEvaluator(
         val requiredRole = valueOf(permission as String)
         val accountId = when (val principal = authentication.principal) {
             is AuthenticatedOAuth2User -> principal.accountId
-            is Account -> principal.identity
-            is Workspace -> return target == principal.identity
+            is Account -> principal.id
+            is Workspace -> return target == principal.id
             else -> return false
         }
         return when (targetType) {
@@ -45,20 +44,20 @@ class WorkspacePermissionEvaluator(
 
     private fun evaluatePermissionToDebt(
         target: Serializable,
-        accountId: Long,
+        accountId: String,
         requiredRole: WorkspaceMemberRole
     ): Boolean {
-        val member = permissionQueryRepository.getWorkspaceMemberByDebtId(target as Long, accountId) ?: return false
+        val member = permissionQueryRepository.getWorkspaceMemberByDebtId(target as String, accountId) ?: return false
         return checkMemberPermission(member, requiredRole)
     }
 
     private fun evaluatePermissionToRepository(
         target: Serializable,
-        accountId: Long,
+        accountId: String,
         requiredRole: WorkspaceMemberRole
     ): Boolean {
         when (target) {
-            is Long -> {
+            is String -> {
                 val member =
                     permissionQueryRepository.getWorkspaceMemberByRepositoryId(target, accountId) ?: return false
                 return checkMemberPermission(member, requiredRole)
@@ -79,10 +78,10 @@ class WorkspacePermissionEvaluator(
 
     private fun evaluatePermissionToWorkspace(
         targetId: Serializable,
-        accountId: Long,
+        accountId: String,
         requiredRole: WorkspaceMemberRole
     ): Boolean {
-        val member = permissionQueryRepository.getWorkspaceMemberByWorkspaceId(targetId as Long, accountId) ?: return false
+        val member = permissionQueryRepository.getWorkspaceMemberByWorkspaceId(targetId as String, accountId) ?: return false
         return checkMemberPermission(member, requiredRole)
     }
 }

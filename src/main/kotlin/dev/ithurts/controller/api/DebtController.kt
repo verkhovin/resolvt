@@ -1,17 +1,14 @@
 package dev.ithurts.controller.api
 
-import dev.ithurts.application.dto.ItHurtsError
 import dev.ithurts.application.dto.TechDebtReport
 import dev.ithurts.application.dto.debt.DebtDto
 import dev.ithurts.application.query.DebtQueryRepository
 import dev.ithurts.application.service.DebtApplicationService
 import dev.ithurts.application.service.RepositoryInfo
 import dev.ithurts.application.service.RepositoryInfoService
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
-import javax.persistence.NoResultException
 
 @RestController
 @RequestMapping("api/debts")
@@ -35,24 +32,24 @@ class DebtController(
     }
 
     @PostMapping("/{debtId}/vote")
-    fun vote(@PathVariable debtId: Long): ResponseEntity<Any> {
+    fun vote(@PathVariable debtId: String): ResponseEntity<Any> {
         debtApplicationService.vote(debtId)
         return ResponseEntity.ok().build()
     }
 
     @PostMapping("/{debtId}/downVote")
-    fun downVote(@PathVariable debtId: Long): ResponseEntity<Any> {
+    fun downVote(@PathVariable debtId: String): ResponseEntity<Any> {
         debtApplicationService.downVote(debtId)
         return ResponseEntity.ok().build()
     }
 
-    @ExceptionHandler(NoResultException::class)
-    fun handleNoResult(): ResponseEntity<ItHurtsError> {
-        return ResponseEntity(
-            ItHurtsError(
-                "not_accessible_entity", "We failed to find what you are looking for. " +
-                        "The entity either does not exist or you have lack of access"
-            ), HttpStatus.NOT_FOUND
-        )
-    }
+//    @ExceptionHandler(NoResultException::class)
+//    fun handleNoResult(): ResponseEntity<ItHurtsError> {
+//        return ResponseEntity(
+//            ItHurtsError(
+//                "not_accessible_entity", "We failed to find what you are looking for. " +
+//                        "The entity either does not exist or you have lack of access"
+//            ), HttpStatus.NOT_FOUND
+//        )
+//    }
 }
