@@ -78,11 +78,10 @@ class BitbucketWebhookHandler(
     }
 
     fun changesPushed(changesPushedEvent: ChangesPushed) {
-        repositoryRepository.findByNameAndWorkspaceId(
+        val repository = repositoryRepository.findByNameAndWorkspaceId(
             changesPushedEvent.repository.name,
             authenticationFacade.workspace.id
-        )
-            ?: return
+        ) ?: return
         changesPushedEvent.push.changes.forEach { change ->
             val diffSpec = "${change.new.target.hash}..${change.old.target.hash}"
             val diff = sourceProviderCommunicationService.getDiff(
@@ -94,6 +93,7 @@ class BitbucketWebhookHandler(
                 diff,
                 PushInfo(
                     change.new.target.hash,
+                    repository.id,
                     changesPushedEvent.repository.workspace.slug,
                     changesPushedEvent.repository.name
                 )

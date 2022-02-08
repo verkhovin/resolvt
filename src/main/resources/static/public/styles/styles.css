@@ -1,3 +1,7 @@
+a {
+    text-decoration: none;
+}
+
 nav {
     /*background-color: #ffe5e5;*/
 }
@@ -45,4 +49,24 @@ h2 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.binding {
+    border: 1px solid #ddd;
+}
+
+.binding-link {
+    text-decoration: none;
+}
+
+.code-line {
+    background-color: #ecedf0;
+    padding: 3px;
+}
+
+@media (min-width: 1320px) {
+    .screen-margins {
+        margin-left: 7rem !important;
+        margin-right: 7rem !important;
+    }
 }

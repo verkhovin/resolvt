@@ -5,6 +5,7 @@ import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 import org.bson.codecs.pojo.annotations.BsonId
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.Instant
 
 @Document(collection = "repositories")
 data class Repository(
@@ -21,7 +22,7 @@ data class Repository(
         name = newName
     }
 
-    fun reportDebt(techDebtReport: TechDebtReport, reportedByAccountId: String): Debt {
+    fun reportDebt(techDebtReport: TechDebtReport, reportedByAccountId: String, instant: Instant): Debt {
         return Debt(
             techDebtReport.title,
             techDebtReport.description,
@@ -29,7 +30,8 @@ data class Repository(
             reportedByAccountId,
             this.id,
             workspaceId,
-            techDebtReport.bindings.map { it.toDomain() }.toMutableList()
+            techDebtReport.bindings.map { it.toDomain() }.toMutableList(),
+            instant
         ).also { it.vote(reportedByAccountId) }
     }
 }

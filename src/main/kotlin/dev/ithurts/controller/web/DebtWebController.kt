@@ -4,6 +4,7 @@ import dev.ithurts.application.query.DebtQueryRepository
 import dev.ithurts.application.service.DebtApplicationService
 import dev.ithurts.controller.web.page.DebtEditForm
 import dev.ithurts.controller.web.page.DebtEditPage
+import dev.ithurts.controller.web.page.DebtPage
 import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -20,17 +21,20 @@ class DebtWebController(
     private val debtQueryRepository: DebtQueryRepository,
     private val workspaceRepository: WorkspaceRepository
 ) {
-    @PostMapping("/{debtId}/vote")
-    fun vote(@PathVariable debtId: String): ResponseEntity<Any> {
-        debtApplicationService.vote(debtId)
-        return ResponseEntity.ok().build()
+
+    @GetMapping("/{id}")
+    fun debtPage(@PathVariable id: String, model: Model, httpSession: HttpSession): String {
+        val debt = debtQueryRepository.queryDebtDetails(id)
+        val page = DebtPage(debt)
+        model.addAttribute("page", page)
+
+        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as String
+        val workspace = workspaceRepository.findByIdOrNull(workspaceId)!!
+        model.addAttribute("org", workspace) // TODO <--- to parent class
+
+        return "debts/debt"
     }
 
-    @PostMapping("/{debtId}/downVote")
-    fun downVote(@PathVariable debtId: String): ResponseEntity<Any> {
-        debtApplicationService.downVote(debtId)
-        return ResponseEntity.ok().build()
-    }
 
     @GetMapping("/{debtId}/edit")
     fun editPage(@PathVariable debtId: String, model: Model, httpSession: HttpSession): String {
@@ -44,6 +48,18 @@ class DebtWebController(
         model.addAttribute("org", workspace) // TODO <--- to parent class
 
         return "debts/edit"
+    }
+
+    @PostMapping("/{debtId}/vote")
+    fun vote(@PathVariable debtId: String): ResponseEntity<Any> {
+        debtApplicationService.vote(debtId)
+        return ResponseEntity.ok().build()
+    }
+
+    @PostMapping("/{debtId}/downVote")
+    fun downVote(@PathVariable debtId: String): ResponseEntity<Any> {
+        debtApplicationService.downVote(debtId)
+        return ResponseEntity.ok().build()
     }
 
     @PostMapping("/{debtId}/edit")

@@ -2,6 +2,7 @@ package dev.ithurts.domain.debt
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.Instant
 
 @Document(collection = "debts")
 data class Debt(
@@ -12,6 +13,8 @@ data class Debt(
     val repositoryId: String,
     val workspaceId: String,
     val bindings: MutableList<Binding>,
+    val createdAt: Instant,
+    var updatedAt: Instant = createdAt,
     val votes: MutableList<DebtVote> = mutableListOf(),
     var resolutionReason: ResolutionReason? = null,
     @BsonId
@@ -20,31 +23,14 @@ data class Debt(
     val id: String
         get() = _id!!
 
-    /// TODO REMOVE
-    var startLine: Int
-        get() = bindings.first().startLine
-        set(value) {
-            bindings.first().startLine = value
-        }
-    var endLine: Int
-        get() = bindings.first().endLine
-        set(value) {
-            bindings.first().endLine = value
-        }
-    var filePath: String
-        get() = bindings.first().filePath
-        set(value) {
-            bindings.first().filePath = value
-        }
-    ///
-
     fun update(
         title: String,
         description: String,
         status: DebtStatus,
         filePath: String,
         startLine: Int,
-        endLine: Int
+        endLine: Int,
+        updatedAt: Instant
     ) {
         if (status == DebtStatus.PROBABLY_RESOLVED) {
             throw IllegalArgumentException("${DebtStatus.PROBABLY_RESOLVED} can't be set by manual update")
@@ -52,22 +38,13 @@ data class Debt(
         this.title = title
         this.description = description
         this.status = status
+        this.updatedAt = updatedAt
         val binding = this.bindings[0].copy(
             filePath = filePath,
             startLine = startLine,
             endLine = endLine,
         )
         bindings[0] = binding
-    }
-
-    fun updateBinding(id: String, filePath: String, startLine: Int, endLine: Int) {
-        val binding = bindings.find { it.id == id } ?: return
-        val newBinding = binding.copy(
-            filePath = filePath,
-            startLine = startLine,
-            endLine = endLine,
-        )
-        bindings[bindings.indexOf(binding)] = newBinding
     }
 
     fun vote(accountId: String) {

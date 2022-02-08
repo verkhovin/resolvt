@@ -3,6 +3,7 @@ package dev.ithurts
 import dev.ithurts.domain.debt.Binding
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
+import java.time.Instant
 
 fun debtMock(startLine: Int, endLine: Int): Debt {
     return Debt(
@@ -13,6 +14,6 @@ fun debtMock(startLine: Int, endLine: Int): Debt {
         "1",
         "1",
         mutableListOf(Binding("src/main/java/ru/verkhovin/poker/model/Room.java", startLine, endLine, null)),
-
+        createdAt = Instant.now(),
     )
 }

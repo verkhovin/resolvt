@@ -12,6 +12,7 @@ import dev.ithurts.exception.EntityNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
+import java.time.Clock
 
 @Service
 class DebtApplicationService(
@@ -20,6 +21,7 @@ class DebtApplicationService(
     private val workspaceRepository: WorkspaceRepository,
     private val repositoryRepository: RepositoryRepository,
     private val authenticationFacade: AuthenticationFacade,
+    private val clock: Clock,
 ) {
     @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
     fun createDebt(techDebtReport: TechDebtReport, repositoryInfo: RepositoryInfo): String {
@@ -33,7 +35,7 @@ class DebtApplicationService(
                 repositoryRepository.save(it)
             }
 
-        val debt = repository.reportDebt(techDebtReport, authenticationFacade.account.id)
+        val debt = repository.reportDebt(techDebtReport, authenticationFacade.account.id, clock.instant())
         return debtRepository.save(debt).id
     }
 
@@ -47,7 +49,8 @@ class DebtApplicationService(
             changes.status!!,
             changes.filePath,
             start,
-            end
+            end,
+            clock.instant()
         )
         debtRepository.save(debt)
     }

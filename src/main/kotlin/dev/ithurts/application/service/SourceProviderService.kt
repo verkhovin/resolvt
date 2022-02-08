@@ -3,6 +3,7 @@ package dev.ithurts.application.service
 import dev.ithurts.domain.SourceProvider
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.application.security.AuthenticationFacade
+import dev.ithurts.domain.debt.Binding
 import dev.ithurts.domain.repository.Repository
 import org.springframework.stereotype.Service
 
@@ -16,10 +17,16 @@ class SourceProviderService(
         }
     }
 
-    fun getSourceUrl(debt: Debt, repositoryName: String, mainBranch: String, workspaceExternalId: String): String {
+    fun getSourceUrl(binding: Binding, repositoryName: String, mainBranch: String, workspaceExternalId: String): String {
         return when (authenticationFacade.account.sourceProvider) {
             SourceProvider.BITBUCKET -> "https://bitbucket.org/${workspaceExternalId}/${repositoryName}/src/${mainBranch}/" +
-                    "${debt.bindings[0].filePath}#lines-${debt.bindings[0].startLine}:${debt.bindings[0].endLine}"
+                    "${binding.filePath}#lines-${binding.startLine}:${binding.endLine}"
+        }
+    }
+
+    fun getCommitUrl(repositoryName: String, commitHash: String, workspaceExternalId: String): String {
+        return when (authenticationFacade.account.sourceProvider) {
+            SourceProvider.BITBUCKET -> "https://bitbucket.org/${workspaceExternalId}/${repositoryName}/commits/${commitHash}"
         }
     }
 }
