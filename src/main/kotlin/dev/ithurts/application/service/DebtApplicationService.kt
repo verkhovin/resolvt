@@ -9,6 +9,7 @@ import dev.ithurts.domain.repository.RepositoryRepository
 import dev.ithurts.domain.debt.DebtRepository
 import dev.ithurts.domain.repository.RepositoryService
 import dev.ithurts.exception.EntityNotFoundException
+import dev.ithurts.external.ArchiveService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -21,6 +22,7 @@ class DebtApplicationService(
     private val workspaceRepository: WorkspaceRepository,
     private val repositoryRepository: RepositoryRepository,
     private val authenticationFacade: AuthenticationFacade,
+    private val archiveService: ArchiveService,
     private val clock: Clock,
 ) {
     @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
@@ -41,15 +43,11 @@ class DebtApplicationService(
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun edit(debtId: String, changes: DebtEditForm) {
-        val (start, end) = changes.linesSpec.split(':', limit = 2).map { it.toInt() }
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
         debt.update(
             changes.title,
             changes.description,
-            changes.status!!,
-            changes.filePath,
-            start,
-            end,
+            changes.status,
             clock.instant()
         )
         debtRepository.save(debt)
@@ -67,6 +65,12 @@ class DebtApplicationService(
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
         debt.downVote(authenticationFacade.account.id)
         debtRepository.save(debt)
+    }
+    @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
+    fun deleteDebt(debtId: String) {
+        val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
+        archiveService.archiveDebt(debt)
+        debtRepository.delete(debt)
     }
 
 }

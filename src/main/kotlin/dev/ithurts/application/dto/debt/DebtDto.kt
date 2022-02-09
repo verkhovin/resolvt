@@ -2,7 +2,9 @@ package dev.ithurts.application.dto.debt
 
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 data class DebtDto(
     val id: String,
@@ -14,18 +16,19 @@ data class DebtDto(
     val endLine: Int, //TODO MVP REMOVED
     val votes: Int,
     val voted: Boolean,
-    val sourceLink: SourceLink, //TODO MVP REMOVED
     val repository: DebtRepositoryDto,
     val reporter: DebtAccountDto,
-    val cost: Int = 0, // TODO MVP
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val cost: Int
 ) {
     companion object {
         fun from(
             debt: Debt,
-            sourceLink: SourceLink,
             repository: DebtRepositoryDto,
             reporter: DebtAccountDto,
-            currentUserVoted: Boolean
+            currentUserVoted: Boolean,
+            cost: Int,
         ): DebtDto {
             return DebtDto(
                 debt.id,
@@ -37,9 +40,11 @@ data class DebtDto(
                 debt.bindings[0].endLine,
                 debt.votes.size,
                 currentUserVoted,
-                sourceLink,
                 repository,
                 reporter,
+                debt.createdAt,
+                debt.updatedAt,
+                cost
             )
         }
     }

@@ -9,16 +9,12 @@ data class DebtEditPage(
     val form = DebtEditForm(
         debt.title,
         debt.description,
-        debt.status,
-        debt.filePath,
-        "${debt.startLine}:${debt.endLine}"
+        debt.status
     )
 }
 
 data class DebtEditForm(
     val title: String,
     val description: String,
-    var status: DebtStatus?, // Null if status dropdown is disabled, should be set by chosen action
-    val filePath: String,
-    val linesSpec: String
+    var status: DebtStatus
 )

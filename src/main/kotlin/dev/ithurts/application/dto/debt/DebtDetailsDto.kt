@@ -7,26 +7,22 @@ import java.time.ZoneOffset
 data class DebtDetailsDto(
     val debt: DebtDto,
     val bindings: List<BindingDto>,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
-    val commits: List<CommitEventsDto>
+    val events: List<DebtEventDto>
 ) {
     companion object {
         fun from(
             debt: Debt,
-            sourceLink: SourceLink,
+            debtCost: Int,
             bindings: List<BindingDto>,
             repository: DebtRepositoryDto,
             reporter: DebtAccountDto,
             currentUserVoted: Boolean,
-            bindingEventsByCommitHash: List<CommitEventsDto>
+            events: List<DebtEventDto>
         ): DebtDetailsDto {
             return DebtDetailsDto(
-                DebtDto.from(debt, sourceLink, repository, reporter, currentUserVoted),
+                DebtDto.from(debt, repository, reporter, currentUserVoted, debtCost),
                 bindings,
-                LocalDateTime.ofInstant(debt.createdAt, ZoneOffset.UTC),
-                LocalDateTime.ofInstant(debt.updatedAt, ZoneOffset.UTC),
-                bindingEventsByCommitHash
+                events
             )
         }
     }

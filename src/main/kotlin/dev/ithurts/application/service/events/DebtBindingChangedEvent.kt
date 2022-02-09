@@ -5,13 +5,13 @@ import org.springframework.context.ApplicationEvent
 class DebtBindingChangedEvent (
     source: Any,
     val debtId: String,
-    val bindingId: String,
     val repositoryId: String,
     val commitHash: String,
     val changes: List<Change>
 ): ApplicationEvent(source)
 
 class Change(
+    val bindingId: String,
     val type: ChangeType,
     val from: String?,
     val to: String?

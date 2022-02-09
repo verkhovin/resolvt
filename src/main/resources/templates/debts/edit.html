@@ -5,25 +5,14 @@
 <div layout:fragment="main" th:with="debt=${page.debt}">
     <div class="row mt-3 mt-lg-3 align-items-center">
         <div class="col-md-12 ">
-            <p class="text-muted">
-                <span th:text="${debt.repository.name}"></span> /
-                <a th:href="${debt.sourceLink.url}"
-                   target="_blank"
-                   class="text-muted"
-                   th:text="${debt.sourceLink.text}"></a>
-            </p>
             <form action=# th:action="@{/debts/{id}/edit(id=${debt.id})}" method="post" th:object=${form}
                   class="row g-3">
                 <div class="col-10">
                     <input th:field="*{title}" type="text" class="form-control" id="Title" placeholder="Title">
                 </div>
                 <div class="col-md-2">
-                    <select th:field="*{status}" id="status" class="form-select"
-                            th:disabled="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}">
+                    <select th:field="*{status}" id="status" class="form-select">
                         <option th:value="${T(dev.ithurts.domain.debt.DebtStatus).OPEN}">Open</option>
-                        <option th:if="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}" th:value="${T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}">Probably
-                            resolved
-                        </option>
                         <option th:value="${T(dev.ithurts.domain.debt.DebtStatus).RESOLVED}">Resolved</option>
                     </select>
                 </div>
@@ -31,28 +20,8 @@
                     <textarea th:field="*{description}" class="form-control" id="Description"
                               placeholder="Description" rows="20"></textarea>
                 </div>
-                <div class="col-md-11">
-                    <input th:field="*{filePath}" type="text" class="form-control" id="filePath">
-                </div>
-                <div class="col-md-1">
-                    <input th:field="*{linesSpec}" type="text" id="lineSpec" class="form-control">
-                </div>
-                <!--                <div class="col-md-9"></div>-->
-                <div th:if="${debt.status != T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}"
-                     class="col-md-12 text-end">
+                <div class="col-md-12 text-end">
                     <button type="submit" class="btn btn-outline-primary" name="action" value="save">Save</button>
-                </div>
-                <div th:if="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}" class="col-md-8">
-                </div>
-                <div th:if="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}" class="col-md-2 text-end">
-                    <button type="submit" class="btn btn-outline-warning w-100" name="action" value="leave_open">Leave
-                        Open & Save
-                    </button>
-                </div>
-                <div th:if="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}" class="col-md-2 text-end">
-                    <button type="submit" class="btn btn-outline-success w-100" name="action" value="resolve">Resolve &
-                        Save
-                    </button>
                 </div>
             </form>
         </div>

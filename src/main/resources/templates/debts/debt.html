@@ -3,7 +3,7 @@
       layout:decorate="~{layout}">
 <body>
 <div layout:fragment="main"
-     th:with="debt=${page.details.debt}, bindings=${page.details.bindings}, commits=${page.details.commits}">
+     th:with="debt=${page.details.debt}, bindings=${page.details.bindings}, events=${page.details.events}">
     <div class="row mt-3 mt-lg-3 screen-margins">
         <!-- Content -->
         <div class="col-md-9">
@@ -21,7 +21,7 @@
                     </h4>
                 </div>
                 <div class="col-md-2 text-end pe-5">
-                    <p class="text-muted"> Cost: <b>35</b></p>
+                    <p class="text-muted"> Cost: <b th:text="${debt.cost}"></b></p>
                 </div>
             </div>
             <p class="fw-bold mb-0">Description</p>
@@ -30,38 +30,49 @@
             <!-- Bindings -->
             <p class="fw-bold mt-3 mb-0">Bindings</p>
             <div class="mt-3">
-                <div th:each="binding:${bindings}" class="row m-1 p-3 binding shadow-sm p-3 bg-white">
-                    <a class="binding-link" target="_blank" th:href="${binding.sourceLink.url}">
+                <div th:each="binding:${bindings}" class="row">
+                    <a class="binding-link m-1 p-3 binding shadow-sm p-3" target="_blank" th:href="${binding.sourceLink.url}">
                         <div class="row">
                             <div class="col-1">
                                 <i class="bi" th:classappend="${@frontendUtil.getIconClassBasedOnBinding(binding)}"
                                    style="font-size: 2em;"></i>
                             </div>
                             <div class="col-11">
-                                <p class="m-0" th:text="${binding.fullName()}"></p>
+                                <p th:if="${!binding.isAdvanced()}" class="mb-0">
+                                    Source code: <span th:text="${binding.lines()}"></span>
+                                </p>
+                                <p th:if="${binding.isAdvanced()}" class="mb-0">
+                                    <span th:text="${binding.type()}"></span>
+                                    <span class="code-line rounded" th:text="${binding.fullName()}"></span>
+                                </p>
                                 <p class="m-0 text-muted" th:text="${binding.filePath}"></p>
                             </div>
                         </div>
                     </a>
+                    <a th:href="@{/debts/{debtId}/{bindingId}/edit(debtId=${debt.id}, bindingId=${binding.id})}"
+                       class="btn btn-sm btn-outline-primary m-1">Edit</a>
                 </div>
             </div>
 
             <!-- Events -->
             <p class="fw-bold mb-0 mt-4">Events</p>
-            <div th:each="commit: ${commits}" class="row">
+            <div th:each="event: ${events}" class="row event-row mb-1">
                 <div class="col-md-2">
-                    <a th:href="${commit.commitUrl}" th:text="${#strings.substring(commit.commitHash, 0, 8)}" target="_blank"></a>
+                    <a th:href="${event.commitUrl}" th:text="${#strings.substring(event.commitHash, 0, 8)}" target="_blank"></a>
                 </div>
                 <div  class="col-md-10 ">
-                    <div th:each="event: ${commit.events}" >
+                    <div th:each="change: ${event.changes}" >
 
-                        <p th:if="${!event.binding.isAdvanced()}" class="mb-0">
-                            Source code: <span th:text="${event.binding.lines()}"></span>
+                        <p th:if="${!change.binding.isAdvanced()}" class="mb-0">
+                            Source code: <span th:text="${change.binding.lines()}"></span>
+                            <span th:text="${change.type.title}"></span>
                         </p>
-                        <p th:if="${event.binding.isAdvanced()}" class="mb-0">
-                            <span th:text="${event.binding.type()}"></span>
-                            <span class="code-line rounded" th:text="${event.binding.fullName()}"></span>
+                        <p th:if="${change.binding.isAdvanced()}" class="mb-0">
+                            <span th:text="${change.binding.type()}"></span>
+                            <span class="code-line rounded" th:text="${change.binding.fullName()}"></span>
+                            <span th:text="${change.type.title}"></span>
                         </p>
+                        <p th:if="${change.from != null || change.to !=null}" th:text="${change.from} ?: '' + ' → ' + ${change.to}" class="text-muted m-0" ></p>
                     </div>
                 </div>
             </div>
@@ -73,7 +84,7 @@
                     <a th:href="@{/debts/{id}/edit(id=${debt.id})}" class="btn btn-light">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a th:href="@{/debts/{id}/edit(id=${debt.id})}" class="btn btn-light">
+                    <a th:href="@{/debts/{id}/delete(id=${debt.id})}" class="btn btn-light">
                         <i class="bi bi-trash"></i>
                     </a>
                 </div>
@@ -108,7 +119,7 @@
                     <p>Created</p>
                 </div>
                 <div class="col-6">
-                    <p>07.02.2022 19:20</p>
+                    <p class="date" th:text="${debt.createdAt}"></p>
                 </div>
             </div>
             <div class="row">
@@ -116,7 +127,7 @@
                     <p>Updated</p>
                 </div>
                 <div class="col-6">
-                    <p>07.02.2022 19:20</p>
+                    <p class="date" th:text="${debt.updatedAt}">
                 </div>
             </div>
             <div class="row">

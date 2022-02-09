@@ -34,22 +34,22 @@ class CodeChangeHandlingService(
         val debtsForChangedFiles = debtsForChangedFiles(parsedDiffs)
         val filePathToDiffs: Map<String, List<Diff>> = parsedDiffs.groupBy { trimDiffFilepath(it.fromFileName) }
         debtsForChangedFiles.forEach { debt ->
-            applyDiffs(debt, filePathToDiffs, pushInfo)
+            val changes = applyDiffs(debt, filePathToDiffs, pushInfo)
+            applicationEventPublisher.publishEvent(
+                debt.eventForChanges(changes, pushInfo.commitHash)
+            )
             debtRepository.save(debt)
         }
     }
 
-    private fun applyDiffs(debt: Debt, diffsByFile: Map<String, List<Diff>>, pushInfo: PushInfo) {
-        debt.bindings.forEach { binding ->
-            val changes = if (binding.isAdvanced()) {
+    private fun applyDiffs(debt: Debt, diffsByFile: Map<String, List<Diff>>, pushInfo: PushInfo): List<Change> {
+        return debt.bindings.map { binding ->
+            if (binding.isAdvanced()) {
                 advancedBindingAdjustmentService.adjustBinding(binding, diffsByFile, pushInfo)
             } else {
                 adjustBasicBinding(binding, diffsByFile)
             }
-            if (changes.isNotEmpty()) {
-                sendBindingChangedEvent(debt, binding, pushInfo, changes)
-            }
-        }
+        }.flatten()
     }
 
     /**
@@ -76,25 +76,6 @@ class CodeChangeHandlingService(
         return debtRepository.findByWorkspaceIdAndBindingsFilePathInAndStatusNot(
             integrationAuthenticationFacade.workspace.id,
             changedFilePaths
-        )
-    }
-
-
-    private fun sendBindingChangedEvent(
-        debt: Debt,
-        binding: Binding,
-        pushInfo: PushInfo,
-        changes: List<Change>
-    ) {
-        applicationEventPublisher.publishEvent(
-            DebtBindingChangedEvent(
-                this,
-                debt.id,
-                binding.id,
-                pushInfo.repositoryId,
-                pushInfo.commitHash,
-                changes
-            )
         )
     }
 

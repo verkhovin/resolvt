@@ -1,5 +1,8 @@
 package dev.ithurts.domain.debt
 
+import dev.ithurts.application.service.events.Change
+import dev.ithurts.application.service.events.ChangeType
+import dev.ithurts.application.service.events.DebtBindingChangedEvent
 import org.bson.codecs.pojo.annotations.BsonId
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
@@ -27,9 +30,6 @@ data class Debt(
         title: String,
         description: String,
         status: DebtStatus,
-        filePath: String,
-        startLine: Int,
-        endLine: Int,
         updatedAt: Instant
     ) {
         if (status == DebtStatus.PROBABLY_RESOLVED) {
@@ -39,12 +39,6 @@ data class Debt(
         this.description = description
         this.status = status
         this.updatedAt = updatedAt
-        val binding = this.bindings[0].copy(
-            filePath = filePath,
-            startLine = startLine,
-            endLine = endLine,
-        )
-        bindings[0] = binding
     }
 
     fun vote(accountId: String) {
@@ -61,19 +55,20 @@ data class Debt(
 
     fun accountVoted(accountId: String) = this.votes.contains(DebtVote(accountId))
 
-    fun codeDeleted() {
-        status = DebtStatus.PROBABLY_RESOLVED
-        resolutionReason = ResolutionReason.CODE_DELETED
-    }
-
-    fun partlyChanged() {
-        status = DebtStatus.PROBABLY_RESOLVED
-        resolutionReason = ResolutionReason.PARTLY_CHANGED
-    }
-
-    fun manuallyResolved() {
-        status = DebtStatus.RESOLVED
-        resolutionReason = ResolutionReason.MANUAL
+    fun eventForChanges(changes: List<Change>, commitHash: String): DebtBindingChangedEvent {
+        val movedBindingIds = changes.filter { it.type == ChangeType.MOVED }.map { it.bindingId }
+        val acceptedChanges = if (movedBindingIds == this.bindings.map { it.id }) {
+            changes.filter { it.type != ChangeType.MOVED }
+        } else {
+            changes
+        }
+        return DebtBindingChangedEvent(
+            this,
+            id,
+            repositoryId,
+            commitHash,
+            acceptedChanges
+        )
     }
 }
 

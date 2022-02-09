@@ -2,10 +2,10 @@ package dev.ithurts.controller.web
 
 import dev.ithurts.application.query.DebtQueryRepository
 import dev.ithurts.application.service.DebtApplicationService
+import dev.ithurts.controller.web.page.BindingEditPage
 import dev.ithurts.controller.web.page.DebtEditForm
 import dev.ithurts.controller.web.page.DebtEditPage
 import dev.ithurts.controller.web.page.DebtPage
-import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
@@ -50,6 +50,27 @@ class DebtWebController(
         return "debts/edit"
     }
 
+    @GetMapping("/{debtId}/{bindingId}/edit")
+    fun bindingEditPage(@PathVariable debtId: String, @PathVariable bindingId: String, model: Model, httpSession: HttpSession): String {
+        val details = debtQueryRepository.queryDebtDetails(debtId)
+        val page = BindingEditPage(details.debt, details.bindings.first { it.id == bindingId })
+        model.addAttribute("page", page)
+        model.addAttribute("form", page.bindingForm)
+        model.addAttribute("advancedForm", page.advancedBindingEditForm)
+
+        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as String
+        val workspace = workspaceRepository.findByIdOrNull(workspaceId)!!
+        model.addAttribute("org", workspace) // TODO <--- to parent class
+
+        return "debts/edit-binding"
+    }
+
+    @GetMapping("/{debtId}/delete")
+    fun deleteDebt(@PathVariable debtId: String): String {
+        debtApplicationService.deleteDebt(debtId)
+        return "redirect:/dashboard"
+    }
+
     @PostMapping("/{debtId}/vote")
     fun vote(@PathVariable debtId: String): ResponseEntity<Any> {
         debtApplicationService.vote(debtId)
@@ -67,10 +88,6 @@ class DebtWebController(
         @PathVariable debtId: String, @ModelAttribute("form") form: DebtEditForm,
         @RequestParam(value = "action") action: String
     ): String {
-        when(action) {
-            "leave_open" -> form.status = DebtStatus.OPEN
-            "resolve" -> form.status = DebtStatus.RESOLVED
-        }
         debtApplicationService.edit(debtId, form)
         return "redirect:/dashboard"
     }

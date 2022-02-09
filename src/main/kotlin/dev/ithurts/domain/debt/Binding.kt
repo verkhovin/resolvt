@@ -18,10 +18,10 @@ data class Binding(
     fun update(newFilePath: String, coveredCodeHasChanges: Boolean, startLine: Int, endLine: Int): List<Change> {
         val changes = mutableListOf<Change>()
         if (newFilePath != this.filePath) {
-            changes.add(Change(ChangeType.MOVED, this.filePath, newFilePath))
+            changes.add(Change(id, ChangeType.MOVED, this.filePath, newFilePath))
         }
-        if (coveredCodeHasChanges || startLine != this.startLine || endLine != this.endLine) {
-            changes.add(Change(ChangeType.CODE_CHANGED, null, null))
+        if (coveredCodeHasChanges || startLine - endLine != this.startLine - this.endLine) {
+            changes.add(Change(id, ChangeType.CODE_CHANGED, null, null))
         }
 
         this.filePath = newFilePath

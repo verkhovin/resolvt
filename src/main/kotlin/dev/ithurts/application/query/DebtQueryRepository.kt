@@ -4,12 +4,12 @@ import dev.ithurts.application.dto.debt.*
 import dev.ithurts.application.security.AuthenticationFacade
 import dev.ithurts.application.service.RepositoryInfo
 import dev.ithurts.application.service.SourceProviderService
+import dev.ithurts.domain.CostCalculationService
 import dev.ithurts.domain.account.Account
 import dev.ithurts.domain.account.AccountRepository
-import dev.ithurts.domain.bindingevent.BindingEvent
-import dev.ithurts.domain.bindingevent.BindingEventRepository
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtRepository
+import dev.ithurts.domain.debtevent.DebtEvent
 import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.repository.RepositoryRepository
 import dev.ithurts.domain.workspace.Workspace
@@ -25,24 +25,27 @@ class DebtQueryRepository(
     private val workspaceRepository: WorkspaceRepository,
     private val repositoryRepository: RepositoryRepository,
     private val accountRepository: AccountRepository,
-    private val bindingEventRepository: BindingEventRepository,
+    private val debtEventQueryRepository: DebtEventQueryRepository,
     private val sourceProviderService: SourceProviderService,
+    private val costCalculationService: CostCalculationService,
     private val authenticationFacade: AuthenticationFacade,
 ) {
 
     fun queryDebt(debtId: String): DebtDto {
+        val bindingEventsCount = debtEventQueryRepository.countByDebtId(debtId)
         return queryDebt(debtId) { debt, repository, workspace, account ->
             toDto(
                 debt,
                 repository,
                 workspace,
-                account
+                account,
+                costCalculationService.calculateCost(debt, bindingEventsCount)
             )
         }
     }
 
     fun queryDebtDetails(debtId: String): DebtDetailsDto {
-        val events = bindingEventRepository.findByDebtId(debtId)
+        val events = debtEventQueryRepository.findByDebtId(debtId)
         return queryDebt(debtId) { debt, repository, workspace, account ->
             toDetailsDto(
                 debt,
@@ -71,12 +74,15 @@ class DebtQueryRepository(
         val repository = repositoryRepository.findByIdOrNull(repositoryId)!!
         val workspace = workspaceRepository.findByIdOrNull(repository.workspaceId)!!
         val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
+        val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })
         return debts.map { debt ->
             toDto(
                 debt,
                 repository,
                 workspace,
-                accounts.first { acc -> acc.id == debt.creatorAccountId })
+                accounts.first { acc -> acc.id == debt.creatorAccountId },
+                eventsCount[debt.id] ?: 0
+            )
         }
     }
 
@@ -89,12 +95,15 @@ class DebtQueryRepository(
         val repository = repositoryRepository.findByNameAndWorkspaceId(repositoryInfo.name, workspace.id)!!
         val debts = debtRepository.findByRepositoryIdAndStatusNot(repository.id)
         val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
+        val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })
         return debts.map { debt ->
             toDto(
                 debt,
                 repository,
                 workspace,
-                accounts.first { acc -> acc.id == debt.creatorAccountId })
+                accounts.first { acc -> acc.id == debt.creatorAccountId },
+                eventsCount[debt.id] ?: 0
+            )
         }
     }
 
@@ -105,30 +114,25 @@ class DebtQueryRepository(
         val debts = debtRepository.findByWorkspaceIdAndStatusNot(workspace.id)
         val repository = repositoryRepository.findAllById(debts.map { it.repositoryId })
         val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
+        val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })
         return debts.map { debt ->
             toDto(
                 debt,
                 repository.first { repo -> repo.id == debt.repositoryId },
                 workspace,
-                accounts.first { acc -> acc.id == debt.creatorAccountId })
+                accounts.first { acc -> acc.id == debt.creatorAccountId },
+                eventsCount[debt.id] ?: 0
+            )
         }
     }
 
-    private fun toDto(debt: Debt, repo: Repository, workspace: Workspace, reporter: Account?): DebtDto {
+    private fun toDto(debt: Debt, repo: Repository, workspace: Workspace, reporter: Account?, cost: Int): DebtDto {
         return DebtDto.from(
             debt,
-            SourceLink(
-                sourceProviderService.getSourceUrl(
-                    debt.bindings[0],
-                    repo.name,
-                    repo.mainBranch,
-                    workspace.externalId
-                ),
-                getFileName(debt.bindings[0].filePath)
-            ),
             DebtRepositoryDto(repo.name),
             DebtAccountDto(reporter?.name ?: "Unknown"),
-            debt.accountVoted(authenticationFacade.account.id)
+            debt.accountVoted(authenticationFacade.account.id),
+            cost
         )
     }
 
@@ -137,22 +141,14 @@ class DebtQueryRepository(
         repo: Repository,
         workspace: Workspace,
         reporter: Account?,
-        events: List<BindingEvent>
+        events: List<DebtEvent>
     ): DebtDetailsDto {
         val bindingDtos = mapBindings(debt, repo, workspace)
         val eventsDtos = mapBindingEvents(events, bindingDtos, repo, workspace)
 
         return DebtDetailsDto.from(
             debt,
-            SourceLink(
-                sourceProviderService.getSourceUrl(
-                    debt.bindings[0],
-                    repo.name,
-                    repo.mainBranch,
-                    workspace.externalId
-                ),
-                getFileName(debt.bindings[0].filePath)
-            ),
+            costCalculationService.calculateCost(debt, events.size),
             bindingDtos,
             DebtRepositoryDto(repo.name),
             DebtAccountDto(reporter?.name ?: "Unknown"),
@@ -162,26 +158,25 @@ class DebtQueryRepository(
     }
 
     private fun mapBindingEvents(
-        events: List<BindingEvent>,
+        events: List<DebtEvent>,
         bindingDtos: List<BindingDto>,
         repo: Repository,
         workspace: Workspace
-    ) = events.groupBy { it.commitHash }
-        .toList()
-        .sortedWith(Comparator.comparing { it.second[0].createdAt })
-        .map { commit ->
-            CommitEventsDto(
-                commit.first,
-                sourceProviderService.getCommitUrl(repo.name, commit.first, workspace.externalId),
-                commit.second.map { event ->
-                    BindingEventDto(
-                        bindingDtos.first { it.id == event.bindingId },
-                        event.changes.map { ChangeDto(it.type, it.from, it.to) },
-                        event.createdAt
-                    )
-                }
-            )
-        }
+    ) = events.map { event ->
+        DebtEventDto(
+            event.commitHash,
+            sourceProviderService.getCommitUrl(repo.name, event.commitHash, workspace.externalId),
+            event.changes.map { change ->
+                ChangeDto(
+                    bindingDtos.first { it.id == change.bindingId },
+                    ChangeType.valueOf(change.type.toString()),
+                    change.from,
+                    change.to
+                )
+            },
+            event.createdAt
+        )
+    }
 
     private fun mapBindings(
         debt: Debt,

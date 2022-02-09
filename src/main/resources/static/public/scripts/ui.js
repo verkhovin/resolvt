@@ -34,3 +34,9 @@ function vote(id, action, target) {
         }
     });
 }
+
+$(".date").each(function() {
+    const utcDate = $(this).text()
+    $(this).text(new Date(utcDate).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}))
+    //this.replace("qwe")
+})

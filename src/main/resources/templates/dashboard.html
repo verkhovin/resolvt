@@ -28,13 +28,13 @@
                                       th:text="${debt.votes}"></span><span
                                     class="text-muted">people were hurt by this</span>
                             </h6>
-                            <p class="text-muted">
-                                <span th:text="${debt.repository.name}"></span> /
-                                <a th:href="${debt.sourceLink.url}"
-                                   target="_blank"
-                                   class="text-muted"
-                                   th:text="${debt.sourceLink.text}"></a>
-                            </p>
+<!--                            <p class="text-muted">-->
+<!--                                <span th:text="${debt.repository.name}"></span> /-->
+<!--                                <a th:href="${debt.sourceLink.url}"-->
+<!--                                   target="_blank"-->
+<!--                                   class="text-muted"-->
+<!--                                   th:text="${debt.sourceLink.text}"></a>-->
+<!--                            </p>-->
                             <pre class="mb-2" th:text="${debt.description}"></pre>
                             <div class="text-end">
                                 <a th:href="@{/debts/{id}/edit(id=${debt.id})}" class="card-link btn btn-secondary"
