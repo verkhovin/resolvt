@@ -9,6 +9,7 @@ import dev.ithurts.domain.account.Account
 import dev.ithurts.domain.account.AccountRepository
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtRepository
+import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.domain.debtevent.DebtEvent
 import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.repository.RepositoryRepository
@@ -108,10 +109,10 @@ class DebtQueryRepository(
     }
 
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
-    fun queryWorkspaceDebts(workspaceId: String): List<DebtDto> {
+    fun queryWorkspaceDebts(workspaceId: String, resolved: Boolean): List<DebtDto> {
         val workspace = workspaceRepository.findByIdOrNull(workspaceId)
             ?: throw EntityNotFoundException("Workspace", "id", workspaceId)
-        val debts = debtRepository.findByWorkspaceIdAndStatusNot(workspace.id)
+        val debts = debtRepository.findByWorkspaceIdAndStatusNot(workspace.id, if (!resolved) DebtStatus.RESOLVED else DebtStatus.OPEN)
         val repository = repositoryRepository.findAllById(debts.map { it.repositoryId })
         val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
         val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })
@@ -121,14 +122,16 @@ class DebtQueryRepository(
                 repository.first { repo -> repo.id == debt.repositoryId },
                 workspace,
                 accounts.first { acc -> acc.id == debt.creatorAccountId },
-                eventsCount[debt.id] ?: 0
+                costCalculationService.calculateCost(debt, eventsCount[debt.id] ?: 0)
             )
         }
     }
 
     private fun toDto(debt: Debt, repo: Repository, workspace: Workspace, reporter: Account?, cost: Int): DebtDto {
+        val bindingDtos = mapBindings(debt, repo, workspace)
         return DebtDto.from(
             debt,
+            bindingDtos,
             DebtRepositoryDto(repo.name),
             DebtAccountDto(reporter?.name ?: "Unknown"),
             debt.accountVoted(authenticationFacade.account.id),

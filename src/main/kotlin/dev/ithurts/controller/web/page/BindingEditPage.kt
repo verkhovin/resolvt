@@ -14,6 +14,7 @@ data class BindingEditPage(
     )
     val advancedBindingEditForm = if(binding.isAdvanced()) {
         AdvancedBindingEditForm(
+            binding.filePath,
             binding.advancedBinding!!.parent,
             binding.advancedBinding.name,
             binding.advancedBinding.params.joinToString { it }
@@ -23,11 +24,12 @@ data class BindingEditPage(
 
 data class BindingEditForm(
     val path: String,
-    val linespec: String
+    val linespec: String?
 )
 
 data class AdvancedBindingEditForm(
+    val path: String,
     val parent: String?,
-    val name: String,
-    val params: String
+    val name: String?,
+    val params: String?
 )

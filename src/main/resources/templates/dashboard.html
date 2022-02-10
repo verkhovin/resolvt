@@ -5,52 +5,70 @@
 <div layout:fragment="main">
     <div class="row mt-3 mt-lg-3 align-items-center">
         <div class="col-md-12 ">
+            <a th:unless="${resolved}" th:href="@{/dashboard?status=resolved}">See Resolved</a>
+            <a th:if="${resolved}" th:href="@{/dashboard}">See Open</a>
             <h6 th:if="${debts.isEmpty()}" class="text-center">Dashboard is empty for now</h6>
             <p class="text-center"><small th:if="${debts.isEmpty()}"><a target="_blank"
                                                                         href="https://ithurtsdev.github.io/public/">Checkout
                 Getting Started guide</a></small></p>
             <div th:unless="${debts.isEmpty()}">
-                <div th:each="debt : ${debts}">
-                    <div class="card mt-2">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="vote-button bi fa-10x"
-                                   th:data-id="${debt.id}"
-                                   th:data-action="${debt.voted? 'downVote' : 'vote'}"
-                                   th:classappend="${debt.voted ? 'bi-caret-up-fill' : 'bi-caret-up'}"
-                                   th:title="${debt.voted? 'Downvote' : 'Vote'}"
-                                   th:onClick="vote(this.getAttribute('data-id'), this.getAttribute('data-action'), this)"></i>
-                                <a th:href="@{/debts/{id}(id=${debt.id})}"><span th:text="${debt.title}"></span></a></h5>
-                            <h6>
-                                <span class="badge bg-dark"
-                                      th:text="${#strings.replace(debt.status.name, '_', ' ')}"></span>
-                                <span th:id="${debt.id}+'-votes'" class="text-muted ps-2 pe-1"
-                                      th:text="${debt.votes}"></span><span
-                                    class="text-muted">people were hurt by this</span>
-                            </h6>
-<!--                            <p class="text-muted">-->
-<!--                                <span th:text="${debt.repository.name}"></span> /-->
-<!--                                <a th:href="${debt.sourceLink.url}"-->
-<!--                                   target="_blank"-->
-<!--                                   class="text-muted"-->
-<!--                                   th:text="${debt.sourceLink.text}"></a>-->
-<!--                            </p>-->
-                            <pre class="mb-2" th:text="${debt.description}"></pre>
-                            <div class="text-end">
-                                <a th:href="@{/debts/{id}/edit(id=${debt.id})}" class="card-link btn btn-secondary"
-                                   th:if="${debt.status != T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}"><i
-                                        class="bi bi-pencil"></i> Edit</a>
-                                <div>
 
-                                    <a th:href="@{debts/{id}/edit(id=${debt.id})}" class="card-link btn btn-warning"
-                                       th:if="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}">
-                                        <i class="bi bi-exclamation-triangle"></i> Action required
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <table class="table table-light">
+                    <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Bindings</th>
+                        <th scope="col">Votes</th>
+                        <th scope="col">Reported</th>
+                        <th scope="col">Reporter</th>
+                        <th scope="col">Cost</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="debt : ${debts}">
+                        <th scope="row"> <a th:href="@{/debts/{id}(id=${debt.id})}" th:text="${debt.title}"></th>
+                        <td th:text="${debt.bindings.size()}"></td>
+                        <td th:text="${debt.votes}"></td>
+                        <td class="date" th:text="${debt.createdAt}"></td>
+                        <td th:text="${debt.reporter.name}"></td>
+                        <td th:text="${debt.cost}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+<!--                <div th:each="debt : ${debts}">-->
+<!--                    <div class="card mt-2">-->
+<!--                        <div class="card-body">-->
+<!--                            <h5 class="card-title">-->
+<!--                                <i class="vote-button bi fa-10x"-->
+<!--                                   th:data-id="${debt.id}"-->
+<!--                                   th:data-action="${debt.voted? 'downVote' : 'vote'}"-->
+<!--                                   th:classappend="${debt.voted ? 'bi-caret-up-fill' : 'bi-caret-up'}"-->
+<!--                                   th:title="${debt.voted? 'Downvote' : 'Vote'}"-->
+<!--                                   th:onClick="vote(this.getAttribute('data-id'), this.getAttribute('data-action'), this)"></i>-->
+<!--                                <a th:href="@{/debts/{id}(id=${debt.id})}"><span th:text="${debt.title}"></span></a></h5>-->
+<!--                            <h6>-->
+<!--                                <span class="badge bg-dark"-->
+<!--                                      th:text="${#strings.replace(debt.status.name, '_', ' ')}"></span>-->
+<!--                                <span th:id="${debt.id}+'-votes'" class="text-muted ps-2 pe-1"-->
+<!--                                      th:text="${debt.votes}"></span><span-->
+<!--                                    class="text-muted">people were hurt by this</span>-->
+<!--                            </h6>-->
+<!--                            <pre class="mb-2" th:text="${debt.description}"></pre>-->
+<!--                            <div class="text-end">-->
+<!--                                <a th:href="@{/debts/{id}/edit(id=${debt.id})}" class="card-link btn btn-secondary"-->
+<!--                                   th:if="${debt.status != T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}"><i-->
+<!--                                        class="bi bi-pencil"></i> Edit</a>-->
+<!--                                <div>-->
+
+<!--                                    <a th:href="@{debts/{id}/edit(id=${debt.id})}" class="card-link btn btn-warning"-->
+<!--                                       th:if="${debt.status == T(dev.ithurts.domain.debt.DebtStatus).PROBABLY_RESOLVED}">-->
+<!--                                        <i class="bi bi-exclamation-triangle"></i> Action required-->
+<!--                                    </a>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
             </div>
         </div>
     </div>

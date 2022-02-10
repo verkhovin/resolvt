@@ -6,7 +6,6 @@ import java.time.ZoneOffset
 
 data class DebtDetailsDto(
     val debt: DebtDto,
-    val bindings: List<BindingDto>,
     val events: List<DebtEventDto>
 ) {
     companion object {
@@ -20,8 +19,7 @@ data class DebtDetailsDto(
             events: List<DebtEventDto>
         ): DebtDetailsDto {
             return DebtDetailsDto(
-                DebtDto.from(debt, repository, reporter, currentUserVoted, debtCost),
-                bindings,
+                DebtDto.from(debt, bindings, repository, reporter, currentUserVoted, debtCost),
                 events
             )
         }

@@ -61,7 +61,7 @@ data class BindingDto(
             "Function", "Method" ->
                 " ${if (hasParent) "${simpleJvmClassName(advancedBinding.parent)}#" else ""}" +
                         advancedBinding.name +
-                        (if (hasParams) "(${simpleJvmClassName(advancedBinding.params.joinToString())})" else "")
+                        (if (hasParams) "(${advancedBinding.params.map(::simpleJvmClassName).joinToString()})" else "")
             else -> advancedBinding.name
         }
     }

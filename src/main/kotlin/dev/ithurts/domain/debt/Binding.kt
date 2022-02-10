@@ -8,7 +8,7 @@ data class Binding(
     var filePath: String,
     var startLine: Int,
     var endLine: Int,
-    val advancedBinding: AdvancedBinding?,
+    var advancedBinding: AdvancedBinding?,
     val id: String = ObjectId().toString()
 ) {
     fun isAdvanced(): Boolean {
@@ -33,6 +33,12 @@ data class Binding(
         }
 
         return changes
+    }
+
+    fun updateAdvancedManually(path: String, parent: String?, name: String, params: List<String>) {
+        val advancedBinding = this.advancedBinding ?: throw IllegalStateException("Binding is not advanced")
+        this.filePath = path
+        this.advancedBinding = advancedBinding.copy(parent = parent, name = name, params = params)
     }
 
     companion object {
