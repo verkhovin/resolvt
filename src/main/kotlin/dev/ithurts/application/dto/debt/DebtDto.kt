@@ -12,9 +12,6 @@ data class DebtDto(
     val description: String,
     val status: DebtStatus,
     val bindings: List<BindingDto>,
-    val filePath: String, //TODO MVP REMOVED
-    val startLine: Int, //TODO MVP REMOVED
-    val endLine: Int, //TODO MVP REMOVED
     val votes: Int,
     val voted: Boolean,
     val repository: DebtRepositoryDto,
@@ -38,9 +35,6 @@ data class DebtDto(
                 debt.description,
                 debt.status,
                 bindings,
-                debt.bindings[0].filePath,
-                debt.bindings[0].startLine,
-                debt.bindings[0].endLine,
                 debt.votes.size,
                 currentUserVoted,
                 repository,
