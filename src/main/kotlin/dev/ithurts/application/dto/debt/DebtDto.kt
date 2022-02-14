@@ -2,46 +2,47 @@ package dev.ithurts.application.dto.debt
 
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 data class DebtDto(
-    val id: Long,
+    val id: String,
     val title: String,
     val description: String,
     val status: DebtStatus,
-    val filePath: String,
-    val startLine: Int,
-    val endLine: Int,
+    val bindings: List<BindingDto>,
     val votes: Int,
     val voted: Boolean,
-    val sourceLink: SourceLink,
     val repository: DebtRepositoryDto,
-    val debtReporterAccount: DebtAccountDto,
-    val test: String = "AAAA"
+    val reporter: DebtAccountDto,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val cost: Int
 ) {
     companion object {
         fun from(
-            debt: Debt, sourceLink: SourceLink, debtRepositoryDTO: DebtRepositoryDto, debtReportedAccount: DebtAccountDto,
-            currentUserVoted: Boolean
+            debt: Debt,
+            bindings: List<BindingDto>,
+            repository: DebtRepositoryDto,
+            reporter: DebtAccountDto,
+            currentUserVoted: Boolean,
+            cost: Int,
         ): DebtDto {
             return DebtDto(
-                debt.identity,
+                debt.id,
                 debt.title,
                 debt.description,
                 debt.status,
-                debt.filePath,
-                debt.startLine,
-                debt.endLine,
+                bindings,
                 debt.votes.size,
                 currentUserVoted,
-                sourceLink,
-                debtRepositoryDTO,
-                debtReportedAccount
+                repository,
+                reporter,
+                debt.createdAt,
+                debt.updatedAt,
+                cost
             )
         }
     }
 }
-
-data class SourceLink(
-    val url: String,
-    val text: String,
-)

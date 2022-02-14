@@ -9,6 +9,6 @@ class RepositoryService(
 ) {
     fun acknowledgeExternalRepositoryByWorkspace(workspace: Workspace, name: String): Repository {
         val mainBranch = externalRepositoryService.getExternalRepositoryMainBranch(workspace, name)
-        return Repository(name, mainBranch, workspace.identity)
+        return Repository(name, mainBranch, workspace.id)
     }
 }

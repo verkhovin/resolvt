@@ -1,19 +1,19 @@
 package dev.ithurts.domain.authcode
 
+import org.bson.codecs.pojo.annotations.BsonId
+import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
 
-@Entity
-class AuthCode(
+@Document(collection = "auth_codes")
+data class AuthCode(
     var authCode: String,
     var codeChallenge: String,
-    val accountId: Long,
+    val accountId: String,
     var expiresAt: Instant,
     var used: Boolean = false,
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
-)
+    @BsonId
+    val _id: String? = null
+) {
+    val id: String
+        get() = _id!!
+}

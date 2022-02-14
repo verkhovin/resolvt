@@ -1,6 +1,6 @@
 package dev.ithurts.application.dto
 
 data class Me(
-    val id: Long,
+    val id: String,
     val name: String,
 )

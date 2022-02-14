@@ -6,7 +6,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 
 
 class AuthenticatedOAuth2User(val account: Account, private val delegate: OAuth2User): OAuth2User {
-    val accountId = account.identity!!
+    val accountId = account.id
 
     override fun getName(): String = delegate.name
 

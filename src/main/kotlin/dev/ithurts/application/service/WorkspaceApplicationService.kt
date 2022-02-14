@@ -15,14 +15,14 @@ class WorkspaceApplicationService(
     private val accountRepository: AccountRepository,
 ) {
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
-    fun addMemberByEmail(workspaceId: Long, email: String) {
+    fun addMemberByEmail(workspaceId: String, email: String) {
         val account = accountRepository.findByEmail(email) ?: throw EntityNotFoundException("account", "email", email)
         val workspace = workspaceRepository.findByIdOrNull(workspaceId) ?: throw EntityNotFoundException(
             "workspace",
             "id",
-            workspaceId.toString()
+            workspaceId
         )
-        workspace.addMember(account.identity, WorkspaceMemberRole.MEMBER, WorkspaceMemberStatus.ACTIVE)
+        workspace.addMember(account.id, WorkspaceMemberRole.MEMBER, WorkspaceMemberStatus.ACTIVE)
         workspaceRepository.save(workspace)
     }
 }

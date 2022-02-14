@@ -1,35 +1,37 @@
 package dev.ithurts.domain.repository
 
 import dev.ithurts.application.dto.TechDebtReport
-import dev.ithurts.domain.DomainEntity
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
-import javax.persistence.*
+import org.bson.codecs.pojo.annotations.BsonId
+import org.springframework.data.mongodb.core.mapping.Document
+import java.time.Instant
 
-@Entity
-class Repository(
+@Document(collection = "repositories")
+data class Repository(
     var name: String,
     var mainBranch: String,
-    val workspaceId: Long,
-): DomainEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val id: Long? = null
+    val workspaceId: String,
+    @BsonId
+    val _id: String? = null
+) {
+    val id: String
+        get() = _id!!
 
     fun rename(newName: String) {
         name = newName
     }
 
-    fun reportDebt(techDebtReport: TechDebtReport, reportedByAccountId: Long): Debt {
+    fun reportDebt(techDebtReport: TechDebtReport, reportedByAccountId: String, instant: Instant): Debt {
         return Debt(
             techDebtReport.title,
             techDebtReport.description,
             DebtStatus.OPEN,
-            techDebtReport.filePath,
-            techDebtReport.startLine,
-            techDebtReport.endLine,
             reportedByAccountId,
-            this.identity,
+            this.id,
+            workspaceId,
+            techDebtReport.bindings.map { it.toDomain() }.toMutableList(),
+            instant
         ).also { it.vote(reportedByAccountId) }
     }
 }

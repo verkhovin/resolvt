@@ -5,7 +5,7 @@ import dev.ithurts.domain.SourceProviderWorkspace
 class WorkspaceFactory {
     companion object {
         fun fromBitbucketWorkspace(
-            ownerAccountId: Long,
+            ownerAccountId: String,
             sourceProviderWorkspace: SourceProviderWorkspace,
             sourceProviderApplicationCredentials: SourceProviderApplicationCredentials
         ): Workspace {

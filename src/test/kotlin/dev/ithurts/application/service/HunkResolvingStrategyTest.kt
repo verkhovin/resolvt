@@ -1,97 +1,89 @@
 package dev.ithurts.application.service
 
+import dev.ithurts.application.service.git.Direction
 import io.reflectoring.diffparser.api.UnifiedDiffParser
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import dev.ithurts.debtMock
-import dev.ithurts.domain.debt.DebtStatus.*
-import dev.ithurts.domain.debt.ResolutionReason.*
-import dev.ithurts.application.service.diff.HunkResolvingStrategy
+import dev.ithurts.application.service.git.HunkResolvingStrategy
+import dev.ithurts.application.service.git.LineRangeMutator
+import org.junit.jupiter.api.Assertions.*
 
 class HunkResolvingStrategyTest {
-
     private val strategy = HunkResolvingStrategy()
-    private val diffParser = UnifiedDiffParser()
 
     @Test
-    fun `debt starts and ends on the same line before actual changes shouldn't be moved`() {
-        val debt = debtMock(24, 24)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(24, debt.startLine)
-        assertEquals(24, debt.endLine)
+    fun `selection starts and ends on the same line before actual changes shouldn't be moved`() {
+        val selection = LineRangeMutator(24, 24)
+        strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(24, 24), selection)
     }
 
     @Test
-    fun `debt that starts and ends on the same line after actual changes should be moved`() {
-        val debt = debtMock(34, 34)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(29, debt.startLine)
-        assertEquals(29, debt.endLine)
+    fun `selection that starts and ends on the same line after actual changes should be moved`() {
+        val selection = LineRangeMutator(34, 34)
+        strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(29, 29), selection)
     }
 
     @Test
-    fun `debt that start and ends on the same FROM line should be marked as probably resolved`() {
-        val debt = debtMock(29, 29)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(26, debt.startLine)
-        assertEquals(26, debt.endLine)
-        assertEquals(debt.status, PROBABLY_RESOLVED)
-        assertEquals(debt.resolutionReason, CODE_DELETED)
+    fun `selection that start and ends on the same FROM line should be considered as changed`() {
+        val selection = LineRangeMutator(29, 29)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(26, 26), selection)
+        assertTrue(changed)
     }
 
     @Test
-    fun `debt that starts before actual changed and ends after them should have end moved and marked as probably resolved`() {
-        val debt = debtMock(24, 34)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(24, debt.startLine)
-        assertEquals(29, debt.endLine)
-        assertEquals(debt.status, PROBABLY_RESOLVED)
-        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
+    fun `selection that starts before actual changed and ends after them should have end moved and considered as changed`() {
+        val selection = LineRangeMutator(24, 34)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(24, 29), selection)
+        assertTrue(changed)
     }
 
     @Test
-    fun `debt that starts before actual changes and ends after the hunk should have end moved and marked as probably resolved` () {
-        val debt = debtMock(24, 40)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(24, debt.startLine)
-        assertEquals(35, debt.endLine)
-        assertEquals(debt.status, PROBABLY_RESOLVED)
-        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
+    fun `selection that starts before actual changes and ends after the hunk should have end moved and considered as changed` () {
+        val selection = LineRangeMutator(24, 40)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(24, 35), selection)
+        assertTrue(changed)
+
     }
 
     @Test
-    fun `debt that starts after actual changes and ends after the hunk should be moved and status shouldn't be changed`() {
-        val debt = debtMock(34, 40)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(29, debt.startLine)
-        assertEquals(35, debt.endLine)
-        assertEquals(debt.status, OPEN)
+    fun `selection that starts after actual changes and ends after the hunk should be moved and NOT considered as changed`() {
+        val selection = LineRangeMutator(34, 40)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(29, 35), selection)
+        assertFalse(changed)
     }
 
     @Test
-    fun `debt that start on FROM line and ends after actual changes should have end moved and marked as probably resolved` () {
-        val debt = debtMock(26, 34)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(26, debt.startLine)
-        assertEquals(29, debt.endLine)
-        assertEquals(debt.status, PROBABLY_RESOLVED)
-        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
+    fun `selection that start on FROM line and ends after actual changes should have end moved and considered as changed` () {
+        val selection = LineRangeMutator(26, 34)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(26, 29), selection)
+        assertTrue(changed)
     }
 
     @Test
-    fun `debt that start on FROM line and ends after the hunk should have end moved and marked as probably resolved` () {
-        val debt = debtMock(26, 40)
-        strategy.processHunk(debt, hunk(DIFF_6DELETE_1ADD))
-        assertEquals(26, debt.startLine)
-        assertEquals(35, debt.endLine)
-        assertEquals(debt.status, PROBABLY_RESOLVED)
-        assertEquals(debt.resolutionReason, PARTLY_CHANGED)
+    fun `selection that start on FROM line and ends after the hunk should have end moved and considered as changed` () {
+        val selection = LineRangeMutator(26, 40)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD)
+        assertEquals(LineRangeMutator(26, 35), selection)
+        assertTrue(changed)
     }
 
-    private fun hunk(diff: String) = diffParser.parse(diff.toByteArray())[0].hunks[0]
+    @Test
+    fun `REVERSED selection that starts before actual changed and ends after them should have end moved and considered as changed`() {
+        val selection = LineRangeMutator(24, 34)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD, Direction.REVERSE)
+        assertEquals(LineRangeMutator(24, 39), selection)
+        assertTrue(changed)
+    }
+
 
     companion object {
-        const val DIFF_6DELETE_1ADD = """
+        val DIFF_6DELETE_1ADD = UnifiedDiffParser().parse("""
 Index: src/main/java/ru/verkhovin/poker/model/Room.java
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
@@ -111,10 +103,10 @@ diff --git a/src/main/java/ru/verkhovin/poker/model/Room.java b/src/main/java/ru
 -    this.estimates = new ArrayList<>();
 -  }
 +  public Room() {this.showEstimates = false;this.estimates = new ArrayList<>();}
- 
+
    public Long getId() {
      return id;
 
-        """
+        """.toByteArray())[0].latestHunk
     }
 }

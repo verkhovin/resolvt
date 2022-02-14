@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="main" th:with="debt=${page.debt}, binding=${page.binding}">
+    <div class="row mt-3 mt-lg-3 align-items-center">
+        <div class="alert alert-warning" role="alert">
+            This page is only available because binding editing is not supported by IDE plugin yet. Please, use it carefully.
+        </div>
+        <div class="col-md-12 ">
+            <div th:if="${!binding.isAdvanced()}">
+                <form action=# th:action="@{/debts/{id}/{bindingId}/edit?type=basic(id=${debt.id}, bindingId=${binding.id})}" method="post" th:object="${form}"
+                      class="row g-3">
+                    <div class="col-10">
+                        <label for="Path">File path</label>
+                        <input th:field="*{path}" type="text" class="form-control" id="Path" placeholder="Path">
+                    </div>
+                    <div class="col-2">
+                        <label for="Linespec">Lines</label>
+                        <input th:field="*{linespec}" type="text" class="form-control" id="Linespec" placeholder="Linespec">
+                    </div>
+                    <div class="col-md-12 text-end">
+                        <button type="submit" class="btn btn-outline-primary" name="action" value="save">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div th:if="${binding.isAdvanced()}">
+                <form action=# th:action="@{/debts/{id}/{bindingId}/edit?type=advanced(id=${debt.id}, bindingId=${binding.id})}" method="post" th:object="${advancedForm}"
+                      class="row g-3">
+                    <div class="col-12">
+                        <label for="Path">File path</label>
+                        <input th:field="*{path}" type="text" class="form-control" id="Path" placeholder="Path">
+                    </div>
+                    <p class="m-0 mt-5">Advanced binding for <b th:text="${binding.advancedBinding.type}"></b></p>
+                    <div class="col-md-5">
+                        <label for="Parent">Parent</label>
+                        <input th:field="*{parent}" type="text" class="form-control" id="Parent" placeholder="Parent">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="Name">Name</label>
+                        <input th:field="*{name}" type="text" class="form-control" id="Name" placeholder="Name">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="Params">Parameters</label>
+                        <input th:field="*{params}" type="text" class="form-control" id="Params" placeholder="java.lang.String, java.lang.Integer">
+                    </div>
+                    <div class="col-md-12 text-end">
+                        <button type="submit" class="btn btn-outline-primary" name="action" value="save">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

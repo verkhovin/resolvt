@@ -26,7 +26,8 @@ class IndexController(
         @AuthenticationPrincipal authentication: AuthenticatedOAuth2User,
         model: Model,
         httpSession: HttpSession,
-        @RequestParam("sync", required = false) sync: Boolean = false
+        @RequestParam("sync", required = false) sync: Boolean = false,
+        @RequestParam("status", required = false) status: String? = null
     ): String {
         // if sync, then new organisation was created and request can contain jwt or other sensitive info
         if (sync) {
@@ -36,21 +37,13 @@ class IndexController(
         if (workspaces == null || workspaces.isEmpty()) {
             return "init_dashboard"
         }
-        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as Long
+        val workspaceId = httpSession.getAttribute("currentOrganisation.id") as String
         val workspace = workspaceRepository.findByIdOrNull(workspaceId)!!
-        val debts = debtQueryRepository.queryWorkspaceDebts(workspaceId)
-            .sortedWith { d1, d2 ->
-                when {
-                    d1.status == d2.status -> d2.votes - d1.votes
-                    d1.status == DebtStatus.PROBABLY_RESOLVED -> -1
-                    d1.status == DebtStatus.OPEN && d2.status == DebtStatus.RESOLVED -> -1
-                    d1.status == DebtStatus.OPEN && d2.status == DebtStatus.PROBABLY_RESOLVED -> 1
-                    d1.status == DebtStatus.RESOLVED  -> 1
-                    else -> 0
-                }
-            }
+        val debts = debtQueryRepository.queryWorkspaceDebts(workspaceId, status == "resolved")
+            .sortedByDescending {it.cost}
         model.addAttribute("debts", debts)
         model.addAttribute("org", workspace)
+        model.addAttribute("resolved", status == "resolved")
         return "dashboard"
     }
 }

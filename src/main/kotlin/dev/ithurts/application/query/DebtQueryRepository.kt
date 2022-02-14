@@ -1,119 +1,205 @@
 package dev.ithurts.application.query
 
-import dev.ithurts.application.dto.debt.DebtAccountDto
-import dev.ithurts.application.dto.debt.DebtDto
-import dev.ithurts.application.dto.debt.DebtRepositoryDto
-import dev.ithurts.application.dto.debt.SourceLink
+import dev.ithurts.application.dto.debt.*
 import dev.ithurts.application.security.AuthenticationFacade
 import dev.ithurts.application.service.RepositoryInfo
 import dev.ithurts.application.service.SourceProviderService
+import dev.ithurts.domain.CostCalculationService
 import dev.ithurts.domain.account.Account
+import dev.ithurts.domain.account.AccountRepository
 import dev.ithurts.domain.debt.Debt
+import dev.ithurts.domain.debt.DebtRepository
 import dev.ithurts.domain.debt.DebtStatus
+import dev.ithurts.domain.debtevent.DebtEvent
 import dev.ithurts.domain.repository.Repository
+import dev.ithurts.domain.repository.RepositoryRepository
 import dev.ithurts.domain.workspace.Workspace
+import dev.ithurts.domain.workspace.WorkspaceRepository
 import dev.ithurts.exception.EntityNotFoundException
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
-import javax.persistence.EntityManager
-import javax.persistence.NoResultException
-import javax.persistence.Tuple
 import org.springframework.stereotype.Repository as SpringRepository
 
 @SpringRepository
 class DebtQueryRepository(
-    private val entityManager: EntityManager,
+    private val debtRepository: DebtRepository,
+    private val workspaceRepository: WorkspaceRepository,
+    private val repositoryRepository: RepositoryRepository,
+    private val accountRepository: AccountRepository,
+    private val debtEventQueryRepository: DebtEventQueryRepository,
     private val sourceProviderService: SourceProviderService,
+    private val costCalculationService: CostCalculationService,
     private val authenticationFacade: AuthenticationFacade,
 ) {
 
-    fun queryDebt(debtId: Long): DebtDto {
-        val result = try {
-            entityManager.createQuery(
-                "SELECT d, r, w, a FROM Debt d " +
-                        "LEFT JOIN Repository r ON r.id = d.repositoryId " +
-                        "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
-                        "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
-                        "WHERE d.id = :debtId",
-                Tuple::class.java
-            ).setParameter("debtId", debtId).singleResult
-        } catch (e: NoResultException) {
-            throw EntityNotFoundException("Debt", "id", debtId.toString())
+    fun queryDebt(debtId: String): DebtDto {
+        val bindingEventsCount = debtEventQueryRepository.countByDebtId(debtId)
+        return queryDebt(debtId) { debt, repository, workspace, account ->
+            toDto(
+                debt,
+                repository,
+                workspace,
+                account,
+                costCalculationService.calculateCost(debt, bindingEventsCount)
+            )
         }
+    }
 
-        return toDto(result)
+    fun queryDebtDetails(debtId: String): DebtDetailsDto {
+        val events = debtEventQueryRepository.findByDebtId(debtId)
+        return queryDebt(debtId) { debt, repository, workspace, account ->
+            toDetailsDto(
+                debt,
+                repository,
+                workspace,
+                account,
+                events
+            )
+        }
+    }
+
+    private fun <T> queryDebt(debtId: String, mapper: (Debt, Repository, Workspace, Account?) -> T): T {
+        val debt = debtRepository.findByIdOrNull(debtId)
+            ?: throw EntityNotFoundException("Debt", "id", debtId)
+        val workspace = workspaceRepository.findByIdOrNull(debt.workspaceId)!!
+        val repository = repositoryRepository.findByIdOrNull(debt.repositoryId)!!
+        val account = accountRepository.findByIdOrNull(debt.creatorAccountId)
+
+        return mapper(debt, repository, workspace, account)
     }
 
 
     @PreAuthorize("hasPermission(#repositoryId, 'Repository', 'MEMBER')")
-    fun queryRepositoryActiveDebts(repositoryId: Long): List<DebtDto> {
-        val resultList = entityManager.createQuery(
-            "SELECT d, r, w, a FROM Debt d " +
-                    "LEFT JOIN Repository r ON r.id = d.repositoryId " +
-                    "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
-                    "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
-                    "WHERE r.id = :repositoryId " +
-                    "AND d.status <> :debtStatus",
-            Tuple::class.java
-        ).setParameter("repositoryId", repositoryId)
-            .setParameter("debtStatus", DebtStatus.RESOLVED).resultList
-
-        return resultList.map(::toDto)
+    fun queryRepositoryActiveDebts(repositoryId: String): List<DebtDto> {
+        val debts = debtRepository.findByRepositoryIdAndStatusNot(repositoryId)
+        val repository = repositoryRepository.findByIdOrNull(repositoryId)!!
+        val workspace = workspaceRepository.findByIdOrNull(repository.workspaceId)!!
+        val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
+        val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })
+        return debts.map { debt ->
+            toDto(
+                debt,
+                repository,
+                workspace,
+                accounts.first { acc -> acc.id == debt.creatorAccountId },
+                eventsCount[debt.id] ?: 0
+            )
+        }
     }
 
     @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
     fun queryRepositoryActiveDebts(repositoryInfo: RepositoryInfo): List<DebtDto> {
-        val resultList = entityManager.createQuery(
-            "SELECT d, r, w, a FROM Debt d " +
-                    "LEFT JOIN Repository r ON r.id = d.repositoryId " +
-                    "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
-                    "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
-                    "WHERE r.name = :repositoryName AND w.externalId = :workspaceExternalId AND w.sourceProvider = :sourceProvider " +
-                    "AND d.status <> :debtStatus",
-            Tuple::class.java
-        ).setParameter("repositoryName", repositoryInfo.name)
-            .setParameter("workspaceExternalId", repositoryInfo.workspaceExternalId)
-            .setParameter("sourceProvider", repositoryInfo.sourceProvider)
-
-            .setParameter("debtStatus", DebtStatus.RESOLVED).resultList
-
-        return resultList.map(::toDto)
+        val workspace = workspaceRepository.findBySourceProviderAndExternalId(
+            repositoryInfo.sourceProvider,
+            repositoryInfo.workspaceExternalId
+        )!!
+        val repository = repositoryRepository.findByNameAndWorkspaceId(repositoryInfo.name, workspace.id)!!
+        val debts = debtRepository.findByRepositoryIdAndStatusNot(repository.id)
+        val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
+        val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })
+        return debts.map { debt ->
+            toDto(
+                debt,
+                repository,
+                workspace,
+                accounts.first { acc -> acc.id == debt.creatorAccountId },
+                costCalculationService.calculateCost(debt, eventsCount[debt.id] ?: 0)
+            )
+        }
     }
 
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
-    fun queryWorkspaceDebts(workspaceId: Long): List<DebtDto> {
-        val resultList = entityManager.createQuery(
-            "SELECT d, r, w, a FROM Debt d " +
-                    "LEFT JOIN Repository r ON r.id = d.repositoryId " +
-                    "LEFT JOIN Workspace w ON w.id = r.workspaceId " +
-                    "LEFT JOIN Account a ON a.id = d.creatorAccountId " +
-                    "WHERE w.id = :workspaceId",
-            Tuple::class.java
-        ).setParameter("workspaceId", workspaceId).resultList
-
-        return resultList.map(::toDto)
+    fun queryWorkspaceDebts(workspaceId: String, resolved: Boolean): List<DebtDto> {
+        val workspace = workspaceRepository.findByIdOrNull(workspaceId)
+            ?: throw EntityNotFoundException("Workspace", "id", workspaceId)
+        val debts = debtRepository.findByWorkspaceIdAndStatusNot(workspace.id, if (!resolved) DebtStatus.RESOLVED else DebtStatus.OPEN)
+        val repository = repositoryRepository.findAllById(debts.map { it.repositoryId })
+        val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
+        val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })
+        return debts.map { debt ->
+            toDto(
+                debt,
+                repository.first { repo -> repo.id == debt.repositoryId },
+                workspace,
+                accounts.first { acc -> acc.id == debt.creatorAccountId },
+                costCalculationService.calculateCost(debt, eventsCount[debt.id] ?: 0)
+            )
+        }
     }
 
-    private fun toDto(selectResult: Tuple): DebtDto {
-        val debt = selectResult.get(0, Debt::class.java)
-        val repo = selectResult.get(1, Repository::class.java)
-        val workspace = selectResult.get(2, Workspace::class.java)
-        val reporter = selectResult.get(3, Account::class.java)
+    private fun toDto(debt: Debt, repo: Repository, workspace: Workspace, reporter: Account?, cost: Int): DebtDto {
+        val bindingDtos = mapBindings(debt, repo, workspace)
         return DebtDto.from(
-            selectResult.get(0, Debt::class.java),
+            debt,
+            bindingDtos,
+            DebtRepositoryDto(repo.name),
+            DebtAccountDto(reporter?.name ?: "Unknown"),
+            debt.accountVoted(authenticationFacade.account.id),
+            cost
+        )
+    }
+
+    private fun toDetailsDto(
+        debt: Debt,
+        repo: Repository,
+        workspace: Workspace,
+        reporter: Account?,
+        events: List<DebtEvent>
+    ): DebtDetailsDto {
+        val bindingDtos = mapBindings(debt, repo, workspace)
+        val eventsDtos = mapBindingEvents(events, bindingDtos, repo, workspace)
+
+        return DebtDetailsDto.from(
+            debt,
+            costCalculationService.calculateCost(debt, events.size),
+            bindingDtos,
+            DebtRepositoryDto(repo.name),
+            DebtAccountDto(reporter?.name ?: "Unknown"),
+            debt.accountVoted(authenticationFacade.account.id),
+            eventsDtos
+        )
+    }
+
+    private fun mapBindingEvents(
+        events: List<DebtEvent>,
+        bindingDtos: List<BindingDto>,
+        repo: Repository,
+        workspace: Workspace
+    ) = events.map { event ->
+        DebtEventDto(
+            event.commitHash,
+            sourceProviderService.getCommitUrl(repo.name, event.commitHash, workspace.externalId),
+            event.changes.map { change ->
+                ChangeDto(
+                    bindingDtos.first { it.id == change.bindingId },
+                    ChangeType.valueOf(change.type.toString()),
+                    change.from,
+                    change.to
+                )
+            },
+            event.createdAt
+        )
+    }
+
+    private fun mapBindings(
+        debt: Debt,
+        repo: Repository,
+        workspace: Workspace
+    ) = debt.bindings.map { binding ->
+        BindingDto.from(
+            binding,
             SourceLink(
                 sourceProviderService.getSourceUrl(
-                    debt,
+                    binding,
                     repo.name,
                     repo.mainBranch,
                     workspace.externalId
                 ),
-                getFileName(debt.filePath)
-            ),
-            DebtRepositoryDto(repo.name),
-            DebtAccountDto(reporter?.name ?: "Unknown"),
-            debt.accountVoted(authenticationFacade.account.identity)
+                getFileName(binding.filePath)
+            )
         )
     }
+
 
     private fun getFileName(path: String) = path.substringAfterLast("/")
 }

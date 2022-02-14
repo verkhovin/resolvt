@@ -1,19 +1,18 @@
 package dev.ithurts.domain.account
 
-import dev.ithurts.domain.DomainEntity
 import dev.ithurts.domain.SourceProvider
-import javax.persistence.*
+import org.bson.codecs.pojo.annotations.BsonId
+import org.springframework.data.mongodb.core.mapping.Document
 
-@Entity
-class Account (
+@Document(collection = "accounts")
+data class Account (
     val email: String,
     val name: String,
-    @Enumerated(EnumType.STRING)
     val sourceProvider: SourceProvider,
     val externalId: String,
-): DomainEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val id: Long? = null
-
+    @BsonId
+    val _id: String? = null
+) {
+    val id: String
+        get() = _id!!
 }

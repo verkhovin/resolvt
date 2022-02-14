@@ -35,6 +35,10 @@ class SourceProviderCommunicationService(
         return client.getRepository(getAccessTokenUnsafe(organisationExternalId), organisationExternalId, repository)
     }
 
+    fun getFile(workspace: String, repository: String, filePath: String, commitHash: String): String {
+        return client.getFile(getAccessToken(), workspace, repository, filePath, commitHash)
+    }
+
     private val client: SourceProviderClient
         get() = when (getCurrentSourceProvider()) {
             BITBUCKET -> bitbucketClient

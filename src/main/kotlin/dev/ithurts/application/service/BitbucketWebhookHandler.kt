@@ -1,18 +1,18 @@
 package dev.ithurts.application.service
 
+import dev.ithurts.application.dto.PushInfo
+import dev.ithurts.application.security.IntegrationAuthenticationFacade
+import dev.ithurts.application.sourceprovider.SourceProviderCommunicationService
 import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed
 import dev.ithurts.controller.api.webhook.dto.RepoUpdated
 import dev.ithurts.domain.SourceProvider
 import dev.ithurts.domain.SourceProviderWorkspace
-import dev.ithurts.domain.workspace.SourceProviderApplicationCredentials
-import dev.ithurts.domain.workspace.WorkspaceFactory
 import dev.ithurts.domain.account.AccountRepository
 import dev.ithurts.domain.repository.RepositoryRepository
+import dev.ithurts.domain.workspace.SourceProviderApplicationCredentials
+import dev.ithurts.domain.workspace.WorkspaceFactory
 import dev.ithurts.domain.workspace.WorkspaceRepository
-import dev.ithurts.application.security.IntegrationAuthenticationFacade
-import dev.ithurts.application.service.diff.DiffHandlingService
-import dev.ithurts.application.sourceprovider.SourceProviderCommunicationService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -24,7 +24,7 @@ class BitbucketWebhookHandler(
     private val repositoryRepository: RepositoryRepository,
     private val authenticationFacade: IntegrationAuthenticationFacade,
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
-    private val diffHandlingService: DiffHandlingService
+    private val codeChangeHandlingService: CodeChangeHandlingService
 ) {
     fun appInstalled(bitbucketAppInstallation: BitbucketAppInstallation) {
         val actorAccount = accountRepository.findByExternalIdAndSourceProvider(
@@ -47,7 +47,7 @@ class BitbucketWebhookHandler(
             workspaceRepository.save(workspace)
         } else {
             WorkspaceFactory.fromBitbucketWorkspace(
-                actorAccount.identity, SourceProviderWorkspace(
+                actorAccount.id, SourceProviderWorkspace(
                     bitbucketWorkspace.username ?: bitbucketWorkspace.nickname!!,
                     bitbucketWorkspace.displayName,
                     SourceProvider.BITBUCKET
@@ -71,15 +71,17 @@ class BitbucketWebhookHandler(
         val workspace = authenticationFacade.workspace
         val oldName = data.changes.slug.old
         val newName = data.changes.slug.new
-        repositoryRepository.findByNameAndWorkspaceId(oldName, workspace.identity)?.let { repository ->
-                repository.rename(newName)
-                repositoryRepository.save(repository)
-            }
+        repositoryRepository.findByNameAndWorkspaceId(oldName, workspace.id)?.let { repository ->
+            repository.rename(newName)
+            repositoryRepository.save(repository)
+        }
     }
 
     fun changesPushed(changesPushedEvent: ChangesPushed) {
-        repositoryRepository.findByNameAndWorkspaceId(changesPushedEvent.repository.name, authenticationFacade.workspace.identity)
-            ?: return
+        val repository = repositoryRepository.findByNameAndWorkspaceId(
+            changesPushedEvent.repository.name,
+            authenticationFacade.workspace.id
+        ) ?: return
         changesPushedEvent.push.changes.forEach { change ->
             val diffSpec = "${change.new.target.hash}..${change.old.target.hash}"
             val diff = sourceProviderCommunicationService.getDiff(
@@ -87,8 +89,15 @@ class BitbucketWebhookHandler(
                 changesPushedEvent.repository.name,
                 diffSpec
             )
-            log.info(diff)
-            diffHandlingService.handleDiff(diff)
+            codeChangeHandlingService.handleDiff(
+                diff,
+                PushInfo(
+                    change.new.target.hash,
+                    repository.id,
+                    changesPushedEvent.repository.workspace.slug,
+                    changesPushedEvent.repository.name
+                )
+            )
         }
     }
 

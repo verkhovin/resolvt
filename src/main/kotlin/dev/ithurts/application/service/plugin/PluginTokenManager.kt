@@ -16,21 +16,21 @@ class PluginTokenManager(
     private val clock: Clock,
     @Value("\${ithurts.security.jwt.key}")private val jwtKey: String
 ) {
-    fun issuePluginToken(accountId: Long): PluginToken {
+    fun issuePluginToken(accountId: String): PluginToken {
         return PluginToken(
             generateJwtToken(accountId, TokenType.ACCESS, 30)   ,
             generateJwtToken(accountId, TokenType.REFRESH, ONE_MONTH_IN_MINUTES),
         )
     }
 
-    fun validateToken(expectedType: TokenType, token: String): Long {
+    fun validateToken(expectedType: TokenType, token: String): String {
         val claims = Jwts.parserBuilder()
             .setSigningKey(Keys.hmacShaKeyFor(jwtKey.toByteArray()))
             .build()
             .parseClaimsJws(token)
             .body
 
-        val accountId = claims.subject.toLong()
+        val accountId = claims.subject
         val tokenType = claims.get("type", String::class.java)
 
         if (tokenType != expectedType.name) {
@@ -40,8 +40,8 @@ class PluginTokenManager(
         return accountId
     }
 
-    private fun generateJwtToken(userId: Long, type: TokenType, expirationMinutes: Long) = Jwts.builder()
-        .setSubject(userId.toString())
+    private fun generateJwtToken(userId: String, type: TokenType, expirationMinutes: Long) = Jwts.builder()
+        .setSubject(userId)
         .addClaims(mapOf("type" to type))
         .setExpiration(Date.from(clock.instant().plus(expirationMinutes, ChronoUnit.MINUTES)))
         .signWith(Keys.hmacShaKeyFor(jwtKey.toByteArray()))

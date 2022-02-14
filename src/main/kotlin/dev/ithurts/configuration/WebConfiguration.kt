@@ -40,7 +40,7 @@ class MvcConfiguration: WebMvcConfigurer{
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("/public")
             .addResourceLocations("classpath:/static/public")
-            .setCacheControl(CacheControl.maxAge(31, TimeUnit.DAYS))
+            .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS))
         registry.addResourceHandler("/**")
             .addResourceLocations("classpath:/static/");
     }

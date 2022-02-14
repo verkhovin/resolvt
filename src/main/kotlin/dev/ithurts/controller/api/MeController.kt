@@ -14,7 +14,7 @@ class MeController(
     @GetMapping("/me")
     fun me(): Me {
         val account = authenticationFacade.account
-        return Me(account.identity, account.name)
+        return Me(account.id, account.name)
     }
 
 //    @ExceptionHandler(Exception::class)
