@@ -1,5 +1,5 @@
 package dev.ithurts.utils
 
-fun simpleJvmClassName(className: String?): String? {
+fun jvmSimpleClassName(className: String?): String? {
     return className?.substringAfterLast(".")
 }

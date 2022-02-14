@@ -35,9 +35,11 @@ class CodeChangeHandlingService(
         val filePathToDiffs: Map<String, List<Diff>> = parsedDiffs.groupBy { trimDiffFilepath(it.fromFileName) }
         debtsForChangedFiles.forEach { debt ->
             val changes = applyDiffs(debt, filePathToDiffs, pushInfo)
-            applicationEventPublisher.publishEvent(
-                debt.eventForChanges(changes, pushInfo.commitHash)
-            )
+            if (changes.isNotEmpty()) {
+                applicationEventPublisher.publishEvent(
+                    debt.eventForChanges(changes, pushInfo.commitHash)
+                )
+            }
             debtRepository.save(debt)
         }
     }

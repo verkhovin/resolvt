@@ -3,7 +3,7 @@ package dev.ithurts.application.dto.debt
 import dev.ithurts.domain.Language
 import dev.ithurts.domain.debt.AdvancedBinding
 import dev.ithurts.domain.debt.Binding
-import dev.ithurts.utils.simpleJvmClassName
+import dev.ithurts.utils.jvmSimpleClassName
 
 data class BindingDto(
     val id: String,
@@ -59,9 +59,9 @@ data class BindingDto(
         val hasParams = advancedBinding.params.isNotEmpty()
         return when (advancedBinding.type) {
             "Function", "Method" ->
-                " ${if (hasParent) "${simpleJvmClassName(advancedBinding.parent)}#" else ""}" +
+                " ${if (hasParent) "${jvmSimpleClassName(advancedBinding.parent)}#" else ""}" +
                         advancedBinding.name +
-                        (if (hasParams) "(${advancedBinding.params.map(::simpleJvmClassName).joinToString()})" else "")
+                        (if (hasParams) "(${advancedBinding.params.map(::jvmSimpleClassName).joinToString()})" else "")
             else -> advancedBinding.name
         }
     }

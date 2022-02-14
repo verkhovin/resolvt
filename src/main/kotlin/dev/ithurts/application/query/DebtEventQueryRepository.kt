@@ -14,7 +14,7 @@ class DebtEventQueryRepository(
     private val mongoOperations: MongoOperations,
 ) {
     fun findByDebtId(debtId: String): List<DebtEvent> {
-        return debtEventRepository.findByDebtId(debtId)
+        return debtEventRepository.findByDebtIdOrderByCreatedAtDesc(debtId)
     }
 
     fun countByDebtId(debtId: String): Int {

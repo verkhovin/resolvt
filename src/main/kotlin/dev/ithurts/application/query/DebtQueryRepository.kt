@@ -103,7 +103,7 @@ class DebtQueryRepository(
                 repository,
                 workspace,
                 accounts.first { acc -> acc.id == debt.creatorAccountId },
-                eventsCount[debt.id] ?: 0
+                costCalculationService.calculateCost(debt, eventsCount[debt.id] ?: 0)
             )
         }
     }

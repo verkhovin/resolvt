@@ -4,6 +4,7 @@
 <body>
 <div layout:fragment="main"
      th:with="debt=${page.details.debt}, bindings=${page.details.debt.bindings}, events=${page.details.events}">
+    <a th:href="@{/dashboard}"><i class="bi bi-arrow-left"></i> Dashboard</a>
     <div class="row mt-3 mt-lg-3 screen-margins">
         <!-- Content -->
         <div class="col-md-9">
@@ -63,12 +64,23 @@
 
             <!-- Events -->
             <p class="fw-bold mb-0 mt-4">Events</p>
-            <div th:each="event: ${events}" class="row event-row mb-1">
+            <div class="row d-none d-md-flex">
+                <div class="col-md-1">
+                    <p class="text-muted">Commit</p>
+                </div>
+                <div class="col-md-9">
+                    <p class="text-muted">Changes</p>
+                </div>
                 <div class="col-md-2">
+                    <p class="text-muted">Date</p>
+                </div>
+            </div>
+            <div th:each="event: ${events}" class="row event-row mb-1">
+                <div class="col-md-1">
                     <a th:href="${event.commitUrl}" th:text="${#strings.substring(event.commitHash, 0, 8)}"
                        target="_blank"></a>
                 </div>
-                <div class="col-md-10 ">
+                <div class="col-md-9 ">
                     <div th:each="change: ${event.changes}">
 
                         <p th:if="${!change.binding.isAdvanced()}" class="mb-0">
@@ -83,6 +95,9 @@
                         <p th:if="${change.from != null || change.to !=null}"
                            th:text="${change.from} ?: '' + ' → ' + ${change.to}" class="text-muted m-0"></p>
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <p class="text-muted date" th:text="${event.createdAt}"></p>
                 </div>
             </div>
         </div>

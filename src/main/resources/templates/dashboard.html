@@ -17,6 +17,7 @@
                     <thead>
                     <tr>
                         <th scope="col">Title</th>
+                        <th scope="col">Repository</th>
                         <th scope="col">Bindings</th>
                         <th scope="col">Votes</th>
                         <th scope="col">Reported</th>
@@ -27,6 +28,7 @@
                     <tbody>
                     <tr th:each="debt : ${debts}">
                         <th scope="row"> <a th:href="@{/debts/{id}(id=${debt.id})}" th:text="${debt.title}"></th>
+                        <td th:text="${debt.repository.name}"></td>
                         <td th:text="${debt.bindings.size()}"></td>
                         <td th:text="${debt.votes}"></td>
                         <td class="date" th:text="${debt.createdAt}"></td>

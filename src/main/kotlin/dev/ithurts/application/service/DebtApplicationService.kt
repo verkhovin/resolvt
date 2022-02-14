@@ -86,9 +86,9 @@ class DebtApplicationService(
         debt.bindings.first { it.id == bindingId }.let { binding ->
             binding.updateAdvancedManually(
                 form.path,
-                form.parent,
+                if(form.parent.isNullOrBlank()) null else form.parent,
                 form.name ?: "",
-                form.params?.split(',')?.map { it.trim() } ?: emptyList()
+                form.params?.split(',')?.map { it.trim() }?.filter {it.isNotBlank()} ?: emptyList()
             )
         }
         debtRepository.save(debt)
