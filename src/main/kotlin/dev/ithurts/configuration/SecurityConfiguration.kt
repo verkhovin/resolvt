@@ -43,8 +43,7 @@ class WebSecurityConfiguration(
                 authorize("/", permitAll)
                 authorize("/public/**", permitAll)
                 authorize("/favicon.ico", permitAll)
-                authorize("/bitbucket-connect-descriptor.json", permitAll)
-                authorize("/bitbucket-connect-descriptor-dev.json", permitAll)
+                authorize("/connect/bitbucket/descriptor", permitAll)
                 authorize("/actuator/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
