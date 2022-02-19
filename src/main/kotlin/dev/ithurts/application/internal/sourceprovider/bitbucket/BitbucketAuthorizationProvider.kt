@@ -1,14 +1,11 @@
 package dev.ithurts.application.internal.sourceprovider.bitbucket
 
-import dev.ithurts.domain.SourceProvider
 import dev.ithurts.domain.workspace.SourceProviderApplicationCredentials
 import dev.ithurts.domain.workspace.Workspace
 import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
 import dev.ithurts.application.internal.sourceprovider.bitbucket.dto.Token
-import dev.ithurts.domain.workspace.WorkspaceRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
-import org.apache.tomcat.util.buf.HexUtils
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.*
 import org.springframework.security.access.prepost.PreAuthorize
@@ -20,7 +17,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
-import java.security.MessageDigest
 import java.time.Clock
 import java.util.*
 
@@ -92,13 +88,6 @@ class BitbucketAuthorizationProvider(
     }
 
     companion object {
-        private val qsh = getQueryStringHash("POST&/site/oauth2/access_token$")
-
-        private fun getQueryStringHash(canonicalUrl: String): String? {
-            val md: MessageDigest = MessageDigest.getInstance("SHA-256")
-            md.update(canonicalUrl.toByteArray(charset("UTF-8")))
-            val digest: ByteArray = md.digest()
-            return HexUtils.toHexString(digest)
-        }
+        private val qsh = buildQueryStringHash("POST&/site/oauth2/access_token$")
     }
 }

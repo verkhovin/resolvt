@@ -33,7 +33,7 @@ class AdvancedBindingAdjustmentService(
 
         return binding.update(
             pathToFileBindingCurrentlyLocated,
-            false, // todo consider as changed if there were change in a diff, do not base on line range
+            false, // todo consider as changed if there were changes in a diff, do not base on line range
             bindingLineRange.start,
             bindingLineRange.end
         )

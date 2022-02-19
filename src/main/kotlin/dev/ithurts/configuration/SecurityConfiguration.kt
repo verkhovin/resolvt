@@ -93,7 +93,8 @@ class ApiSecurityConfiguration(
 @EnableWebSecurity
 @Order(2)
 class IntegrationApiSecurityConfiguration(
-    private val workspaceRepository: WorkspaceRepository
+    private val workspaceRepository: WorkspaceRepository,
+    private val applicationProperties: ApplicationProperties
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http {
@@ -108,7 +109,7 @@ class IntegrationApiSecurityConfiguration(
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(
-                BitbucketCloudAuthenticationFilter(workspaceRepository)
+                BitbucketCloudAuthenticationFilter(workspaceRepository, applicationProperties)
             )
             exceptionHandling {
 
