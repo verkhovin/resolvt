@@ -1,6 +1,6 @@
 package dev.ithurts.controller.web.page
 
-import dev.ithurts.application.dto.debt.DebtDto
+import dev.ithurts.application.model.debt.DebtDto
 import dev.ithurts.domain.debt.DebtStatus
 
 data class DebtEditPage(

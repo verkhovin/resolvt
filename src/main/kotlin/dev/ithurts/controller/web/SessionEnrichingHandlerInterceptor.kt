@@ -2,7 +2,6 @@ package dev.ithurts.controller.web
 
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
-import dev.ithurts.application.service.web.SessionManager
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor

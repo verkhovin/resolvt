@@ -1,7 +1,7 @@
 package dev.ithurts.controller.web
 
 import dev.ithurts.application.query.DebtQueryRepository
-import dev.ithurts.application.service.DebtApplicationService
+import dev.ithurts.application.DebtService
 import dev.ithurts.controller.web.page.*
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession
 @Controller
 @RequestMapping("/debts")
 class DebtWebController(
-    private val debtApplicationService: DebtApplicationService,
+    private val debtService: DebtService,
     private val debtQueryRepository: DebtQueryRepository,
     private val workspaceRepository: WorkspaceRepository
 ) {
@@ -69,19 +69,19 @@ class DebtWebController(
 
     @GetMapping("/{debtId}/delete")
     fun deleteDebt(@PathVariable debtId: String): String {
-        debtApplicationService.deleteDebt(debtId)
+        debtService.deleteDebt(debtId)
         return "redirect:/dashboard"
     }
 
     @PostMapping("/{debtId}/vote")
     fun vote(@PathVariable debtId: String): ResponseEntity<Any> {
-        debtApplicationService.vote(debtId)
+        debtService.vote(debtId)
         return ResponseEntity.ok().build()
     }
 
     @PostMapping("/{debtId}/downVote")
     fun downVote(@PathVariable debtId: String): ResponseEntity<Any> {
-        debtApplicationService.downVote(debtId)
+        debtService.downVote(debtId)
         return ResponseEntity.ok().build()
     }
 
@@ -90,7 +90,7 @@ class DebtWebController(
         @PathVariable debtId: String, @ModelAttribute("form") form: DebtEditForm,
         @RequestParam(value = "action") action: String
     ): String {
-        debtApplicationService.edit(debtId, form)
+        debtService.edit(debtId, form)
         return "redirect:/dashboard"
     }
 
@@ -103,8 +103,8 @@ class DebtWebController(
         @ModelAttribute("advancedForm") advancedForm: AdvancedBindingEditForm
     ): String {
         when (type) {
-            "basic" -> debtApplicationService.editBinding(debtId, bindingId, form)
-            "advanced" -> debtApplicationService.editAdvancedBinding(debtId, bindingId, advancedForm)
+            "basic" -> debtService.editBinding(debtId, bindingId, form)
+            "advanced" -> debtService.editAdvancedBinding(debtId, bindingId, advancedForm)
             else -> throw IllegalArgumentException("Unknown type: $type")
         }
         return "redirect:/debts/${debtId}"

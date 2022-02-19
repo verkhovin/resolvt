@@ -1,8 +1,7 @@
 package dev.ithurts.controller.web.page
 
-import dev.ithurts.application.dto.debt.BindingDto
-import dev.ithurts.application.dto.debt.DebtDto
-import dev.ithurts.domain.debt.DebtStatus
+import dev.ithurts.application.model.debt.BindingDto
+import dev.ithurts.application.model.debt.DebtDto
 
 data class BindingEditPage(
     val debt: DebtDto,

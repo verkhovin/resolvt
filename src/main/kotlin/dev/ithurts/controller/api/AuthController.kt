@@ -1,7 +1,7 @@
 package dev.ithurts.controller.api
 
-import dev.ithurts.application.dto.PluginToken
-import dev.ithurts.application.service.plugin.PluginAuthService
+import dev.ithurts.application.model.PluginToken
+import dev.ithurts.application.security.plugin.PluginAuthService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam

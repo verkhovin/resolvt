@@ -1,7 +1,7 @@
 package dev.ithurts.domain.debt
 
-import dev.ithurts.application.service.events.Change
-import dev.ithurts.application.service.events.ChangeType
+import dev.ithurts.application.events.Change
+import dev.ithurts.application.events.ChangeType
 import org.bson.types.ObjectId
 
 data class Binding(

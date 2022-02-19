@@ -1,9 +1,8 @@
 package dev.ithurts.application.query
 
-import dev.ithurts.application.dto.debt.*
+import dev.ithurts.application.model.RepositoryInfo
+import dev.ithurts.application.model.debt.*
 import dev.ithurts.application.security.AuthenticationFacade
-import dev.ithurts.application.service.RepositoryInfo
-import dev.ithurts.application.service.SourceProviderService
 import dev.ithurts.domain.CostCalculationService
 import dev.ithurts.domain.account.Account
 import dev.ithurts.domain.account.AccountRepository
@@ -112,7 +111,10 @@ class DebtQueryRepository(
     fun queryWorkspaceDebts(workspaceId: String, resolved: Boolean): List<DebtDto> {
         val workspace = workspaceRepository.findByIdOrNull(workspaceId)
             ?: throw EntityNotFoundException("Workspace", "id", workspaceId)
-        val debts = debtRepository.findByWorkspaceIdAndStatusNot(workspace.id, if (!resolved) DebtStatus.RESOLVED else DebtStatus.OPEN)
+        val debts = debtRepository.findByWorkspaceIdAndStatusNot(
+            workspace.id,
+            if (!resolved) DebtStatus.RESOLVED else DebtStatus.OPEN
+        )
         val repository = repositoryRepository.findAllById(debts.map { it.repositoryId })
         val accounts = accountRepository.findAllById(debts.map { it.creatorAccountId })
         val eventsCount = debtEventQueryRepository.eventCountForEvents(debts.map { it.id })

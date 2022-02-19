@@ -2,8 +2,7 @@ package dev.ithurts.controller.web
 
 import dev.ithurts.controller.web.dto.MemberInvitationRequest
 import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
-import dev.ithurts.application.service.WorkspaceApplicationService
-import dev.ithurts.application.service.web.SessionManager
+import dev.ithurts.application.WorkspaceService
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -15,7 +14,7 @@ import javax.servlet.http.HttpSession
 @Controller
 @RequestMapping("organisations")
 class WorkspaceController(
-    private val workspaceApplicationService: WorkspaceApplicationService,
+    private val workspaceService: WorkspaceService,
     private val workspaceRepository: WorkspaceRepository,
     private val sessionManager: SessionManager
 ) {
@@ -45,7 +44,7 @@ class WorkspaceController(
         @ModelAttribute("memberInvitationRequest") memberInvitationRequest: MemberInvitationRequest,
         httpSession: HttpSession
     ): String {
-        workspaceApplicationService.addMemberByEmail(
+        workspaceService.addMemberByEmail(
             httpSession.getAttribute("currentOrganisation.id") as String,
             memberInvitationRequest.email
         )

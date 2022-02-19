@@ -1,6 +1,6 @@
 package dev.ithurts.domain.repository
 
-import dev.ithurts.application.dto.TechDebtReport
+import dev.ithurts.application.model.TechDebtReport
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 import org.bson.codecs.pojo.annotations.BsonId

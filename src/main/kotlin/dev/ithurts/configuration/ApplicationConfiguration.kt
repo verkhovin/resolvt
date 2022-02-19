@@ -1,14 +1,17 @@
 package dev.ithurts.configuration
 
-import dev.ithurts.application.service.advancedbinding.JavaBindingService
-import dev.ithurts.application.service.advancedbinding.KotlinBindingService
-import dev.ithurts.application.service.advancedbinding.LanguageSpecificBindingService
-import dev.ithurts.application.service.advancedbinding.code.JavaCodeAnalyzer
-import dev.ithurts.application.service.advancedbinding.code.KotlinCodeAnalyzer
+import dev.ithurts.application.internal.advancedbinding.JavaBindingService
+import dev.ithurts.application.internal.advancedbinding.KotlinBindingService
+import dev.ithurts.application.internal.advancedbinding.LanguageSpecificBindingService
+import dev.ithurts.application.internal.advancedbinding.code.JavaCodeAnalyzer
+import dev.ithurts.application.internal.advancedbinding.code.KotlinCodeAnalyzer
 import dev.ithurts.domain.CostCalculationService
 import dev.ithurts.domain.Language
+import io.reflectoring.diffparser.api.DiffParser
+import io.reflectoring.diffparser.api.UnifiedDiffParser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.time.Clock
 
 @Configuration
 class ApplicationConfiguration {
@@ -26,5 +29,15 @@ class ApplicationConfiguration {
     @Bean
     fun costCalculationService(): CostCalculationService {
         return CostCalculationService()
+    }
+
+    @Bean
+    fun clock(): Clock {
+        return Clock.systemUTC()
+    }
+
+    @Bean
+    fun diffParser() : DiffParser {
+        return UnifiedDiffParser()
     }
 }

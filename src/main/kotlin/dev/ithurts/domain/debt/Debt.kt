@@ -1,8 +1,8 @@
 package dev.ithurts.domain.debt
 
-import dev.ithurts.application.service.events.Change
-import dev.ithurts.application.service.events.ChangeType
-import dev.ithurts.application.service.events.DebtBindingChangedEvent
+import dev.ithurts.application.events.Change
+import dev.ithurts.application.events.ChangeType
+import dev.ithurts.application.events.DebtBindingChangedEvent
 import org.bson.codecs.pojo.annotations.BsonId
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant

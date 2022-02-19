@@ -1,11 +1,11 @@
 package dev.ithurts.controller.api
 
-import dev.ithurts.application.dto.TechDebtReport
-import dev.ithurts.application.dto.debt.DebtDto
+import dev.ithurts.application.model.TechDebtReport
+import dev.ithurts.application.model.debt.DebtDto
 import dev.ithurts.application.query.DebtQueryRepository
-import dev.ithurts.application.service.DebtApplicationService
-import dev.ithurts.application.service.RepositoryInfo
-import dev.ithurts.application.service.RepositoryInfoService
+import dev.ithurts.application.DebtService
+import dev.ithurts.application.model.RepositoryInfo
+import dev.ithurts.application.RepositoryInfoService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
@@ -13,14 +13,14 @@ import java.net.URI
 @RestController
 @RequestMapping("api/debts")
 class DebtController(
-    private val debtApplicationService: DebtApplicationService,
+    private val debtService: DebtService,
     private val debtQueryRepository: DebtQueryRepository,
     private val repositoryInfoService: RepositoryInfoService,
 ) {
     @PostMapping
     fun reportDebt(@RequestBody techDebtReport: TechDebtReport): ResponseEntity<Any> {
         val repositoryInfo: RepositoryInfo = repositoryInfoService.parseRemoteUrl(techDebtReport.remoteUrl)
-        val debtId = debtApplicationService.createDebt(techDebtReport, repositoryInfo)
+        val debtId = debtService.createDebt(techDebtReport, repositoryInfo)
         return ResponseEntity.created(URI.create("https://ithurts.dev/api/debt/$debtId"))
             .build()
     }
@@ -33,13 +33,13 @@ class DebtController(
 
     @PostMapping("/{debtId}/vote")
     fun vote(@PathVariable debtId: String): ResponseEntity<Any> {
-        debtApplicationService.vote(debtId)
+        debtService.vote(debtId)
         return ResponseEntity.ok().build()
     }
 
     @PostMapping("/{debtId}/downVote")
     fun downVote(@PathVariable debtId: String): ResponseEntity<Any> {
-        debtApplicationService.downVote(debtId)
+        debtService.downVote(debtId)
         return ResponseEntity.ok().build()
     }
 

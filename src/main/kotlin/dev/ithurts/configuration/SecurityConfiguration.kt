@@ -3,10 +3,10 @@ package dev.ithurts.configuration
 import dev.ithurts.domain.account.AccountRepository
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import dev.ithurts.application.security.oauth2.AccountPersistingOAuth2UserService
-import dev.ithurts.application.security.WorkspacePermissionEvaluator
-import dev.ithurts.application.security.api.IntegrationApiSecurityFilter
-import dev.ithurts.application.security.api.PluginAuthenticationFilter
-import dev.ithurts.application.service.plugin.PluginTokenManager
+import dev.ithurts.application.security.permission.WorkspacePermissionEvaluator
+import dev.ithurts.application.security.filter.BitbucketCloudAuthenticationFilter
+import dev.ithurts.application.security.filter.PluginAuthenticationFilter
+import dev.ithurts.application.security.plugin.PluginTokenManager
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler
@@ -108,7 +108,7 @@ class IntegrationApiSecurityConfiguration(
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(
-                IntegrationApiSecurityFilter(workspaceRepository)
+                BitbucketCloudAuthenticationFilter(workspaceRepository)
             )
             exceptionHandling {
 
