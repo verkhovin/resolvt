@@ -5,12 +5,14 @@ import dev.ithurts.domain.workspace.WorkspaceMemberRole.*
 import dev.ithurts.domain.workspace.WorkspaceMemberStatus.*
 import org.bson.codecs.pojo.annotations.BsonId
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.Field
 
 @Document(collection = "workspaces")
 data class Workspace(
     val name: String,
     val sourceProvider: SourceProvider,
     val externalId: String,
+    @Field
     var sourceProviderApplicationCredentials: SourceProviderApplicationCredentials,
     var active: Boolean = true,
     val members: MutableList<WorkspaceMember> = mutableListOf(),
