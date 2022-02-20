@@ -18,7 +18,7 @@
         <div class="col-md-12">
             <nav class="navbar navbar-expand-lg navbar-light mt-3 rounded-3">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="/">
+                    <a class="navbar-brand" th:href="@{/dashboard}">
                         <img class="logo" th:src="@{/public/imgs/logo.svg}" width="150"></a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -31,7 +31,7 @@
                                 <a class="nav-link" th:href="${@sourceProviderService.getSourceProviderConnectLink()}">Create workspace</a>
                             </li>
                             <li th:unless="${#session.getAttribute('organisations') == null}" class="nav-item dropdown">
-                                <a class="nav-link" th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{organisations/invite}">
+                                <a class="nav-link" th:if="${#session.getAttribute('currentOrganisation.role') == 'ADMIN'}" th:href="@{/organisations/invite}">
                                     Invite
                                 </a>
                             </li>
@@ -39,7 +39,7 @@
                                 <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#" th:text="${org.name}">Current workspace</a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li th:each="org: ${#session.getAttribute('organisations')}">
-                                        <a class="dropdown-item" th:href="@{organisations/{id}/select(id=${org.id})}" th:text="${org.name}"></a>
+                                        <a class="dropdown-item" th:href="@{/organisations/{id}/select(id=${org.id})}" th:text="${org.name}"></a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
