@@ -31,6 +31,7 @@ class DebtQueryRepository(
     private val authenticationFacade: AuthenticationFacade,
 ) {
 
+    @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun queryDebt(debtId: String): DebtDto {
         val bindingEventsCount = debtEventQueryRepository.countByDebtId(debtId)
         return queryDebt(debtId) { debt, repository, workspace, account ->
@@ -44,6 +45,7 @@ class DebtQueryRepository(
         }
     }
 
+    @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun queryDebtDetails(debtId: String): DebtDetailsDto {
         val events = debtEventQueryRepository.findByDebtId(debtId)
         return queryDebt(debtId) { debt, repository, workspace, account ->
@@ -56,17 +58,6 @@ class DebtQueryRepository(
             )
         }
     }
-
-    private fun <T> queryDebt(debtId: String, mapper: (Debt, Repository, Workspace, Account?) -> T): T {
-        val debt = debtRepository.findByIdOrNull(debtId)
-            ?: throw EntityNotFoundException("Debt", "id", debtId)
-        val workspace = workspaceRepository.findByIdOrNull(debt.workspaceId)!!
-        val repository = repositoryRepository.findByIdOrNull(debt.repositoryId)!!
-        val account = accountRepository.findByIdOrNull(debt.creatorAccountId)
-
-        return mapper(debt, repository, workspace, account)
-    }
-
 
     @PreAuthorize("hasPermission(#repositoryId, 'Repository', 'MEMBER')")
     fun queryRepositoryActiveDebts(repositoryId: String): List<DebtDto> {
@@ -85,6 +76,7 @@ class DebtQueryRepository(
             )
         }
     }
+
 
     @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
     fun queryRepositoryActiveDebts(repositoryInfo: RepositoryInfo): List<DebtDto> {
@@ -127,6 +119,16 @@ class DebtQueryRepository(
                 costCalculationService.calculateCost(debt, eventsCount[debt.id] ?: 0)
             )
         }
+    }
+
+    private fun <T> queryDebt(debtId: String, mapper: (Debt, Repository, Workspace, Account?) -> T): T {
+        val debt = debtRepository.findByIdOrNull(debtId)
+            ?: throw EntityNotFoundException("Debt", "id", debtId)
+        val workspace = workspaceRepository.findByIdOrNull(debt.workspaceId)!!
+        val repository = repositoryRepository.findByIdOrNull(debt.repositoryId)!!
+        val account = accountRepository.findByIdOrNull(debt.creatorAccountId)
+
+        return mapper(debt, repository, workspace, account)
     }
 
     private fun toDto(debt: Debt, repo: Repository, workspace: Workspace, reporter: Account?, cost: Int): DebtDto {
