@@ -33,6 +33,22 @@ class KotlinCodeAnalyzer : LanguageSpecificCodeAnalyzer {
                 }
                 return functions
             }
+            "Class" -> {
+                val classes = mutableListOf<CodeEntitySpec>()
+                summary.onSuccess { asts ->
+                    asts.forEach { ast ->
+                        findNode(ast, null, "class", name) { node, parent ->
+                            classes.add(
+                                buildCodeSpec(
+                                    node,
+                                    null
+                                )
+                            )
+                        }
+                    }
+                }
+                return classes
+            }
             else -> throw IllegalArgumentException("Unknown binding type: ${type}")
         }
     }
