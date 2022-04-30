@@ -138,7 +138,7 @@ class DebtQueryRepository(
             bindingDtos,
             DebtRepositoryDto(repo.name),
             DebtAccountDto(reporter?.name ?: "Unknown"),
-            debt.accountVoted(authenticationFacade.account.id),
+            debt.isVotedBy(authenticationFacade.account.id),
             cost
         )
     }
@@ -159,7 +159,7 @@ class DebtQueryRepository(
             bindingDtos,
             DebtRepositoryDto(repo.name),
             DebtAccountDto(reporter?.name ?: "Unknown"),
-            debt.accountVoted(authenticationFacade.account.id),
+            debt.isVotedBy(authenticationFacade.account.id),
             eventsDtos
         )
     }

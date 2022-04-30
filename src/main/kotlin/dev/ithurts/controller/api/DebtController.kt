@@ -24,6 +24,12 @@ class DebtController(
         return ResponseEntity.created(URI.create("https://ithurts.dev/api/debt/$debtId"))
             .build()
     }
+    @PutMapping("/{id}")
+    fun updateDebt(@PathVariable id: String, @RequestBody debtDto: TechDebtReport): ResponseEntity<Any> {
+        debtService.update(id, debtDto)
+        return ResponseEntity.noContent().build()
+    }
+
 
     @GetMapping
     fun getDebts(@RequestParam remoteUrl: String): List<DebtDto> {

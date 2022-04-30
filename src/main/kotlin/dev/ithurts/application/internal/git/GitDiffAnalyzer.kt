@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service
 class GitDiffAnalyzer(
     private val hunkResolvingStrategy: HunkResolvingStrategy
 ) {
-    fun lookupSelectionChange(initialPosition: LineRange, diffs: List<Diff>): SelectionChangeLookupResult {
-        val mutator = LineRangeMutator.of(initialPosition)
-        var selectionChanded = false
+    fun lookupCodeRangeChange(codeRange: LineRange, diffs: List<Diff>): SelectionChangeLookupResult {
+        val mutator = LineRangeMutator.of(codeRange)
+        var selectionChanged = false
         diffs.forEach { diff ->
             diff.hunks.forEach hunk@{ hunk ->
                 if (mutator.end < hunk.fromFileRange.lineStart) {
@@ -26,13 +26,13 @@ class GitDiffAnalyzer(
                 if (mutator.start < hunk.fromFileRange.lineStart && mutator.end > hunk.fromFileRange.lineEnd) {
                     val offsetChange = hunk.toFileRange.lineCount - hunk.fromFileRange.lineCount
                     mutator.end += offsetChange
-                    selectionChanded = true
+                    selectionChanged = true
                     return@hunk
                 }
                 hunkResolvingStrategy.processHunk(mutator, hunk)
             }
         }
-        return SelectionChangeLookupResult(mutator.toLineRange(), selectionChanded)
+        return SelectionChangeLookupResult(mutator.toLineRange(), selectionChanged)
     }
 }
 

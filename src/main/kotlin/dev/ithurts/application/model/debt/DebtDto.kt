@@ -32,7 +32,7 @@ data class DebtDto(
                 debt.title,
                 debt.description,
                 debt.status,
-                bindings,
+                bindings.filter { it.active },
                 debt.votes.size,
                 currentUserVoted,
                 repository,

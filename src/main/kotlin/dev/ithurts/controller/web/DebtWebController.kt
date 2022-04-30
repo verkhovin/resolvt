@@ -90,7 +90,7 @@ class DebtWebController(
         @PathVariable debtId: String, @ModelAttribute("form") form: DebtEditForm,
         @RequestParam(value = "action") action: String
     ): String {
-        debtService.edit(debtId, form)
+        debtService.update(debtId, form)
         return "redirect:/dashboard"
     }
 

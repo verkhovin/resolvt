@@ -18,21 +18,21 @@ class GitDiffAnalyzerTest {
 
     @Test
     fun `when selection is located before the diff it shouldn't be changed`() {
-        val result = gitDiffAnalyzer.lookupSelectionChange(LineRange(5, 10), DIFF_6DELETE_1ADD).position
+        val result = gitDiffAnalyzer.lookupCodeRangeChange(LineRange(5, 10), DIFF_6DELETE_1ADD).position
         assertEquals(LineRange(5, 10), result)
         then(hunkResolvingStrategy).should(never()).processHunk(anyOrNull(), anyOrNull(), anyOrNull())
     }
 
     @Test
     fun `when selection is located after the diff its position should be adjusted`() {
-        val result = gitDiffAnalyzer.lookupSelectionChange(LineRange(36, 45), DIFF_6DELETE_1ADD).position
+        val result = gitDiffAnalyzer.lookupCodeRangeChange(LineRange(36, 45), DIFF_6DELETE_1ADD).position
         assertEquals(LineRange(31, 40), result)
         then(hunkResolvingStrategy).should(never()).processHunk(anyOrNull(), anyOrNull(), anyOrNull())
     }
 
     @Test
     fun `when selection is around the hunk the end of debt should be adjusted and selection considered changed`() {
-        val result = gitDiffAnalyzer.lookupSelectionChange(LineRange(5, 36), DIFF_6DELETE_1ADD)
+        val result = gitDiffAnalyzer.lookupCodeRangeChange(LineRange(5, 36), DIFF_6DELETE_1ADD)
         assertEquals(LineRange(5, 31), result.position)
         assertEquals(true, result.wasSelectedCodeChanged)
         then(hunkResolvingStrategy).should(never()).processHunk(anyOrNull(), anyOrNull(), anyOrNull())
@@ -40,7 +40,7 @@ class GitDiffAnalyzerTest {
 
     @Test
     fun `when debt start is inside of the hunk processing should be delegated to HunkProcessingStrategy`() {
-        gitDiffAnalyzer.lookupSelectionChange(LineRange(35, 40), DIFF_6DELETE_1ADD)
+        gitDiffAnalyzer.lookupCodeRangeChange(LineRange(35, 40), DIFF_6DELETE_1ADD)
         then(hunkResolvingStrategy).should(times(1)).processHunk(anyOrNull(), anyOrNull(), anyOrNull())
     }
 

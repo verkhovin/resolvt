@@ -1,7 +1,5 @@
 package dev.ithurts.domain.debt
 
-import dev.ithurts.application.events.Change
-import dev.ithurts.application.events.ChangeType
 import org.bson.types.ObjectId
 
 data class Binding(
@@ -9,19 +7,35 @@ data class Binding(
     var startLine: Int,
     var endLine: Int,
     var advancedBinding: AdvancedBinding?,
+    var active: Boolean = true,
     val id: String = ObjectId().toString()
 ) {
+    init {
+        this.endLine = if (startLine < endLine) {
+            endLine
+        } else {
+            startLine
+        }
+    }
+
     fun isAdvanced(): Boolean {
         return advancedBinding != null
     }
 
-    fun update(newFilePath: String, coveredCodeHasChanges: Boolean, startLine: Int, endLine: Int): List<Change> {
-        val changes = mutableListOf<Change>()
+    fun update(newFilePath: String, coveredCodeHasChanges: Boolean, startLine: Int, endLine: Int): List<BindingChange> {
+        val bindingChanges = mutableListOf<BindingChange>()
         if (newFilePath != this.filePath) {
-            changes.add(Change(id, ChangeType.MOVED, this.filePath, newFilePath))
+            bindingChanges.add(BindingChange(id, ChangeType.MOVED, this.filePath, newFilePath))
         }
         if (coveredCodeHasChanges || startLine - endLine != this.startLine - this.endLine) {
-            changes.add(Change(id, ChangeType.CODE_CHANGED, null, null))
+            bindingChanges.add(
+                BindingChange(
+                    id,
+                    ChangeType.CODE_CHANGED,
+                    "${this.startLine}:${this.endLine}",
+                    "${startLine}:${endLine}"
+                )
+            )
         }
 
         this.filePath = newFilePath
@@ -32,16 +46,26 @@ data class Binding(
             startLine
         }
 
-        return changes
+        val changeTypes = bindingChanges.map { it.type }.distinct()
+        if (changeTypes.size != bindingChanges.size) {
+            throw IllegalStateException("Binding change types duplicated: ${this.id}}: ${changeTypes}")
+        }
+        return bindingChanges
     }
 
-    fun updateAdvancedManually(path: String, parent: String?, name: String, params: List<String>) {
+    fun updateAdvanced(path: String, parent: String?, name: String, params: List<String>) {
         val advancedBinding = this.advancedBinding ?: throw IllegalStateException("Binding is not advanced")
         this.filePath = path
         this.advancedBinding = advancedBinding.copy(parent = parent, name = name, params = params)
     }
 
-    companion object {
-        val log = org.slf4j.LoggerFactory.getLogger(Binding::class.java)
+    fun applyChanges(changes: List<BindingChange>): Binding {
+        val newFilePath = changes.last { it.type == ChangeType.MOVED }.to ?: this.filePath
+        val newLines = changes.last { it.type == ChangeType.CODE_CHANGED }.to?.split(":")?.map { it.toInt() }
+        return this.copy(
+            filePath = newFilePath,
+            startLine = newLines?.get(0) ?: this.startLine,
+            endLine = newLines?.get(0) ?: this.endLine,
+        )
     }
 }

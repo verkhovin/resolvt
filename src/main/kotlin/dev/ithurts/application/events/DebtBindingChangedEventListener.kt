@@ -14,6 +14,9 @@ class DebtBindingChangedEventListener(
     private val clock: Clock
 ): ApplicationListener<DebtBindingChangedEvent> {
     override fun onApplicationEvent(event: DebtBindingChangedEvent) {
+        if (event.changes.isEmpty()) {
+            return
+        }
         val debtEvent = DebtEvent(
             event.debtId,
             event.repositoryId,

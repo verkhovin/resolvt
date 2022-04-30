@@ -1,30 +1,37 @@
 package dev.ithurts.domain.debt
 
-import dev.ithurts.application.events.Change
-import dev.ithurts.application.events.ChangeType
 import dev.ithurts.application.events.DebtBindingChangedEvent
+import io.reflectoring.diffparser.api.model.Diff
 import org.bson.codecs.pojo.annotations.BsonId
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 @Document(collection = "debts")
-data class Debt(
-    var title: String,
-    var description: String,
-    var status: DebtStatus,
+class Debt(
+    title: String,
+    description: String,
+    status: DebtStatus,
     val creatorAccountId: String,
     val repositoryId: String,
     val workspaceId: String,
-    val bindings: MutableList<Binding>,
+    bindings: List<Binding>,
     val createdAt: Instant,
     var updatedAt: Instant = createdAt,
     val votes: MutableList<DebtVote> = mutableListOf(),
-    var resolutionReason: ResolutionReason? = null,
     @BsonId
     val _id: String? = null
 ) {
     val id: String
         get() = _id!!
+    var title: String = title
+        private set
+    var description: String = description
+        private set
+    var status: DebtStatus = status
+        private set
+    var bindings: List<Binding> = bindings
+        private set
+        get() = field.map { it.copy() }
 
     fun update(
         title: String,
@@ -32,13 +39,55 @@ data class Debt(
         status: DebtStatus,
         updatedAt: Instant
     ) {
-        if (status == DebtStatus.PROBABLY_RESOLVED) {
-            throw IllegalArgumentException("${DebtStatus.PROBABLY_RESOLVED} can't be set by manual update")
-        }
         this.title = title
         this.description = description
         this.status = status
         this.updatedAt = updatedAt
+    }
+
+    fun rebind(bindings: List<Binding>) {
+        val bindingIds = bindings.map { it.id }
+        val inactiveBindings = this.bindings
+            .filter { existingBinding -> existingBinding.id !in bindingIds }
+        inactiveBindings.forEach { inactiveBinding ->
+            inactiveBinding.active = false
+        }
+        this.bindings = bindings + inactiveBindings
+    }
+
+    fun applyDiffs(
+        diffs: Map<String, List<Diff>>,
+        commitHash: String,
+        diffApplier: DiffApplier
+    ): DebtBindingChangedEvent {
+        val activeBindings = this.bindings.filter { it.active }
+        val changes = activeBindings.associate { binding ->
+            binding.id to diffApplier.applyDiffs(binding, diffs[binding.filePath] ?: emptyList())
+        }
+        val updatedBindings = activeBindings.map { binding -> binding.applyChanges(changes[binding.id] ?: emptyList()) }
+        rebind(updatedBindings)
+        return DebtBindingChangedEvent(
+            this, this.id, repositoryId, commitHash, changes.flatMap { it.value }
+        )
+    }
+
+    fun updateBinding(bindingId: String, path: String, startLine: Int, endLine: Int) {
+        val binding = bindings.find { it.id == bindingId } ?: throw IllegalArgumentException("Binding not found")
+        binding.update(path, false, startLine, endLine)
+    }
+
+    fun updateAdvancedBindingManually(
+        bindingId: String,
+        path: String,
+        parent: String?,
+        name: String,
+        params: List<String>
+    ) {
+        val binding = bindings.find { it.id == bindingId } ?: throw IllegalArgumentException("Binding not found")
+        if (!binding.isAdvanced()) {
+            throw IllegalArgumentException("Binding is not advanced")
+        }
+        binding.updateAdvanced(path, parent, name, params)
     }
 
     fun vote(accountId: String) {
@@ -53,33 +102,10 @@ data class Debt(
         votes.remove(vote)
     }
 
-    fun accountVoted(accountId: String) = this.votes.contains(DebtVote(accountId))
-
-    fun eventForChanges(changes: List<Change>, commitHash: String): DebtBindingChangedEvent {
-        val movedBindingIds = changes.filter { it.type == ChangeType.MOVED }.map { it.bindingId }
-        val acceptedChanges = if (movedBindingIds == this.bindings.map { it.id }) {
-            changes.filter { it.type != ChangeType.MOVED }
-        } else {
-            changes
-        }
-        return DebtBindingChangedEvent(
-            this,
-            id,
-            repositoryId,
-            commitHash,
-            acceptedChanges
-        )
-    }
+    fun isVotedBy(accountId: String) = this.votes.contains(DebtVote(accountId))
 }
 
 enum class DebtStatus {
     OPEN,
-    PROBABLY_RESOLVED,
     RESOLVED
-}
-
-enum class ResolutionReason {
-    CODE_DELETED,
-    PARTLY_CHANGED,
-    MANUAL
 }

@@ -10,6 +10,7 @@ data class BindingDto(
     val filePath: String,
     val startLine: Int,
     val endLine: Int,
+    val active: Boolean,
     val sourceLink: SourceLink,
     val advancedBinding: AdvancedBindingDto?
 ) {
@@ -20,6 +21,7 @@ data class BindingDto(
                 binding.filePath,
                 binding.startLine,
                 binding.endLine,
+                binding.active,
                 sourceLink,
                 binding.advancedBinding?.let { AdvancedBindingDto.from(it) }
             )
@@ -50,7 +52,7 @@ data class BindingDto(
                 else -> "${advancedBinding.type} ${advancedBinding.name}"
             }
         } else {
-          ""
+            ""
         }
     }
 
