@@ -18,7 +18,7 @@ class DiffApplyingService(
         val selectionChange = gitDiffAnalyzer.lookupCodeRangeChange(currentBindingPosition, diffs)
         val newFilePath = trimDiffFilepath(diffs.last().toFileName)
         val newBindingPosition: LineRange = selectionChange.position
-        return binding.update(
+        return binding.deriveChanges(
             newFilePath,
             selectionChange.wasSelectedCodeChanged,
             newBindingPosition.start,

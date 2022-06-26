@@ -1,6 +1,6 @@
 package dev.ithurts.domain.authcode
 
-import org.bson.codecs.pojo.annotations.BsonId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
@@ -11,7 +11,7 @@ data class AuthCode(
     val accountId: String,
     var expiresAt: Instant,
     var used: Boolean = false,
-    @BsonId
+    @Id
     val _id: String? = null
 ) {
     val id: String

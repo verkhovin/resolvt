@@ -1,7 +1,7 @@
 package dev.ithurts.domain.account
 
 import dev.ithurts.domain.SourceProvider
-import org.bson.codecs.pojo.annotations.BsonId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "accounts")
@@ -10,7 +10,7 @@ data class Account (
     val name: String,
     val sourceProvider: SourceProvider,
     val externalId: String,
-    @BsonId
+    @Id
     val _id: String? = null
 ) {
     val id: String

@@ -22,8 +22,6 @@ data class Workspace(
     val id: String
         get() = _id!!
 
-
-
     fun addMember(
         account: String,
         role: WorkspaceMemberRole = MEMBER,

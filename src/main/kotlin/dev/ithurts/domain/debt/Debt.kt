@@ -2,7 +2,7 @@ package dev.ithurts.domain.debt
 
 import dev.ithurts.application.events.DebtBindingChangedEvent
 import io.reflectoring.diffparser.api.model.Diff
-import org.bson.codecs.pojo.annotations.BsonId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
@@ -18,8 +18,8 @@ class Debt(
     val createdAt: Instant,
     var updatedAt: Instant = createdAt,
     val votes: MutableList<DebtVote> = mutableListOf(),
-    @BsonId
-    val _id: String? = null
+    @Id
+    var _id: String? = null,
 ) {
     val id: String
         get() = _id!!
@@ -37,7 +37,7 @@ class Debt(
         title: String,
         description: String,
         status: DebtStatus,
-        updatedAt: Instant
+        updatedAt: Instant,
     ) {
         this.title = title
         this.description = description
@@ -45,20 +45,10 @@ class Debt(
         this.updatedAt = updatedAt
     }
 
-    fun rebind(bindings: List<Binding>) {
-        val bindingIds = bindings.map { it.id }
-        val inactiveBindings = this.bindings
-            .filter { existingBinding -> existingBinding.id !in bindingIds }
-        inactiveBindings.forEach { inactiveBinding ->
-            inactiveBinding.active = false
-        }
-        this.bindings = bindings + inactiveBindings
-    }
-
     fun applyDiffs(
         diffs: Map<String, List<Diff>>,
         commitHash: String,
-        diffApplier: DiffApplier
+        diffApplier: DiffApplier,
     ): DebtBindingChangedEvent {
         val activeBindings = this.bindings.filter { it.active }
         val changes = activeBindings.associate { binding ->
@@ -71,9 +61,26 @@ class Debt(
         )
     }
 
+    /**
+     * Sets the binding list.
+     * Existing bindings that are missed from [bindings] are marked as inactive
+     */
+    fun rebind(bindings: List<Binding>) {
+        val bindingIds = bindings.map { it.id }
+        val missingBindings = this.bindings
+            .filter { existingBinding -> existingBinding.id !in bindingIds }
+            .map { it.inactivate() }
+        this.bindings = bindings + missingBindings
+    }
+
     fun updateBinding(bindingId: String, path: String, startLine: Int, endLine: Int) {
-        val binding = bindings.find { it.id == bindingId } ?: throw IllegalArgumentException("Binding not found")
-        binding.update(path, false, startLine, endLine)
+        val currentBindings = this.bindings
+        val binding = currentBindings.find { it.id == bindingId } ?: throw IllegalArgumentException("Binding not found")
+        rebindSingleBinding(
+            binding.applyChanges(
+                binding.deriveChanges(path, false, startLine, endLine)
+            )
+        )
     }
 
     fun updateAdvancedBindingManually(
@@ -81,13 +88,15 @@ class Debt(
         path: String,
         parent: String?,
         name: String,
-        params: List<String>
+        params: List<String>,
     ) {
         val binding = bindings.find { it.id == bindingId } ?: throw IllegalArgumentException("Binding not found")
         if (!binding.isAdvanced()) {
             throw IllegalArgumentException("Binding is not advanced")
         }
-        binding.updateAdvanced(path, parent, name, params)
+        rebindSingleBinding(
+            binding.applyAdvancedBindingManualChange(path, parent, name, params)
+        )
     }
 
     fun vote(accountId: String) {
@@ -103,6 +112,14 @@ class Debt(
     }
 
     fun isVotedBy(accountId: String) = this.votes.contains(DebtVote(accountId))
+
+    private fun rebindSingleBinding(binding: Binding) {
+        val currentBindings = this.bindings
+        currentBindings.firstOrNull { it.id == binding.id } ?: throw IllegalArgumentException("Binding should exist: $binding")
+        rebind(
+            this.bindings.filter { it.id != binding.id } + binding
+        )
+    }
 }
 
 enum class DebtStatus {
