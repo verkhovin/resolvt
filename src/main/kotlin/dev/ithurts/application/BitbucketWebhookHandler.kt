@@ -44,8 +44,7 @@ class BitbucketWebhookHandler(
         )
 
         if (workspace != null) {
-            workspace.connectWithSourceProviderApplication(sourceProviderApplicationCredentials)
-            workspaceRepository.save(workspace)
+            workspaceRepository.save(workspace.connectWithSourceProviderApplication(sourceProviderApplicationCredentials))
         } else {
             WorkspaceFactory.fromBitbucketWorkspace(
                 actorAccount.id, SourceProviderWorkspace(
@@ -62,10 +61,7 @@ class BitbucketWebhookHandler(
             SourceProvider.BITBUCKET,
             bitbucketAppInstallation.principal.bitbucketId
         ) ?: return
-
-        workspace.deactivate()
-
-        workspaceRepository.save(workspace)
+        workspaceRepository.save(workspace.deactivate())
     }
 
     fun repoUpdated(data: RepoUpdated) {
@@ -73,8 +69,7 @@ class BitbucketWebhookHandler(
         val oldName = data.changes.slug.old
         val newName = data.changes.slug.new
         repositoryRepository.findByNameAndWorkspaceId(oldName, workspace.id)?.let { repository ->
-            repository.rename(newName)
-            repositoryRepository.save(repository)
+            repositoryRepository.save(repository.rename(newName))
         }
     }
 

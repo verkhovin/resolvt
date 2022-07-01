@@ -34,32 +34,28 @@ class DebtService(
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun update(debtId: String, debtDto: TechDebtReport) {
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
-        debt.update(debtDto.title, debtDto.description, DebtStatus.OPEN, clock.instant())
-        debt.rebind(debtDto.bindings.map { it.toDomain() })
-        debtRepository.save(debt)
+        debtRepository.save(
+            debt.update(debtDto.title, debtDto.description, DebtStatus.OPEN, clock.instant())
+                .rebind(debtDto.bindings.map { it.toDomain() })
+        )
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun update(debtId: String, changes: DebtEditForm) {
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
-        debt.update(
-            changes.title, changes.description, changes.status, clock.instant()
-        )
-        debtRepository.save(debt)
+        debtRepository.save(debt.update(changes.title, changes.description, changes.status, clock.instant()))
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun vote(debtId: String) {
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
-        debt.vote(authenticationFacade.account.id)
-        debtRepository.save(debt)
+        debtRepository.save(debt.vote(authenticationFacade.account.id))
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
     fun downVote(debtId: String) {
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
-        debt.downVote(authenticationFacade.account.id)
-        debtRepository.save(debt)
+        debtRepository.save(debt.downVote(authenticationFacade.account.id))
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")

@@ -6,8 +6,8 @@ import java.time.Instant
 
 @Document(collection = "auth_codes")
 data class AuthCode(
-    var authCode: String,
-    var codeChallenge: String,
+    val authCode: String,
+    val codeChallenge: String,
     val accountId: String,
     var expiresAt: Instant,
     var used: Boolean = false,

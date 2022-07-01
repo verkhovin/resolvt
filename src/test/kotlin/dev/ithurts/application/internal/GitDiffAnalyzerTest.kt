@@ -44,8 +44,37 @@ class GitDiffAnalyzerTest {
         then(hunkResolvingStrategy).should(times(1)).processHunk(anyOrNull(), anyOrNull(), anyOrNull())
     }
 
+    @Test
+    fun one_line_change() {
+        gitDiffAnalyzer.lookupCodeRangeChange(LineRange(74, 81), ONE_LINE_CHANGE)
+        then(hunkResolvingStrategy).should(times(1)).processHunk(anyOrNull(), anyOrNull(), anyOrNull())
+    }
+
 
     companion object {
+        val ONE_LINE_CHANGE = UnifiedDiffParser().parse(
+            """
+                Index: src/main/java/ru/verkhovin/poker/service/RoomService.java
+                IDEA additional info:
+                Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+                <+>UTF-8
+                ===================================================================
+                diff --git a/src/main/java/ru/verkhovin/poker/service/RoomService.java b/src/main/java/ru/verkhovin/poker/service/RoomService.java
+                --- a/src/main/java/ru/verkhovin/poker/service/RoomService.java	(revision 2f65d0bd8100f761eb78909c792a99dd13acf76f)
+                +++ b/src/main/java/ru/verkhovin/poker/service/RoomService.java	(revision 16b2f3a037f8949e31f1ded9138e9f68e6a76393)
+                @@ -75,7 +75,7 @@
+                   public void clearEstimates(Long roomId) {
+                 
+                     onExistingRoom(roomId, room -> {
+                -      room.getEstimates() //
+                +      room.getEstimates()
+                           .forEach(Estimate::clear);
+                       room.setShowEstimates(false);
+                     });
+
+            """.trimIndent().toByteArray()
+        )
+
         val DIFF_6DELETE_1ADD: MutableList<Diff> = UnifiedDiffParser().parse(
             """
 Index: src/main/java/ru/verkhovin/poker/model/Room.java

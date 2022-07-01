@@ -1,48 +1,40 @@
 package dev.ithurts.domain.debt
 
-import dev.ithurts.application.events.DebtBindingChangedEvent
 import io.reflectoring.diffparser.api.model.Diff
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 @Document(collection = "debts")
-class Debt(
-    title: String,
-    description: String,
-    status: DebtStatus,
+data class Debt(
+    val title: String,
+    val description: String,
+    val status: DebtStatus,
     val creatorAccountId: String,
     val repositoryId: String,
     val workspaceId: String,
-    bindings: List<Binding>,
+    val bindings: List<Binding>,
     val createdAt: Instant,
-    var updatedAt: Instant = createdAt,
-    val votes: MutableList<DebtVote> = mutableListOf(),
+    val updatedAt: Instant = createdAt,
+    val votes: List<DebtVote> = emptyList(),
     @Id
-    var _id: String? = null,
+    val _id: String? = null,
 ) {
     val id: String
         get() = _id!!
-    var title: String = title
-        private set
-    var description: String = description
-        private set
-    var status: DebtStatus = status
-        private set
-    var bindings: List<Binding> = bindings
-        private set
-        get() = field.map { it.copy() }
 
     fun update(
         title: String,
         description: String,
         status: DebtStatus,
         updatedAt: Instant,
-    ) {
-        this.title = title
-        this.description = description
-        this.status = status
-        this.updatedAt = updatedAt
+    ): Debt {
+        return this.copy(
+            title = title,
+            description = description,
+            status = status,
+            updatedAt = updatedAt
+        )
     }
 
     fun applyDiffs(
@@ -52,12 +44,12 @@ class Debt(
     ): DebtBindingChangedEvent {
         val activeBindings = this.bindings.filter { it.active }
         val changes = activeBindings.associate { binding ->
-            binding.id to diffApplier.applyDiffs(binding, diffs[binding.filePath] ?: emptyList())
+            binding.id to diffApplier.applyDiffs(this, binding, diffs[binding.filePath] ?: emptyList(), commitHash)
         }
         val updatedBindings = activeBindings.map { binding -> binding.applyChanges(changes[binding.id] ?: emptyList()) }
-        rebind(updatedBindings)
+        val debt = rebind(updatedBindings)
         return DebtBindingChangedEvent(
-            this, this.id, repositoryId, commitHash, changes.flatMap { it.value }
+            debt, this.id, repositoryId, commitHash, changes.flatMap { it.value }
         )
     }
 
@@ -65,18 +57,18 @@ class Debt(
      * Sets the binding list.
      * Existing bindings that are missed from [bindings] are marked as inactive
      */
-    fun rebind(bindings: List<Binding>) {
+    fun rebind(bindings: List<Binding>): Debt {
         val bindingIds = bindings.map { it.id }
         val missingBindings = this.bindings
             .filter { existingBinding -> existingBinding.id !in bindingIds }
             .map { it.inactivate() }
-        this.bindings = bindings + missingBindings
+        return this.copy(bindings = bindings + missingBindings)
     }
 
-    fun updateBinding(bindingId: String, path: String, startLine: Int, endLine: Int) {
+    fun updateBinding(bindingId: String, path: String, startLine: Int, endLine: Int): Debt {
         val currentBindings = this.bindings
         val binding = currentBindings.find { it.id == bindingId } ?: throw IllegalArgumentException("Binding not found")
-        rebindSingleBinding(
+        return rebindSingleBinding(
             binding.applyChanges(
                 binding.deriveChanges(path, false, startLine, endLine)
             )
@@ -89,34 +81,37 @@ class Debt(
         parent: String?,
         name: String,
         params: List<String>,
-    ) {
+    ): Debt {
         val binding = bindings.find { it.id == bindingId } ?: throw IllegalArgumentException("Binding not found")
         if (!binding.isAdvanced()) {
             throw IllegalArgumentException("Binding is not advanced")
         }
-        rebindSingleBinding(
+        return rebindSingleBinding(
             binding.applyAdvancedBindingManualChange(path, parent, name, params)
         )
     }
 
-    fun vote(accountId: String) {
+    fun vote(accountId: String): Debt {
         val vote = DebtVote(accountId)
         if (!votes.contains(vote)) {
-            votes.add(vote)
+            return this.copy(
+                votes = this.votes + vote
+            )
         }
+        return this
     }
 
-    fun downVote(accountId: String) {
+    fun downVote(accountId: String): Debt {
         val vote = DebtVote(accountId)
-        votes.remove(vote)
+        return this.copy(votes = this.votes - vote)
     }
 
     fun isVotedBy(accountId: String) = this.votes.contains(DebtVote(accountId))
 
-    private fun rebindSingleBinding(binding: Binding) {
+    private fun rebindSingleBinding(binding: Binding): Debt {
         val currentBindings = this.bindings
         currentBindings.firstOrNull { it.id == binding.id } ?: throw IllegalArgumentException("Binding should exist: $binding")
-        rebind(
+        return rebind(
             this.bindings.filter { it.id != binding.id } + binding
         )
     }

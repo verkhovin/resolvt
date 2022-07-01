@@ -1,8 +1,8 @@
 package dev.ithurts.domain.workspace
 
 import dev.ithurts.domain.SourceProvider
-import dev.ithurts.domain.workspace.WorkspaceMemberRole.*
-import dev.ithurts.domain.workspace.WorkspaceMemberStatus.*
+import dev.ithurts.domain.workspace.WorkspaceMemberRole.MEMBER
+import dev.ithurts.domain.workspace.WorkspaceMemberStatus.ACTIVE
 import org.bson.codecs.pojo.annotations.BsonId
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -13,11 +13,11 @@ data class Workspace(
     val sourceProvider: SourceProvider,
     val externalId: String,
     @Field
-    var sourceProviderApplicationCredentials: SourceProviderApplicationCredentials,
-    var active: Boolean = true,
+    val sourceProviderApplicationCredentials: SourceProviderApplicationCredentials,
+    val active: Boolean = true,
     val members: MutableList<WorkspaceMember> = mutableListOf(),
     @BsonId
-    val _id: String? = null
+    val _id: String? = null,
 ) {
     val id: String
         get() = _id!!
@@ -25,7 +25,7 @@ data class Workspace(
     fun addMember(
         account: String,
         role: WorkspaceMemberRole = MEMBER,
-        status: WorkspaceMemberStatus = ACTIVE
+        status: WorkspaceMemberStatus = ACTIVE,
     ) {
         members.add(WorkspaceMember(account, role, status))
     }
@@ -34,12 +34,12 @@ data class Workspace(
         return members.find { it.accountId == account }
     }
 
-    fun connectWithSourceProviderApplication(sourceProviderApplicationCredentials: SourceProviderApplicationCredentials) {
-        this.sourceProviderApplicationCredentials = sourceProviderApplicationCredentials
-        this.active = true
+    fun connectWithSourceProviderApplication(sourceProviderApplicationCredentials: SourceProviderApplicationCredentials): Workspace {
+        return this.copy(
+            sourceProviderApplicationCredentials = sourceProviderApplicationCredentials,
+            active = true
+        )
     }
 
-    fun deactivate() {
-        this.active = false
-    }
+    fun deactivate(): Workspace = this.copy(active = false)
 }

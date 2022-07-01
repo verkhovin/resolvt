@@ -1,10 +1,8 @@
-package dev.ithurts.application.events
-
-import dev.ithurts.domain.debt.BindingChange
+package dev.ithurts.domain.debt
 import org.springframework.context.ApplicationEvent
 
 class DebtBindingChangedEvent (
-    source: Any,
+    val source: Debt,
     val debtId: String,
     val repositoryId: String,
     val commitHash: String,

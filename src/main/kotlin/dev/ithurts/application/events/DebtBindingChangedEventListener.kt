@@ -1,5 +1,6 @@
 package dev.ithurts.application.events
 
+import dev.ithurts.domain.debt.DebtBindingChangedEvent
 import dev.ithurts.domain.debtevent.DebtEvent
 import dev.ithurts.domain.debtevent.DebtEventRepository
 import dev.ithurts.domain.debtevent.ChangeType

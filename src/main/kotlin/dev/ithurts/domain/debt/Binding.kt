@@ -8,13 +8,18 @@ data class Binding(
     val endLine: Int,
     val advancedBinding: AdvancedBinding?,
     val active: Boolean = true,
-    val id: String = ObjectId().toString()
+    val id: String = ObjectId().toString(),
 ) {
     fun isAdvanced(): Boolean {
         return advancedBinding != null
     }
 
-    fun deriveChanges(newFilePath: String, coveredCodeHasChanges: Boolean, startLine: Int, endLine: Int): List<BindingChange> {
+    fun deriveChanges(
+        newFilePath: String,
+        coveredCodeHasChanges: Boolean,
+        startLine: Int,
+        endLine: Int,
+    ): List<BindingChange> {
         val bindingChanges = mutableListOf<BindingChange>()
         if (newFilePath != this.filePath) {
             bindingChanges.add(BindingChange(id, ChangeType.MOVED, this.filePath, newFilePath))
@@ -38,8 +43,8 @@ data class Binding(
     }
 
     fun applyChanges(changes: List<BindingChange>): Binding {
-        val newFilePath = changes.last { it.type == ChangeType.MOVED }.to ?: this.filePath
-        val newLines = changes.last { it.type == ChangeType.CODE_CHANGED }.to?.split(":")?.map { it.toInt() }
+        val newFilePath = changes.lastOrNull { it.type == ChangeType.MOVED }?.to ?: this.filePath
+        val newLines = changes.lastOrNull { it.type == ChangeType.CODE_CHANGED }?.to?.split(":")?.map { it.toInt() }
         val startLine = newLines?.get(0) ?: this.startLine
         val endLine = newLines?.get(0) ?: this.endLine
         return this.copy(

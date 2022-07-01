@@ -9,8 +9,8 @@ import java.time.Instant
 
 @Document(collection = "repositories")
 data class Repository(
-    var name: String,
-    var mainBranch: String,
+    val name: String,
+    val mainBranch: String,
     val workspaceId: String,
     @BsonId
     val _id: String? = null
@@ -18,9 +18,7 @@ data class Repository(
     val id: String
         get() = _id!!
 
-    fun rename(newName: String) {
-        name = newName
-    }
+    fun rename(newName: String): Repository = this.copy(name = newName)
 
     fun reportDebt(techDebtReport: TechDebtReport, reportedByAccountId: String, instant: Instant): Debt {
         return Debt(
@@ -32,6 +30,6 @@ data class Repository(
             workspaceId,
             techDebtReport.bindings.map { it.toDomain() }.toMutableList(),
             instant
-        ).also { it.vote(reportedByAccountId) }
+        ).vote(reportedByAccountId)
     }
 }
