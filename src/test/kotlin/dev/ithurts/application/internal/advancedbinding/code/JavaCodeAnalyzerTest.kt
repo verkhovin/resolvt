@@ -1,6 +1,8 @@
 package dev.ithurts.application.internal.advancedbinding.code
 
 import dev.ithurts.application.model.LineRange
+import dev.ithurts.application.service.internal.diff.advancedbinding.code.CodeEntitySpec
+import dev.ithurts.application.service.internal.diff.advancedbinding.code.JavaCodeAnalyzer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

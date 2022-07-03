@@ -2,7 +2,7 @@ package dev.ithurts.controller.web
 
 import dev.ithurts.controller.web.dto.MemberInvitationRequest
 import dev.ithurts.application.security.oauth2.AuthenticatedOAuth2User
-import dev.ithurts.application.WorkspaceService
+import dev.ithurts.application.service.WorkspaceService
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.annotation.AuthenticationPrincipal

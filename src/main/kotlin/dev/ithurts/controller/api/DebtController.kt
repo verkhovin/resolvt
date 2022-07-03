@@ -3,9 +3,9 @@ package dev.ithurts.controller.api
 import dev.ithurts.application.model.TechDebtReport
 import dev.ithurts.application.model.debt.DebtDto
 import dev.ithurts.application.query.DebtQueryRepository
-import dev.ithurts.application.DebtService
+import dev.ithurts.application.service.DebtService
 import dev.ithurts.application.model.RepositoryInfo
-import dev.ithurts.application.RepositoryInfoService
+import dev.ithurts.application.service.internal.RepositoryInfoService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI

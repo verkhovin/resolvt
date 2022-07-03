@@ -1,6 +1,6 @@
 package dev.ithurts.controller.web
 
-import dev.ithurts.application.internal.sourceprovider.bitbucket.BitbucketDescriptorService
+import dev.ithurts.application.service.internal.sourceprovider.bitbucket.BitbucketDescriptorService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 

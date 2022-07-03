@@ -2,7 +2,7 @@ package dev.ithurts.application.security.oauth2
 
 import dev.ithurts.domain.account.Account
 import dev.ithurts.domain.account.AccountRepository
-import dev.ithurts.application.internal.sourceprovider.bitbucket.BitbucketClient
+import dev.ithurts.application.service.internal.sourceprovider.bitbucket.BitbucketClient
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.core.user.OAuth2User

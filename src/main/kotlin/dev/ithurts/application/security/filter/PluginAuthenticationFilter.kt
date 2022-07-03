@@ -1,7 +1,7 @@
 package dev.ithurts.application.security.filter
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import dev.ithurts.exception.PluginAuthFailedException
+import dev.ithurts.application.exception.PluginAuthFailedException
 import dev.ithurts.application.model.Error
 import dev.ithurts.application.model.TokenType
 import dev.ithurts.application.security.plugin.PluginTokenManager

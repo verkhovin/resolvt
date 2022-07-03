@@ -1,10 +1,10 @@
 package dev.ithurts.configuration
 
-import dev.ithurts.application.internal.advancedbinding.JavaBindingService
-import dev.ithurts.application.internal.advancedbinding.KotlinBindingService
-import dev.ithurts.application.internal.advancedbinding.LanguageSpecificBindingService
-import dev.ithurts.application.internal.advancedbinding.code.JavaCodeAnalyzer
-import dev.ithurts.application.internal.advancedbinding.code.KotlinCodeAnalyzer
+import dev.ithurts.application.service.internal.diff.advancedbinding.JavaBindingService
+import dev.ithurts.application.service.internal.diff.advancedbinding.KotlinBindingService
+import dev.ithurts.application.service.internal.diff.advancedbinding.LanguageSpecificBindingService
+import dev.ithurts.application.service.internal.diff.advancedbinding.code.JavaCodeAnalyzer
+import dev.ithurts.application.service.internal.diff.advancedbinding.code.KotlinCodeAnalyzer
 import dev.ithurts.domain.CostCalculationService
 import dev.ithurts.domain.Language
 import io.reflectoring.diffparser.api.DiffParser

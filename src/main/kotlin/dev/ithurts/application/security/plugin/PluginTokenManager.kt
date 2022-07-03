@@ -1,6 +1,6 @@
 package dev.ithurts.application.security.plugin
 
-import dev.ithurts.exception.PluginAuthFailedException
+import dev.ithurts.application.exception.PluginAuthFailedException
 import dev.ithurts.application.model.PluginToken
 import dev.ithurts.application.model.TokenType
 import io.jsonwebtoken.Jwts

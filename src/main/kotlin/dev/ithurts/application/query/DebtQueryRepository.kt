@@ -14,7 +14,7 @@ import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.repository.RepositoryRepository
 import dev.ithurts.domain.workspace.Workspace
 import dev.ithurts.domain.workspace.WorkspaceRepository
-import dev.ithurts.exception.EntityNotFoundException
+import dev.ithurts.application.exception.EntityNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Repository as SpringRepository

@@ -1,6 +1,6 @@
 package dev.ithurts.application.security.filter
 
-import dev.ithurts.application.internal.sourceprovider.bitbucket.buildQueryStringHash
+import dev.ithurts.application.service.internal.sourceprovider.bitbucket.buildQueryStringHash
 import dev.ithurts.configuration.ApplicationProperties
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import io.jsonwebtoken.Jwts

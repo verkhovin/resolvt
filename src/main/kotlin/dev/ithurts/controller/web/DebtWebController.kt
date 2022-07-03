@@ -1,7 +1,7 @@
 package dev.ithurts.controller.web
 
 import dev.ithurts.application.query.DebtQueryRepository
-import dev.ithurts.application.DebtService
+import dev.ithurts.application.service.DebtService
 import dev.ithurts.controller.web.page.*
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull

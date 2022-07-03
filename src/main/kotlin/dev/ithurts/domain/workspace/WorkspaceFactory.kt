@@ -1,7 +1,5 @@
 package dev.ithurts.domain.workspace
 
-import dev.ithurts.domain.SourceProviderWorkspace
-
 class WorkspaceFactory {
     companion object {
         fun fromBitbucketWorkspace(

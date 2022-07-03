@@ -1,10 +1,10 @@
 package dev.ithurts.application.internal
 
-import dev.ithurts.application.internal.git.Direction
+import dev.ithurts.application.service.internal.diff.git.Direction
+import dev.ithurts.application.service.internal.diff.git.HunkResolvingStrategy
+import dev.ithurts.application.service.internal.diff.git.LineRangeMutator
 import io.reflectoring.diffparser.api.UnifiedDiffParser
 import org.junit.jupiter.api.Test
-import dev.ithurts.application.internal.git.HunkResolvingStrategy
-import dev.ithurts.application.internal.git.LineRangeMutator
 import org.junit.jupiter.api.Assertions.*
 
 class HunkResolvingStrategyTest {

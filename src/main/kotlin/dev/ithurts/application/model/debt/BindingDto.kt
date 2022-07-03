@@ -3,7 +3,7 @@ package dev.ithurts.application.model.debt
 import dev.ithurts.domain.Language
 import dev.ithurts.domain.debt.AdvancedBinding
 import dev.ithurts.domain.debt.Binding
-import dev.ithurts.utils.jvmSimpleClassName
+import dev.ithurts.application.utils.jvmSimpleClassName
 
 data class BindingDto(
     val id: String,

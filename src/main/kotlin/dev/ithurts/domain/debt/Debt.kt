@@ -36,7 +36,6 @@ data class Debt(
             updatedAt = updatedAt
         )
     }
-
     fun applyDiffs(
         diffs: Map<String, List<Diff>>,
         commitHash: String,
