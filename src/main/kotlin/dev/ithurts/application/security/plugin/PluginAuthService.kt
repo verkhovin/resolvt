@@ -41,7 +41,7 @@ class PluginAuthService(
         }
 
         authCode.used = true
-
+        authCodeRepository.save(authCode)
         return pluginTokenManager.issuePluginToken(authCode.accountId)
     }
 
