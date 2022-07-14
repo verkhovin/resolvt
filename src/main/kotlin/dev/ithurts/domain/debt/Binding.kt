@@ -46,7 +46,7 @@ data class Binding(
         val newFilePath = changes.lastOrNull { it.type == ChangeType.MOVED }?.to ?: this.filePath
         val newLines = changes.lastOrNull { it.type == ChangeType.CODE_CHANGED }?.to?.split(":")?.map { it.toInt() }
         val startLine = newLines?.get(0) ?: this.startLine
-        val endLine = newLines?.get(0) ?: this.endLine
+        val endLine = newLines?.get(1) ?: this.endLine
         return this.copy(
             filePath = newFilePath,
             startLine = startLine,
