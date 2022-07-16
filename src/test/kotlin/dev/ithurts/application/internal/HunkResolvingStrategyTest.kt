@@ -1,6 +1,6 @@
 package dev.ithurts.application.internal
 
-import dev.ithurts.application.service.internal.diff.git.Direction
+import dev.ithurts.application.service.internal.diff.git.DiffDirection
 import dev.ithurts.application.service.internal.diff.git.HunkResolvingStrategy
 import dev.ithurts.application.service.internal.diff.git.LineRangeMutator
 import io.reflectoring.diffparser.api.UnifiedDiffParser
@@ -76,7 +76,7 @@ class HunkResolvingStrategyTest {
     @Test
     fun `REVERSED selection that starts before actual changed and ends after them should have end moved and considered as changed`() {
         val selection = LineRangeMutator(24, 34)
-        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD, Direction.REVERSE)
+        val changed = strategy.processHunk(selection, DIFF_6DELETE_1ADD, DiffDirection.REVERSE)
         assertEquals(LineRangeMutator(24, 39), selection)
         assertTrue(changed)
     }

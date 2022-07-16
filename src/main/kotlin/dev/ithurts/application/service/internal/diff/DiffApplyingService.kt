@@ -2,6 +2,7 @@ package dev.ithurts.application.service.internal.diff
 
 import dev.ithurts.application.model.LineRange
 import dev.ithurts.application.service.internal.diff.advancedbinding.AdvancedBindingService
+import dev.ithurts.application.service.internal.diff.git.DiffDirection
 import dev.ithurts.application.service.internal.diff.git.GitDiffAnalyzer
 import dev.ithurts.application.service.internal.git.trimDiffFilepath
 import dev.ithurts.domain.debt.Binding
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service
 @Service
 class DiffApplyingService(
     private val gitDiffAnalyzer: GitDiffAnalyzer,
-    private val advancedBindingService: AdvancedBindingService
+    private val advancedBindingService: AdvancedBindingService,
 ) : DiffApplier {
     override fun applyDiffs(debt: Debt, binding: Binding, diffs: List<Diff>, commitHash: String): List<BindingChange> {
         val currentBindingPosition = LineRange(binding.startLine, binding.endLine)
@@ -22,8 +23,9 @@ class DiffApplyingService(
 
         val (newBindingPosition, codeChanged) = if (binding.isAdvanced()) {
             val advancedBinding = binding.advancedBinding!!
-            val newLocation = advancedBindingService.lookupBindingLocation(debt, advancedBinding, newFilePath, commitHash)
-            newLocation to (newLocation != LineRange(binding.startLine, binding.endLine))
+            val newLocation =
+                advancedBindingService.lookupBindingLocation(debt, advancedBinding, newFilePath, commitHash)
+            newLocation to hasCodeChangeInsideAdvancedBinding(newLocation, diffs)
         } else {
             val selectionChange = gitDiffAnalyzer.lookupCodeRangeChange(currentBindingPosition, diffs)
             selectionChange.position to selectionChange.wasSelectedCodeChanged
@@ -35,4 +37,11 @@ class DiffApplyingService(
             newBindingPosition.end
         )
     }
+
+    private fun hasCodeChangeInsideAdvancedBinding(
+        newBindingLocation: LineRange,
+        diffs: List<Diff>,
+    ): Boolean = gitDiffAnalyzer.lookupCodeRangeChange(newBindingLocation, diffs, DiffDirection.REVERSE)
+        .wasSelectedCodeChanged
+
 }

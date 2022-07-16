@@ -1,6 +1,7 @@
 package dev.ithurts.application.service.internal.diff.git
 
 import dev.ithurts.application.model.LineRange
+import dev.ithurts.application.service.internal.diff.git.DiffDirection.*
 import io.reflectoring.diffparser.api.model.Diff
 import io.reflectoring.diffparser.api.model.Range
 import org.springframework.stereotype.Service
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service
 class GitDiffAnalyzer(
     private val hunkResolvingStrategy: HunkResolvingStrategy
 ) {
-    fun lookupCodeRangeChange(codeRange: LineRange, diffs: List<Diff>): SelectionChangeLookupResult {
+    fun lookupCodeRangeChange(codeRange: LineRange, diffs: List<Diff>, direction: DiffDirection = DIRECT): SelectionChangeLookupResult {
         val mutator = LineRangeMutator.of(codeRange)
         var selectionChanged = false
         diffs.forEach { diff ->
@@ -29,7 +30,7 @@ class GitDiffAnalyzer(
                     selectionChanged = true
                     return@hunk
                 }
-                hunkResolvingStrategy.processHunk(mutator, hunk)
+                selectionChanged = hunkResolvingStrategy.processHunk(mutator, hunk, direction)
             }
         }
         return SelectionChangeLookupResult(mutator.toLineRange(), selectionChanged)

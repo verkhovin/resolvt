@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component
 class HunkResolvingStrategy {
     /**
      * Mutates lines in a [mutator] according to changes in the [hunk]
-     * Diff can be reversed by setting [direction] to [Direction.REVERSE]
+     * Diff can be reversed by setting [direction] to [DiffDirection.REVERSE]
      * @return true if there is changes in the lines covered by [mutator] lines
      */
-    fun processHunk(mutator: LineRangeMutator, hunk: Hunk, direction: Direction = Direction.DIRECT): Boolean {
+    fun processHunk(mutator: LineRangeMutator, hunk: Hunk, direction: DiffDirection = DiffDirection.DIRECT): Boolean {
         var leftCursor = hunk.fromFileRange.lineStart - 1
         var rightCursor = hunk.fromFileRange.lineStart - 1
         var startOffset = 0
@@ -72,12 +72,4 @@ class HunkResolvingStrategy {
     companion object {
         val log: Logger = LoggerFactory.getLogger(HunkResolvingStrategy::class.java)
     }
-}
-
-enum class Direction(
-    val FROM: Line.LineType,
-    val TO: Line.LineType
-) {
-    DIRECT(Line.LineType.FROM, Line.LineType.TO),
-    REVERSE(Line.LineType.TO, Line.LineType.FROM)
 }
