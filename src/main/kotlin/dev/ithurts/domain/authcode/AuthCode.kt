@@ -9,11 +9,25 @@ data class AuthCode(
     val authCode: String,
     val codeChallenge: String,
     val accountId: String,
-    var expiresAt: Instant,
-    var used: Boolean = false,
+    val expiresAt: Instant,
+    val used: Boolean = false,
     @Id
     val _id: String? = null
 ) {
     val id: String
         get() = _id!!
+
+    fun use(): AuthCode {
+        return this.copy(
+            used = true
+        )
+    }
+
+    fun regenerate(authCode: String, codeChallenge: String, expiresAt: Instant): AuthCode {
+        return this.copy(
+            authCode = authCode,
+            codeChallenge = codeChallenge,
+            expiresAt = expiresAt
+        )
+    }
 }

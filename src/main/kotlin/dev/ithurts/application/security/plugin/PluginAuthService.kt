@@ -1,10 +1,10 @@
 package dev.ithurts.application.security.plugin
 
 import dev.ithurts.application.exception.PluginAuthFailedException
-import dev.ithurts.domain.account.Account
-import dev.ithurts.domain.authcode.AuthCode
 import dev.ithurts.application.model.PluginToken
 import dev.ithurts.application.model.TokenType
+import dev.ithurts.domain.account.Account
+import dev.ithurts.domain.authcode.AuthCode
 import dev.ithurts.domain.authcode.AuthCodeRepository
 import org.apache.tomcat.util.buf.HexUtils
 import org.springframework.stereotype.Service
@@ -19,7 +19,7 @@ import kotlin.random.Random
 class PluginAuthService(
     private val authCodeRepository: AuthCodeRepository,
     private val pluginTokenManager: PluginTokenManager,
-    private val clock: Clock
+    private val clock: Clock,
 ) {
     fun generateAuthCode(account: Account, codeChallenge: String): String {
         val authCodeValue = Random.nextInt(1000, 10000).toString()
@@ -33,15 +33,14 @@ class PluginAuthService(
 
     fun issuePluginToken(authCodeValue: String, codeVerifier: String): PluginToken {
         val codeChallenge = buildCodeChallenge(codeVerifier)
-        val authCode = authCodeRepository.getByAuthCodeAndCodeChallenge(authCodeValue, codeChallenge)
+        val authCode = authCodeRepository.getByAuthCodeAndCodeChallengeAndUsedIsFalse(authCodeValue, codeChallenge)
             ?: throw PluginAuthFailedException("Invalid auth code")
 
         if (authCode.expiresAt.isBefore(clock.instant())) {
             throw PluginAuthFailedException("Auth code expired")
         }
 
-        authCode.used = true
-        authCodeRepository.save(authCode)
+        authCodeRepository.save(authCode.use())
         return pluginTokenManager.issuePluginToken(authCode.accountId)
     }
 
@@ -58,16 +57,13 @@ class PluginAuthService(
         account: Account,
         authCodeValue: String,
         codeChallenge: String,
-        expiresAt: Instant
+        expiresAt: Instant,
     ) = authCodeRepository.getByAccountIdAndExpiresAtAfterAndUsedIsFalse(account.id, clock.instant())
-        ?.copy(
-            authCode = authCodeValue,
-            codeChallenge = codeChallenge,
-            expiresAt = expiresAt
-        ) ?: AuthCode(
-        authCodeValue,
-        codeChallenge,
-        account.id,
-        expiresAt
-    )
+        ?.regenerate(authCodeValue, codeChallenge, expiresAt)
+        ?: AuthCode(
+            authCodeValue,
+            codeChallenge,
+            account.id,
+            expiresAt
+        )
 }

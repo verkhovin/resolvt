@@ -5,5 +5,5 @@ import java.time.Instant
 
 interface AuthCodeRepository: CrudRepository<AuthCode, String> {
     fun getByAccountIdAndExpiresAtAfterAndUsedIsFalse(accountId: String, expiresAfter: Instant = Instant.now()): AuthCode?
-    fun getByAuthCodeAndCodeChallenge(authCode: String, codeChallenge: String): AuthCode?
+    fun getByAuthCodeAndCodeChallengeAndUsedIsFalse(authCode: String, codeChallenge: String): AuthCode?
 }
