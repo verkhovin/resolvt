@@ -9,6 +9,7 @@ class BindingChange(
 
 enum class ChangeType {
     CODE_CHANGED,
-    MOVED,
+    CODE_MOVED,
+    FILE_MOVED,
     ADVANCED_BINDING_TARGET_RENAMED
 }

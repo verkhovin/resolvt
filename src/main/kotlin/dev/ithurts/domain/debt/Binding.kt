@@ -1,5 +1,6 @@
 package dev.ithurts.domain.debt
 
+import dev.ithurts.domain.debt.ChangeType.*
 import org.bson.types.ObjectId
 
 data class Binding(
@@ -22,13 +23,23 @@ data class Binding(
     ): List<BindingChange> {
         val bindingChanges = mutableListOf<BindingChange>()
         if (newFilePath != this.filePath) {
-            bindingChanges.add(BindingChange(id, ChangeType.MOVED, this.filePath, newFilePath))
+            bindingChanges.add(BindingChange(id, FILE_MOVED, this.filePath, newFilePath))
         }
+
         if (coveredCodeHasChanges || startLine - endLine != this.startLine - this.endLine) {
             bindingChanges.add(
                 BindingChange(
                     id,
-                    ChangeType.CODE_CHANGED,
+                    CODE_CHANGED,
+                    "${this.startLine}:${this.endLine}",
+                    "${startLine}:${endLine}"
+                )
+            )
+        } else if(startLine != this.startLine || endLine != this.endLine) {
+            bindingChanges.add(
+                BindingChange(
+                    id,
+                    CODE_MOVED,
                     "${this.startLine}:${this.endLine}",
                     "${startLine}:${endLine}"
                 )
@@ -43,8 +54,8 @@ data class Binding(
     }
 
     fun applyChanges(changes: List<BindingChange>): Binding {
-        val newFilePath = changes.lastOrNull { it.type == ChangeType.MOVED }?.to ?: this.filePath
-        val newLines = changes.lastOrNull { it.type == ChangeType.CODE_CHANGED }?.to?.split(":")?.map { it.toInt() }
+        val newFilePath = changes.lastOrNull { it.type == FILE_MOVED }?.to ?: this.filePath
+        val newLines = changes.lastOrNull { it.type == CODE_CHANGED || it.type == CODE_MOVED }?.to?.split(":")?.map { it.toInt() }
         val startLine = newLines?.get(0) ?: this.startLine
         val endLine = newLines?.get(1) ?: this.endLine
         return this.copy(

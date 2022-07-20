@@ -51,6 +51,7 @@ class HunkResolvingStrategy {
                 if (leftCursor != rightCursor) {
                     log.info("Setting offset for end")
                     mutator.end += rightCursor - leftCursor
+                    hadChangesAbove = true
                 }
 
                 break

@@ -93,7 +93,7 @@
                             <span th:text="${change.type.title}"></span>
                         </p>
                         <p th:if="${change.from != null || change.to !=null}"
-                           th:text="${change.from} ?: '' + ' → ' + ${change.to}" class="text-muted m-0"></p>
+                           th:text="(${change.from} ?: '') + ' → ' + ${change.to}" class="text-muted m-0"></p>
                     </div>
                 </div>
                 <div class="col-md-2">

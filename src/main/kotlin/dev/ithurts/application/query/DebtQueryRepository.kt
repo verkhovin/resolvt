@@ -173,7 +173,9 @@ class DebtQueryRepository(
         DebtEventDto(
             event.commitHash,
             sourceProviderService.getCommitUrl(repo.name, event.commitHash, workspace.externalId),
-            event.changes.map { change ->
+            event.changes
+                .filter { change -> change.type != dev.ithurts.domain.debt.ChangeType.CODE_MOVED }
+                .map { change ->
                 ChangeDto(
                     bindingDtos.first { it.id == change.bindingId },
                     ChangeType.valueOf(change.type.toString()),
