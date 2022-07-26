@@ -36,12 +36,13 @@ data class Debt(
             updatedAt = updatedAt
         )
     }
+
     fun applyDiffs(
         diffs: Map<String, List<Diff>>,
         commitHash: String,
         diffApplier: DiffApplier,
     ): DebtBindingChangedEvent {
-        val activeBindings = this.bindings.filter { it.active }
+        val activeBindings = this.bindings.filter { it.status != BindingStatus.ARCHIVED }
         val changes = activeBindings.associate { binding ->
             binding.id to diffApplier.applyDiffs(this, binding, diffs[binding.filePath] ?: emptyList(), commitHash)
         }
@@ -54,14 +55,26 @@ data class Debt(
 
     /**
      * Sets the binding list.
-     * Existing bindings that are missed from [bindings] are marked as inactive
+     * Existing bindings that are missed from [bindings] are marked as archived
      */
     fun rebind(bindings: List<Binding>): Debt {
-        val bindingIds = bindings.map { it.id }
+        /*
+        If binding status is null, that means that plugin sent request is of version that is not aware about binding statuses.
+        In this case, we just get current status of that binding if it's already was saved, otherwise set ACTIVE
+         */
+        val bindingsWithStatuses = bindings.map {
+            if (it.status != null) {
+                it
+            } else {
+                val currentStatus = this.bindings.firstOrNull {existingBinding -> existingBinding.id == it.id }?.status
+                it.copy(status = currentStatus ?: BindingStatus.ACTIVE)
+            }
+        }
+        val bindingIds = bindingsWithStatuses.map { it.id }
         val missingBindings = this.bindings
             .filter { existingBinding -> existingBinding.id !in bindingIds }
-            .map { it.inactivate() }
-        return this.copy(bindings = bindings + missingBindings)
+            .map { it.archive() }
+        return this.copy(bindings = bindingsWithStatuses + missingBindings)
     }
 
     fun updateBinding(bindingId: String, path: String, startLine: Int, endLine: Int): Debt {

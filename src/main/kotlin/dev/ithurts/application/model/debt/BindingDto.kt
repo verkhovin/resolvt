@@ -4,13 +4,14 @@ import dev.ithurts.domain.Language
 import dev.ithurts.domain.debt.AdvancedBinding
 import dev.ithurts.domain.debt.Binding
 import dev.ithurts.application.utils.jvmSimpleClassName
+import dev.ithurts.domain.debt.BindingStatus
 
 data class BindingDto(
     val id: String,
     val filePath: String,
     val startLine: Int,
     val endLine: Int,
-    val active: Boolean,
+    val status: BindingStatus?,
     val sourceLink: SourceLink,
     val advancedBinding: AdvancedBindingDto?
 ) {
@@ -21,7 +22,7 @@ data class BindingDto(
                 binding.filePath,
                 binding.startLine,
                 binding.endLine,
-                binding.active,
+                binding.status,
                 sourceLink,
                 binding.advancedBinding?.let { AdvancedBindingDto.from(it) }
             )

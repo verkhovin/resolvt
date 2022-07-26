@@ -4,7 +4,7 @@
 <body>
 <div layout:fragment="main" th:with="debt=${page.debt}, binding=${page.binding}">
     <div class="row mt-3 mt-lg-3 align-items-center">
-        <div class="alert alert-warning" role="alert">
+        <div th:if="${binding.isAdvanced()}" class="alert alert-warning" role="alert">
             Manual editing of advanced binding is error-prone. Please, use it carefully.
         </div>
         <div class="col-md-12 ">

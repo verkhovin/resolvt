@@ -68,8 +68,7 @@ class DebtService(
     fun editBinding(debtId: String, bindingId: String, form: BindingEditForm) {
         val (start, end) = form.linespec!!.split(':', limit = 2).map { it.toInt() }
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
-        debt.updateBinding(bindingId, form.path, start, end)
-        debtRepository.save(debt)
+        debtRepository.save(debt.updateBinding(bindingId, form.path, start, end))
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")

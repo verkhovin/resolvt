@@ -19,7 +19,7 @@ data class ChangeDto(
 enum class ChangeType(val title: String) {
     CODE_CHANGED("was changed"),
     MOVED ("was moved"),
-    ADVANCED_BINDING_TARGET_RENAMED ("was renamed"),
-
+    ADVANCED_BINDING_TARGET_LOST ("tracking was lost"),
+    GENERIC("was changed")
 }
 

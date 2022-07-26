@@ -2,14 +2,18 @@ package dev.ithurts.domain.debt
 
 import dev.ithurts.domain.debt.ChangeType.*
 import org.bson.types.ObjectId
+import org.springframework.data.annotation.LastModifiedDate
+import java.time.Instant
 
 data class Binding(
     val filePath: String,
     val startLine: Int,
     val endLine: Int,
     val advancedBinding: AdvancedBinding?,
-    val active: Boolean = true,
+    val status: BindingStatus,
     val id: String = ObjectId().toString(),
+    @LastModifiedDate
+    val updatedAt: Instant? = null,
 ) {
     fun isAdvanced(): Boolean {
         return advancedBinding != null
@@ -35,7 +39,7 @@ data class Binding(
                     "${startLine}:${endLine}"
                 )
             )
-        } else if(startLine != this.startLine || endLine != this.endLine) {
+        } else if (startLine != this.startLine || endLine != this.endLine) {
             bindingChanges.add(
                 BindingChange(
                     id,
@@ -53,15 +57,28 @@ data class Binding(
         return bindingChanges
     }
 
+    fun lost(): BindingChange {
+        return BindingChange(
+            this.id,
+            ADVANCED_BINDING_TARGET_LOST,
+            null,
+            null
+        )
+    }
+
     fun applyChanges(changes: List<BindingChange>): Binding {
         val newFilePath = changes.lastOrNull { it.type == FILE_MOVED }?.to ?: this.filePath
-        val newLines = changes.lastOrNull { it.type == CODE_CHANGED || it.type == CODE_MOVED }?.to?.split(":")?.map { it.toInt() }
+        val newLines =
+            changes.lastOrNull { it.type == CODE_CHANGED || it.type == CODE_MOVED }?.to?.split(":")?.map { it.toInt() }
         val startLine = newLines?.get(0) ?: this.startLine
         val endLine = newLines?.get(1) ?: this.endLine
+        val status = changes.lastOrNull { it.type == ADVANCED_BINDING_TARGET_LOST }?.let { BindingStatus.TRACKING_LOST }
+            ?: this.status
         return this.copy(
             filePath = newFilePath,
             startLine = startLine,
-            endLine = if (startLine < endLine) endLine else startLine
+            endLine = if (startLine < endLine) endLine else startLine,
+            status = status
         )
     }
 
@@ -73,5 +90,9 @@ data class Binding(
         )
     }
 
-    fun inactivate() = this.copy(active = false)
+    fun archive() = this.copy(status = BindingStatus.ARCHIVED)
+}
+
+enum class BindingStatus {
+    ACTIVE, ARCHIVED, TRACKING_LOST
 }

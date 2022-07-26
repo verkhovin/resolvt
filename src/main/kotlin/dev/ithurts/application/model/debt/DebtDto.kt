@@ -1,5 +1,6 @@
 package dev.ithurts.application.model.debt
 
+import dev.ithurts.domain.debt.BindingStatus
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtStatus
 import java.time.Instant
@@ -16,7 +17,8 @@ data class DebtDto(
     val reporter: DebtAccountDto,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val cost: Int
+    val cost: Int,
+    val hasBindingTrackingLost: Boolean
 ) {
     companion object {
         fun from(
@@ -32,14 +34,15 @@ data class DebtDto(
                 debt.title,
                 debt.description,
                 debt.status,
-                bindings.filter { it.active },
+                bindings.filter { it.status != BindingStatus.ARCHIVED },
                 debt.votes.size,
                 currentUserVoted,
                 repository,
                 reporter,
                 debt.createdAt,
                 debt.updatedAt,
-                cost
+                cost,
+                debt.bindings.any { binding -> binding.status == BindingStatus.TRACKING_LOST }
             )
         }
     }

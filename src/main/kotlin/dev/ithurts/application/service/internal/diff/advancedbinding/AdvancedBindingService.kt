@@ -18,7 +18,7 @@ class AdvancedBindingService(
     private val authenticationFacade: IntegrationAuthenticationFacade,
     private val repositoryRepository: RepositoryRepository
 ) {
-    fun lookupBindingLocation(debt: Debt, advancedBinding: AdvancedBinding, filePath: String, commitHash: String): LineRange {
+    fun lookupBindingLocation(debt: Debt, advancedBinding: AdvancedBinding, filePath: String, commitHash: String): LineRange? {
         val languageSpecificBindingService = languageSpecificBindingServices[advancedBinding.language]
         if (languageSpecificBindingService == null) {
             log.error("Didn't find appropriate handler for language ${advancedBinding.language}")

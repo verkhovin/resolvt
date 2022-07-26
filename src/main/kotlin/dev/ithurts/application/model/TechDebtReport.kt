@@ -1,6 +1,8 @@
 package dev.ithurts.application.model
 
 import dev.ithurts.domain.Language
+import dev.ithurts.domain.debt.BindingStatus
+import org.bson.types.ObjectId
 import dev.ithurts.domain.debt.AdvancedBinding as DomainAdvancedBinding
 import dev.ithurts.domain.debt.Binding as DomainBinding
 
@@ -14,17 +16,21 @@ class TechDebtReport(
 
 
 class Binding(
+    val id: String?,
     val filePath: String,
     val startLine: Int,
     val endLine: Int,
-    val advancedBinding: AdvancedBinding?
+    val advancedBinding: AdvancedBinding?,
+    val status: BindingStatus
 ) {
     fun toDomain(): DomainBinding {
         return DomainBinding(
             filePath,
             startLine,
             endLine,
-            advancedBinding?.toDomain()
+            advancedBinding?.toDomain(),
+            status,
+            id ?: ObjectId().toString()
         )
     }
 }

@@ -23,6 +23,7 @@
                         <th scope="col">Reported</th>
                         <th scope="col">Reporter</th>
                         <th scope="col">Cost</th>
+                        <th scope="col">Tracking</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -34,6 +35,10 @@
                         <td class="date" th:text="${debt.createdAt}"></td>
                         <td th:text="${debt.reporter.name}"></td>
                         <td th:text="${debt.cost}"></td>
+                        <td>
+                            <i th:if="${debt.hasBindingTrackingLost}" class="bi bi-exclamation-triangle text-danger"></i>
+                            <i th:if="${!debt.hasBindingTrackingLost}" class="bi bi-check-lg text-success"></i>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

@@ -1,5 +1,6 @@
 package dev.ithurts.application.query
 
+import dev.ithurts.application.exception.EntityNotFoundException
 import dev.ithurts.application.model.RepositoryInfo
 import dev.ithurts.application.model.debt.*
 import dev.ithurts.application.security.AuthenticationFacade
@@ -9,12 +10,13 @@ import dev.ithurts.domain.account.AccountRepository
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtRepository
 import dev.ithurts.domain.debt.DebtStatus
+import dev.ithurts.domain.debtevent.BindingChange
 import dev.ithurts.domain.debtevent.DebtEvent
 import dev.ithurts.domain.repository.Repository
 import dev.ithurts.domain.repository.RepositoryRepository
 import dev.ithurts.domain.workspace.Workspace
 import dev.ithurts.domain.workspace.WorkspaceRepository
-import dev.ithurts.application.exception.EntityNotFoundException
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Repository as SpringRepository
@@ -148,7 +150,7 @@ class DebtQueryRepository(
         repo: Repository,
         workspace: Workspace,
         reporter: Account?,
-        events: List<DebtEvent>
+        events: List<DebtEvent>,
     ): DebtDetailsDto {
         val bindingDtos = mapBindings(debt, repo, workspace)
         val eventsDtos = mapBindingEvents(events, bindingDtos, repo, workspace)
@@ -168,7 +170,7 @@ class DebtQueryRepository(
         events: List<DebtEvent>,
         bindingDtos: List<BindingDto>,
         repo: Repository,
-        workspace: Workspace
+        workspace: Workspace,
     ) = events.map { event ->
         DebtEventDto(
             event.commitHash,
@@ -176,21 +178,28 @@ class DebtQueryRepository(
             event.changes
                 .filter { change -> change.type != dev.ithurts.domain.debt.ChangeType.CODE_MOVED }
                 .map { change ->
-                ChangeDto(
-                    bindingDtos.first { it.id == change.bindingId },
-                    ChangeType.valueOf(change.type.toString()),
-                    change.from,
-                    change.to
-                )
-            },
+                    ChangeDto(
+                        bindingDtos.first { it.id == change.bindingId },
+                        getChangeType(change),
+                        change.from,
+                        change.to
+                    )
+                },
             event.createdAt
         )
+    }
+
+    private fun getChangeType(change: BindingChange) = try {
+        ChangeType.valueOf(change.type.toString())
+    } catch (e: IllegalArgumentException) {
+        log.error("Unknown change type when building debt view ${change.type}", e)
+        ChangeType.GENERIC
     }
 
     private fun mapBindings(
         debt: Debt,
         repo: Repository,
-        workspace: Workspace
+        workspace: Workspace,
     ) = debt.bindings.map { binding ->
         BindingDto.from(
             binding,
@@ -206,6 +215,9 @@ class DebtQueryRepository(
         )
     }
 
-
     private fun getFileName(path: String) = path.substringAfterLast("/")
+
+    companion object {
+        val log = LoggerFactory.getLogger(DebtQueryRepository::class.java)
+    }
 }

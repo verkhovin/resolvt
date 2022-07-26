@@ -25,6 +25,7 @@ class DiffApplyingService(
             val advancedBinding = binding.advancedBinding!!
             val newLocation =
                 advancedBindingService.lookupBindingLocation(debt, advancedBinding, newFilePath, commitHash)
+                    ?: return listOf(binding.lost())
             newLocation to hasCodeChangeInsideAdvancedBinding(newLocation, diffs)
         } else {
             val selectionChange = gitDiffAnalyzer.lookupCodeRangeChange(currentBindingPosition, diffs)

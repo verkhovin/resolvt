@@ -11,14 +11,17 @@ import io.reflectoring.diffparser.api.DiffParser
 import io.reflectoring.diffparser.api.UnifiedDiffParser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.mongodb.config.EnableMongoAuditing
 import java.time.Clock
 
+
 @Configuration
+@EnableMongoAuditing
 class ApplicationConfiguration {
     @Bean
     fun languageSpecificBindingServices(
         kotlinCodeAnalyzer: KotlinCodeAnalyzer,
-        javaCodeAnalyzer: JavaCodeAnalyzer
+        javaCodeAnalyzer: JavaCodeAnalyzer,
     ): Map<Language, LanguageSpecificBindingService> {
         return mapOf(
             Language.KOTLIN to KotlinBindingService(kotlinCodeAnalyzer),

@@ -37,7 +37,7 @@
                            th:href="${binding.sourceLink.url}">
                             <div class="row">
                                 <div class="col-1">
-                                    <i class="bi" th:classappend="${@frontendUtil.getIconClassBasedOnBinding(binding)}"
+                                    <i class="ms-2 bi" th:classappend="${@frontendUtil.getIconClassBasedOnBinding(binding)}"
                                        style="font-size: 2em;"></i>
                                 </div>
                                 <div class="col-10">
@@ -48,7 +48,8 @@
                                         <span th:text="${binding.type()}"></span>
                                         <span class="code-line rounded" th:text="${binding.fullName()}"></span>
                                     </p>
-                                    <p class="m-0 text-muted" th:text="${binding.filePath}"></p>
+                                    <p th:if="${binding.status.toString() == 'ACTIVE'}" class="m-0 text-muted" th:text="${binding.filePath}"></p>
+                                    <p th:if="${binding.status.toString() == 'TRACKING_LOST'}" class="m-0 text-muted">Tracking lost</p>
                                 </div>
                             </div>
                         </a>
@@ -156,8 +157,8 @@
             </div>
             <div class="row">
                 <div class="col-12">
+                    <span class="text-muted">Votes: </span>
                     <span th:id="${debt.id}+'-votes'" class="text-muted" th:text="${debt.votes}"></span>
-                    <span class="text-muted">people were hurt by this</span>
                 </div>
             </div>
         </div>
