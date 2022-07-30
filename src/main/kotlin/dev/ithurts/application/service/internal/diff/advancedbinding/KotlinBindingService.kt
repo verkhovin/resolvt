@@ -1,6 +1,8 @@
 package dev.ithurts.application.service.internal.diff.advancedbinding
 
 import dev.ithurts.application.model.LineRange
+import dev.ithurts.application.model.end
+import dev.ithurts.application.model.start
 import dev.ithurts.application.service.internal.diff.advancedbinding.code.KotlinCodeAnalyzer
 import dev.ithurts.domain.debt.AdvancedBinding
 import dev.ithurts.application.utils.jvmSimpleClassName

@@ -1,6 +1,8 @@
 package dev.ithurts.application.model
 
-data class LineRange(
-    val start: Int,
-    val end: Int
-)
+typealias LineRange = Pair<Int, Int>
+
+val LineRange.start
+    get() = this.first
+val LineRange.end
+    get() = this.second

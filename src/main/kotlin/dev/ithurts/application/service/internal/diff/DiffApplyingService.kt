@@ -1,14 +1,15 @@
 package dev.ithurts.application.service.internal.diff
 
-import dev.ithurts.application.model.LineRange
+import dev.ithurts.application.model.end
+import dev.ithurts.application.model.start
 import dev.ithurts.application.service.internal.diff.advancedbinding.AdvancedBindingService
-import dev.ithurts.application.service.internal.diff.git.DiffDirection
-import dev.ithurts.application.service.internal.diff.git.GitDiffAnalyzer
-import dev.ithurts.application.service.internal.git.trimDiffFilepath
 import dev.ithurts.domain.debt.Binding
 import dev.ithurts.domain.debt.BindingChange
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DiffApplier
+import dev.ithurts.git.DiffDirection
+import dev.ithurts.git.GitDiffAnalyzer
+import dev.ithurts.git.LineRange
 import io.reflectoring.diffparser.api.model.Diff
 import org.springframework.stereotype.Service
 

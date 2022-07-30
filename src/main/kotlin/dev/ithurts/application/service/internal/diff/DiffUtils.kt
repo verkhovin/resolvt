@@ -1,4 +1,4 @@
-package dev.ithurts.application.service.internal.git
+package dev.ithurts.application.service.internal.diff
 
 
 fun trimDiffFilepath(filePath: String) =

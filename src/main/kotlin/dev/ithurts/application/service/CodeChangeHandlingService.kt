@@ -2,7 +2,7 @@ package dev.ithurts.application.service
 
 import dev.ithurts.application.model.PushInfo
 import dev.ithurts.application.security.IntegrationAuthenticationFacade
-import dev.ithurts.application.service.internal.git.trimDiffFilepath
+import dev.ithurts.application.service.internal.diff.trimDiffFilepath
 import dev.ithurts.domain.debt.Debt
 import dev.ithurts.domain.debt.DebtRepository
 import dev.ithurts.domain.debt.DiffApplier

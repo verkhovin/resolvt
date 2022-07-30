@@ -30,7 +30,6 @@ class DebtController(
         return ResponseEntity.noContent().build()
     }
 
-
     @GetMapping
     fun getDebts(@RequestParam remoteUrl: String): List<DebtDto> {
         val repositoryInfo = repositoryInfoService.parseRemoteUrl(remoteUrl)

@@ -7,6 +7,8 @@ import dev.ithurts.application.service.internal.diff.advancedbinding.code.JavaCo
 import dev.ithurts.application.service.internal.diff.advancedbinding.code.KotlinCodeAnalyzer
 import dev.ithurts.domain.CostCalculationService
 import dev.ithurts.domain.Language
+import dev.ithurts.git.GitDiffAnalyzer
+import dev.ithurts.git.HunkResolvingStrategy
 import io.reflectoring.diffparser.api.DiffParser
 import io.reflectoring.diffparser.api.UnifiedDiffParser
 import org.springframework.context.annotation.Bean
@@ -42,5 +44,10 @@ class ApplicationConfiguration {
     @Bean
     fun diffParser() : DiffParser {
         return UnifiedDiffParser()
+    }
+
+    @Bean
+    fun gitDiffAnalyzer(): GitDiffAnalyzer {
+        return GitDiffAnalyzer(HunkResolvingStrategy())
     }
 }
