@@ -13,4 +13,6 @@ interface SourceProviderClient {
         filePath: String,
         commitHash: String
     ): String
+
+    fun checkIsMember(accessToken: String, workspaceId: String, accountId: String)
 }

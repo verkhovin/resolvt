@@ -7,14 +7,16 @@ import dev.ithurts.controller.api.webhook.dto.BitbucketAppInstallation
 import dev.ithurts.controller.api.webhook.dto.ChangesPushed
 import dev.ithurts.controller.api.webhook.dto.RepoUpdated
 import dev.ithurts.domain.SourceProvider
-import dev.ithurts.domain.workspace.SourceProviderWorkspace
 import dev.ithurts.domain.account.AccountRepository
 import dev.ithurts.domain.repository.RepositoryRepository
 import dev.ithurts.domain.workspace.SourceProviderApplicationCredentials
+import dev.ithurts.domain.workspace.SourceProviderWorkspace
 import dev.ithurts.domain.workspace.WorkspaceFactory
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
@@ -24,7 +26,7 @@ class BitbucketWebhookHandler(
     private val repositoryRepository: RepositoryRepository,
     private val authenticationFacade: IntegrationAuthenticationFacade,
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
-    private val codeChangeHandlingService: CodeChangeHandlingService
+    private val codeChangeHandlingService: CodeChangeHandlingService,
 ) {
     fun appInstalled(bitbucketAppInstallation: BitbucketAppInstallation) {
         val actorAccount = accountRepository.findByExternalIdAndSourceProvider(
@@ -40,19 +42,17 @@ class BitbucketWebhookHandler(
         val workspace = workspaceRepository.findBySourceProviderAndExternalId(
             SourceProvider.BITBUCKET,
             bitbucketWorkspace.bitbucketId
-        )
-
-        if (workspace != null) {
-            workspaceRepository.save(workspace.connectWithSourceProviderApplication(sourceProviderApplicationCredentials))
-        } else {
-            WorkspaceFactory.fromBitbucketWorkspace(
+        )?.connectWithSourceProviderApplication(sourceProviderApplicationCredentials)
+            ?: WorkspaceFactory.fromBitbucketWorkspace(
                 actorAccount.id, SourceProviderWorkspace(
                     bitbucketWorkspace.username ?: bitbucketWorkspace.nickname!!,
                     bitbucketWorkspace.displayName,
                     SourceProvider.BITBUCKET
                 ), sourceProviderApplicationCredentials
-            ).let { workspaceRepository.save(it) }
-        }
+            )
+        SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(workspace, null, emptyList())
+        sourceProviderCommunicationService.checkIsMember(workspace, actorAccount)
+        workspaceRepository.save(workspace)
     }
 
     fun appUninstalled(bitbucketAppInstallation: BitbucketAppInstallation) {

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import org.springframework.web.client.exchange
@@ -53,6 +54,18 @@ class BitbucketClient(
             HttpMethod.GET,
             noBody(accessToken)
         ).body!!
+    }
+
+    override fun checkIsMember(accessToken: String, workspaceId: String, accountId: String) {
+        val status = restTemplate.exchange<Void>(
+            "/workspaces/${workspaceId}/members/{accountId}",
+            HttpMethod.GET,
+            noBody(accessToken),
+            accountId
+        ).statusCode
+        if (status != HttpStatus.OK) {
+            throw IllegalArgumentException("Not a member")
+        }
     }
 
     fun getUserPrimaryEmail(accessToken: String): String {

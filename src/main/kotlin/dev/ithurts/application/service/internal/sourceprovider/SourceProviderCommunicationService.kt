@@ -29,6 +29,10 @@ class SourceProviderCommunicationService(
         return client.getRepository(getAccessToken(workspace), workspace.externalId, repository)
     }
 
+    fun checkIsMember(workspace: Workspace, account: Account) {
+        client.checkIsMember(getAccessToken(workspace), workspace.externalId, account.externalId)
+    }
+
     private val client: SourceProviderClient
         get() = when (getCurrentSourceProvider()) {
             BITBUCKET -> bitbucketClient

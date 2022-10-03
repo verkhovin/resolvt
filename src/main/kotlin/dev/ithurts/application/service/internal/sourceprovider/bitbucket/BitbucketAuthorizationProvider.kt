@@ -8,7 +8,6 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.*
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
@@ -42,7 +41,6 @@ class BitbucketAuthorizationProvider(
         }
     }
 
-    @PreAuthorize("hasPermission(#workspace.id, 'Workspace', 'MEMBER')")
     fun getAuthorization(workspace: Workspace): String {
         return getAuthenticationOnBehalfOfWorkspace(workspace)
     }

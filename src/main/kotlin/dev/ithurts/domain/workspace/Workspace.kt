@@ -35,8 +35,10 @@ data class Workspace(
     }
 
     fun connectWithSourceProviderApplication(sourceProviderApplicationCredentials: SourceProviderApplicationCredentials): Workspace {
+        if (this.sourceProviderApplicationCredentials != sourceProviderApplicationCredentials) {
+            throw IllegalArgumentException("Wrong app credentials provided")
+        }
         return this.copy(
-            sourceProviderApplicationCredentials = sourceProviderApplicationCredentials,
             active = true
         )
     }
