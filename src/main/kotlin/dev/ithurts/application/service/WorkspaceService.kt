@@ -5,6 +5,7 @@ import dev.ithurts.domain.workspace.WorkspaceMemberRole
 import dev.ithurts.domain.workspace.WorkspaceMemberStatus
 import dev.ithurts.domain.workspace.WorkspaceRepository
 import dev.ithurts.application.exception.EntityNotFoundException
+import dev.ithurts.domain.workspace.Workspace
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -24,5 +25,10 @@ class WorkspaceService(
         )
         workspace.addMember(account.id, WorkspaceMemberRole.MEMBER, WorkspaceMemberStatus.ACTIVE)
         workspaceRepository.save(workspace)
+    }
+
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
+    fun getWorkspaceById(workspaceId: String): Workspace {
+        return workspaceRepository.findByIdOrNull(workspaceId)!! //FIXME NPE
     }
 }

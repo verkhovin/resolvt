@@ -47,10 +47,10 @@ class BitbucketClient(
         workspace: String,
         repository: String,
         filePath: String,
-        commitHash: String
+        commitHashOrBranch: String
     ): String {
         return restTemplate.exchange<String>(
-            "/repositories/${workspace}/${repository}/src/${commitHash}/${filePath}",
+            "/repositories/${workspace}/${repository}/src/${commitHashOrBranch}/${filePath}",
             HttpMethod.GET,
             noBody(accessToken)
         ).body!!

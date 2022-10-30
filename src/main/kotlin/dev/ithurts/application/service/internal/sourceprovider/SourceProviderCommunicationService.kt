@@ -21,8 +21,8 @@ class SourceProviderCommunicationService(
         return client.getDiff(getAccessToken(), workspaceId, repository, spec)
     }
 
-    fun getFile(workspaceId: String, repository: String, filePath: String, commitHash: String): String {
-        return client.getFile(getAccessToken(), workspaceId, repository, filePath, commitHash)
+    fun getFile(workspace: Workspace, repository: String, filePath: String, commitHash: String): String {
+        return client.getFile(getAccessToken(workspace), workspace.externalId, repository, filePath, commitHash)
     }
 
     fun getRepository(workspace: Workspace, repository: String): SourceProviderRepository {

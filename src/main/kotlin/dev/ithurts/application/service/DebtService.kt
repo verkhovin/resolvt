@@ -10,6 +10,8 @@ import dev.ithurts.domain.debt.DebtRepository
 import dev.ithurts.domain.debt.DebtStatus
 import dev.ithurts.application.exception.EntityNotFoundException
 import dev.ithurts.application.service.internal.RepositoryService
+import dev.ithurts.domain.debt.DebtReportedEvent
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -21,13 +23,16 @@ class DebtService(
     private val debtRepository: DebtRepository,
     private val authenticationFacade: AuthenticationFacade,
     private val archiveService: dev.ithurts.application.service.internal.ArchiveService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
     private val clock: Clock,
 ) {
     @PreAuthorize("hasPermission(#repositoryInfo, 'Repository', 'MEMBER')")
     fun createDebt(techDebtReport: TechDebtReport, repositoryInfo: RepositoryInfo): String {
         val repository = repositoryService.ensureRepository(repositoryInfo)
         val debt = repository.reportDebt(techDebtReport, authenticationFacade.account.id, clock.instant())
-        return debtRepository.save(debt).id
+        val savedDebt = debtRepository.save(debt)
+        applicationEventPublisher.publishEvent(DebtReportedEvent(savedDebt, this))
+        return savedDebt.id
     }
 
     @PreAuthorize("hasPermission(#debtId, 'Debt', 'MEMBER')")
