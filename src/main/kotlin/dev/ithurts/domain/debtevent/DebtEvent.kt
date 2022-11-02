@@ -23,5 +23,6 @@ class BindingChange(
     val bindingId: String,
     val type: ChangeType,
     val from: String?,
-    val to: String?
+    val to: String?,
+    val visible: Boolean
 )

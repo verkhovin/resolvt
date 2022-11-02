@@ -27,7 +27,7 @@ data class Binding(
     ): List<BindingChange> {
         val bindingChanges = mutableListOf<BindingChange>()
         if (newFilePath != this.filePath) {
-            bindingChanges.add(BindingChange(id, FILE_MOVED, this.filePath, newFilePath))
+            bindingChanges.add(BindingChange(id, FILE_MOVED, this.filePath, newFilePath, visible = true))
         }
 
         if (coveredCodeHasChanges || startLine - endLine != this.startLine - this.endLine) {
@@ -36,7 +36,8 @@ data class Binding(
                     id,
                     CODE_CHANGED,
                     "${this.startLine}:${this.endLine}",
-                    "${startLine}:${endLine}"
+                    "${startLine}:${endLine}",
+                    visible = true
                 )
             )
         } else if (startLine != this.startLine || endLine != this.endLine) {
@@ -45,7 +46,8 @@ data class Binding(
                     id,
                     CODE_MOVED,
                     "${this.startLine}:${this.endLine}",
-                    "${startLine}:${endLine}"
+                    "${startLine}:${endLine}",
+                    visible = false
                 )
             )
         }
@@ -62,7 +64,8 @@ data class Binding(
             this.id,
             ADVANCED_BINDING_TARGET_LOST,
             null,
-            null
+            null,
+            visible = true
         )
     }
 

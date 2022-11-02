@@ -22,7 +22,7 @@ class DebtBindingChangedEventListener(
             event.debtId,
             event.repositoryId,
             event.commitHash,
-            event.changes.map { BindingChange(it.bindingId, ChangeType.valueOf(it.type.name),it.from, it.to)},
+            event.changes.map { BindingChange(it.bindingId, ChangeType.valueOf(it.type.name),it.from, it.to, it.visible)},
             clock.instant()
         )
         debtEventRepository.save(debtEvent)

@@ -157,7 +157,7 @@ class DebtQueryRepository(
 
         return DebtDetailsDto.from(
             debt,
-            costCalculationService.calculateCost(debt, events.size),
+            costCalculationService.calculateCost(debt, eventsDtos.size),
             bindingDtos,
             DebtRepositoryDto(repo.name),
             DebtAccountDto(reporter?.name ?: "Unknown"),
@@ -176,7 +176,7 @@ class DebtQueryRepository(
             event.commitHash,
             sourceProviderService.getCommitUrl(repo.name, event.commitHash, workspace.externalId),
             event.changes
-                .filter { change -> change.type != dev.ithurts.domain.debt.ChangeType.CODE_MOVED }
+                .filter(BindingChange::visible)
                 .map { change ->
                     ChangeDto(
                         bindingDtos.first { it.id == change.bindingId },
@@ -187,7 +187,7 @@ class DebtQueryRepository(
                 },
             event.createdAt
         )
-    }
+    }.filter { it.changes.isNotEmpty() }
 
     private fun getChangeType(change: BindingChange) = try {
         ChangeType.valueOf(change.type.toString())
