@@ -1,6 +1,6 @@
 package dev.ithurts.configuration
 
-import dev.ithurts.controller.web.SessionEnrichingHandlerInterceptor
+import dev.ithurts.api.web.SessionEnrichingHandlerInterceptor
 import nz.net.ultraq.thymeleaf.LayoutDialect
 import nz.net.ultraq.thymeleaf.decorators.strategies.GroupingRespectLayoutTitleStrategy
 import org.springframework.boot.actuate.trace.http.HttpTraceRepository
@@ -42,6 +42,6 @@ class MvcConfiguration: WebMvcConfigurer{
             .addResourceLocations("classpath:/static/public")
             .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS))
         registry.addResourceHandler("/**")
-            .addResourceLocations("classpath:/static/");
+            .addResourceLocations("classpath:/static/")
     }
 }

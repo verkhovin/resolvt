@@ -1,12 +1,12 @@
 package dev.ithurts.configuration
 
-import dev.ithurts.domain.account.AccountRepository
-import dev.ithurts.domain.workspace.WorkspaceRepository
-import dev.ithurts.application.security.oauth2.AccountPersistingOAuth2UserService
-import dev.ithurts.application.security.permission.WorkspacePermissionEvaluator
-import dev.ithurts.application.security.filter.BitbucketCloudAuthenticationFilter
-import dev.ithurts.application.security.filter.PluginAuthenticationFilter
-import dev.ithurts.application.security.plugin.PluginTokenManager
+import dev.ithurts.service.account.AccountRepository
+import dev.ithurts.service.workspace.WorkspaceRepository
+import dev.ithurts.api.web.oauth2.AccountPersistingOAuth2UserService
+import dev.ithurts.service.permission.WorkspacePermissionEvaluator
+import dev.ithurts.api.rest.bitbucket.BitbucketCloudAuthenticationFilter
+import dev.ithurts.api.rest.plugin.PluginAuthenticationFilter
+import dev.ithurts.api.rest.plugin.PluginTokenManager
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler

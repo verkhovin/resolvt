@@ -1,12 +1,11 @@
 package dev.ithurts.configuration
 
-import dev.ithurts.application.service.internal.diff.advancedbinding.JavaBindingService
-import dev.ithurts.application.service.internal.diff.advancedbinding.KotlinBindingService
-import dev.ithurts.application.service.internal.diff.advancedbinding.LanguageSpecificBindingService
-import dev.ithurts.application.service.internal.diff.advancedbinding.code.JavaCodeAnalyzer
-import dev.ithurts.application.service.internal.diff.advancedbinding.code.KotlinCodeAnalyzer
-import dev.ithurts.domain.CostCalculationService
-import dev.ithurts.domain.Language
+import dev.ithurts.service.debt.diff.advancedbinding.JavaBindingService
+import dev.ithurts.service.debt.diff.advancedbinding.KotlinBindingService
+import dev.ithurts.service.debt.diff.advancedbinding.LanguageSpecificBindingService
+import dev.ithurts.service.debt.diff.advancedbinding.code.JavaCodeAnalyzer
+import dev.ithurts.service.debt.diff.advancedbinding.code.KotlinCodeAnalyzer
+import dev.ithurts.service.Language
 import dev.ithurts.git.GitDiffAnalyzer
 import dev.ithurts.git.HunkResolvingStrategy
 import io.reflectoring.diffparser.api.DiffParser
@@ -29,11 +28,6 @@ class ApplicationConfiguration {
             Language.KOTLIN to KotlinBindingService(kotlinCodeAnalyzer),
             Language.JAVA to JavaBindingService(javaCodeAnalyzer)
         )
-    }
-
-    @Bean
-    fun costCalculationService(): CostCalculationService {
-        return CostCalculationService()
     }
 
     @Bean

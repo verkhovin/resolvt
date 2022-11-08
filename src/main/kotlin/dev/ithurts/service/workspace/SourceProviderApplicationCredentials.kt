@@ -1,0 +1,18 @@
+package dev.ithurts.service.workspace
+
+import com.bol.secure.Encrypted
+import org.springframework.data.mongodb.core.mapping.Field
+
+data class SourceProviderApplicationCredentials(
+    @Field
+    val clientKey: String,
+    @Field
+    @Encrypted
+    val secret: String
+) {
+    companion object {
+        fun from(clientKey: String, secret: String): SourceProviderApplicationCredentials {
+            return SourceProviderApplicationCredentials(clientKey, secret)
+        }
+    }
+}
