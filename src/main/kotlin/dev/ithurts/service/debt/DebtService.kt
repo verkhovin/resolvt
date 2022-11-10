@@ -1,16 +1,16 @@
 package dev.ithurts.service.debt
 
-import dev.ithurts.service.repository.RepositoryInfo
-import dev.ithurts.service.debt.model.DebtReport
-import dev.ithurts.service.permission.AuthenticationFacade
 import dev.ithurts.api.web.page.AdvancedBindingEditForm
 import dev.ithurts.api.web.page.BindingEditForm
 import dev.ithurts.api.web.page.DebtEditForm
-import dev.ithurts.service.debt.model.DebtStatus
 import dev.ithurts.application.exception.EntityNotFoundException
-import dev.ithurts.service.repository.RepositoryService
 import dev.ithurts.service.debt.model.Debt
+import dev.ithurts.service.debt.model.DebtReport
+import dev.ithurts.service.debt.model.DebtStatus
 import dev.ithurts.service.debt.model.DebtVote
+import dev.ithurts.service.permission.AuthenticationFacade
+import dev.ithurts.service.repository.RepositoryInfo
+import dev.ithurts.service.repository.RepositoryService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
@@ -91,14 +91,15 @@ class DebtService(
     fun editAdvancedBinding(debtId: String, bindingId: String, form: AdvancedBindingEditForm) {
         val debt = debtRepository.findByIdOrNull(debtId) ?: throw EntityNotFoundException("Debt", "id", debtId)
         val params = form.params?.split(',')?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
-        debt.updateAdvancedBinding(
-            bindingId,
-            form.path,
-            if (form.parent.isNullOrBlank()) null else form.parent,
-            form.name ?: "",
-            params
+        debtRepository.save(
+            debt.updateAdvancedBinding(
+                bindingId,
+                form.path,
+                if (form.parent.isNullOrBlank()) null else form.parent,
+                form.name ?: "",
+                params
+            )
         )
-        debtRepository.save(debt)
     }
 
 }

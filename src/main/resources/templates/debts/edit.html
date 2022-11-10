@@ -12,8 +12,8 @@
                 </div>
                 <div class="col-md-2">
                     <select th:field="*{status}" id="status" class="form-select">
-                        <option th:value="${T(dev.ithurts.domain.debt.DebtStatus).OPEN}">Open</option>
-                        <option th:value="${T(dev.ithurts.domain.debt.DebtStatus).RESOLVED}">Resolved</option>
+                        <option th:value="${T(dev.ithurts.service.debt.model.DebtStatus).OPEN}">Open</option>
+                        <option th:value="${T(dev.ithurts.service.debt.model.DebtStatus).RESOLVED}">Resolved</option>
                     </select>
                 </div>
                 <div class="col-12">
