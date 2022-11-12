@@ -1,5 +1,6 @@
 package dev.ithurts.api.rest.bitbucket
 
+import dev.ithurts.configuration.Bitbucket
 import dev.ithurts.service.sourceprovider.bitbucket.model.BitbucketAppInstallation
 import dev.ithurts.service.sourceprovider.bitbucket.BitbucketWebhookHandler
 import dev.ithurts.service.sourceprovider.bitbucket.model.BitbucketWebhookEvent
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("bitbucket")
 @CrossOrigin(origins = ["*"])
-class BitbucketWebhooksController(
+@Bitbucket
+class BitbucketWebhookController(
     private val bitbucketWebhookHandler: BitbucketWebhookHandler
 ) {
     @PostMapping("/installed")

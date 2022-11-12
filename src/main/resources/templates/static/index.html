@@ -41,6 +41,9 @@
                     <h3>
                         Technical Debt Manager
                     </h3>
+                    <p class="text-muted">
+                        for Java and Kotlin development teams
+                    </p>
                     <p>
                         <b>It Hurts</b> is a tool that helps you to collect, keep track, <b>manage technical debt</b>
                         across
@@ -50,7 +53,11 @@
                     </p>
                     <div class="text-center mt-4">
                         <p>Getting started:</p>
-                        <a th:href="@{/dashboard}" type="button" class="btn bitbucket-button">
+
+                        <a th:if="${@configurationService.isGithubEnabled()}" th:href="@{/oauth2/authorization/github}" type="button" class="btn continue-with-button">
+                            <img th:src="@{/public/imgs/github-logo.png}"/> <span>Continue with GitHub</span>
+                        </a>
+                        <a th:if="${@configurationService.isBitbucketEnabled()}" th:href="@{/oauth2/authorization/bitbucket}" type="button" class="btn continue-with-button">
                             <img th:src="@{/public/imgs/bitbucket-logo.svg}"/> <span>Continue with Bitbucket</span>
                         </a>
                     </div>
@@ -72,7 +79,7 @@
                         Create a workspace by connecting <span class="text-nowrap">It Hurts</span> to your source
                         repositories.
                     </p>
-                    <p class="text-muted d-md-none">Supported: Bitbucket<br/>Coming soon: GitHub, Gitlab</p>
+                    <p class="text-muted d-md-none">Supported: GitHub, Bitbucket</p>
                 </div>
                 <div class="col-md step">
                     <h2 class="text-center text-muted">02</h2>
@@ -81,7 +88,7 @@
                         It Hurts plugin makes technical debt always visible while you are working with the code.
                         There is no need to leave the IDE to browse and report on technical debt.
                     </p>
-                    <p class="text-muted d-md-none">Supported: Intellij<br/>Coming soon: Visual Studio Code</p>
+                    <p class="text-muted d-md-none">Supported: Intellij IDEA</p>
                 </div>
                 <div class="col-md step">
                     <h2 class="text-center text-muted">03</h2>
@@ -95,10 +102,10 @@
             </div>
             <div class="row d-none d-md-flex">
                 <div class="col-md">
-                    <p class="text-muted">Supported: Bitbucket<br/>Coming soon: GitHub, Gitlab</p>
+                    <p class="text-muted">Supported: GitHub, Bitbucket</p>
                 </div>
                 <div class="col-md">
-                    <p class="text-muted">Supported: Intellij<br/>Coming soon: Visual Studio Code</p>
+                    <p class="text-muted">Supported: Intellij IDEA</p>
                 </div>
                 <div class="col-md"></div>
             </div>

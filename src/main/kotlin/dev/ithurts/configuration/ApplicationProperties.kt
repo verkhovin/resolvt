@@ -8,8 +8,16 @@ import org.springframework.boot.context.properties.ConstructorBinding
 class ApplicationProperties(
     val baseUrl: String,
     val bitbucket: BitbucketProperties,
+    val github: GithubProperties
 )
 
 class BitbucketProperties(
     val appName: String = ""
+)
+
+class GithubProperties(
+    val appName: String = "",
+    val appId: String = "",
+    val tokenSignaturePrivateKeyLocation: String = "",
+    val webhookSecret: String = ""
 )

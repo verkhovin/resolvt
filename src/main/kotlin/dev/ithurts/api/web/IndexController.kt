@@ -2,6 +2,7 @@ package dev.ithurts.api.web
 
 import dev.ithurts.query.DebtQueryRepository
 import dev.ithurts.api.web.oauth2.AuthenticatedOAuth2User
+import dev.ithurts.configuration.ConfigurationService
 import dev.ithurts.service.workspace.Workspace
 import dev.ithurts.service.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -14,11 +15,21 @@ import javax.servlet.http.HttpSession
 
 @Controller
 class IndexController(
+    private val configurationService: ConfigurationService,
     private val workspaceRepository: WorkspaceRepository,
     private val debtQueryRepository: DebtQueryRepository
 ) {
     @GetMapping("/")
-    fun index() = "static/index"
+    fun index(@AuthenticationPrincipal authentication: AuthenticatedOAuth2User?): String {
+        if (authentication != null) {
+            return "redirect:/dashboard"
+        }
+        val sourceProvidersEnabled = configurationService.getEnabledSourceProviders()
+        if (sourceProvidersEnabled.size == 1) {
+            return "redirect:/oauth2/authorization/${sourceProvidersEnabled[0].name.lowercase()}"
+        }
+        return "static/index"
+    }
 
     @GetMapping("/dashboard")
     fun dashboard(

@@ -5,13 +5,13 @@ import org.springframework.data.mongodb.core.mapping.Field
 
 data class SourceProviderApplicationCredentials(
     @Field
-    val clientKey: String,
+    val clientKey: Any,
     @Field
     @Encrypted
-    val secret: String
+    val secret: String?
 ) {
     companion object {
-        fun from(clientKey: String, secret: String): SourceProviderApplicationCredentials {
+        fun from(clientKey: Any, secret: String?): SourceProviderApplicationCredentials {
             return SourceProviderApplicationCredentials(clientKey, secret)
         }
     }

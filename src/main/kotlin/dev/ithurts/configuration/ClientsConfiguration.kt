@@ -15,4 +15,8 @@ class ClientsConfiguration {
     @Bean
     fun bitbucketRestTemplate(restTemplateBuilder: RestTemplateBuilder): RestTemplate =
         restTemplateBuilder.rootUri("https://api.bitbucket.org/2.0").build()
+
+    @Bean
+    fun githubRestTemplate(restTemplateBuilder: RestTemplateBuilder): RestTemplate =
+        restTemplateBuilder.rootUri("https://api.github.com").build()
 }

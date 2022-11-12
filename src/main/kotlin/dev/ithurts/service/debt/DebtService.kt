@@ -4,11 +4,11 @@ import dev.ithurts.api.web.page.AdvancedBindingEditForm
 import dev.ithurts.api.web.page.BindingEditForm
 import dev.ithurts.api.web.page.DebtEditForm
 import dev.ithurts.application.exception.EntityNotFoundException
-import dev.ithurts.service.debt.model.Debt
-import dev.ithurts.service.debt.model.DebtReport
-import dev.ithurts.service.debt.model.DebtStatus
-import dev.ithurts.service.debt.model.DebtVote
+import dev.ithurts.application.model.end
+import dev.ithurts.application.model.start
+import dev.ithurts.service.debt.model.*
 import dev.ithurts.service.permission.AuthenticationFacade
+import dev.ithurts.service.repository.Repository
 import dev.ithurts.service.repository.RepositoryInfo
 import dev.ithurts.service.repository.RepositoryService
 import org.springframework.context.ApplicationEventPublisher
@@ -42,7 +42,7 @@ class DebtService(
             votes = listOf(DebtVote(reporterAccountId))
         )
         val savedDebt = debtRepository.save(debt)
-        applicationEventPublisher.publishEvent(DebtReportedEvent(savedDebt, this))
+        applicationEventPublisher.publishEvent(DebtReportedEvent(savedDebt, this)) //TODO async
         return savedDebt.id
     }
 

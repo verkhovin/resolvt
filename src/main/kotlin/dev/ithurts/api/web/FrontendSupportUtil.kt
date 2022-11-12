@@ -3,6 +3,7 @@ package dev.ithurts.api.web
 import dev.ithurts.service.Language
 import dev.ithurts.query.model.BindingDto
 import dev.ithurts.service.debt.model.BindingStatus
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service

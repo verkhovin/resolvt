@@ -1,7 +1,8 @@
 package dev.ithurts.api.rest.bitbucket
 
-import dev.ithurts.service.sourceprovider.bitbucket.buildQueryStringHash
 import dev.ithurts.configuration.ApplicationProperties
+import dev.ithurts.service.SourceProvider
+import dev.ithurts.service.sourceprovider.bitbucket.buildQueryStringHash
 import dev.ithurts.service.workspace.WorkspaceRepository
 import io.jsonwebtoken.Jwts
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -17,47 +18,46 @@ import javax.servlet.http.HttpServletResponse
 
 class BitbucketCloudAuthenticationFilter(
     private val workspaceRepository: WorkspaceRepository,
-    private val applicationProperties: ApplicationProperties
+    private val applicationProperties: ApplicationProperties,
 ) : OncePerRequestFilter() {
     private val decodingParser = Jwts.parserBuilder().build()
 
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
-        val isInstall = request.requestURI.startsWith("/bitbucket/install")
-        if (isInstall) {
-            filterChain.doFilter(request, response)
-            return
-        }
+        authenticate(request)
+        filterChain.doFilter(request, response)
+    }
+
+    private fun authenticate(request: HttpServletRequest) {
         val authorizationHeader = request.getHeader("Authorization")
         if ((authorizationHeader == null) || !authorizationHeader.startsWith("JWT ")
         ) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
             return
         }
         val jwt = authorizationHeader.substring(4)
         val unsignedJwt = jwt.substringBeforeLast(".") + "."
         val claims = decodingParser.parseClaimsJwt(unsignedJwt)
         val clientKey = claims.body.issuer
-        val subjectOrganisation = workspaceRepository.getBySourceProviderApplicationCredentials_ClientKey(clientKey)
-        if (subjectOrganisation == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+        val subjectOrganisation =
+            workspaceRepository.getBySourceProviderAndSourceProviderApplicationCredentials_ClientKey(SourceProvider.BITBUCKET,
+                clientKey) ?: return
+        val verificationParser = Jwts.parserBuilder()
+            .setSigningKey(subjectOrganisation.sourceProviderApplicationCredentials.secret!!.toByteArray()).build()
+        try {
+            verificationParser.parseClaimsJws(jwt)
+        } catch (e: Exception) {
+            logger.warn("Failed to verify token, proceeding without authentication")
             return
         }
-        val verificationParser = Jwts.parserBuilder()
-            .setSigningKey(subjectOrganisation.sourceProviderApplicationCredentials.secret.toByteArray()).build()
-        verificationParser.parseClaimsJws(jwt)
         val qsh = buildQueryStringHash(buildCanonicalUrl(request))
         if (qsh != claims.body["qsh"]) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
             return
         }
         val authentication = UsernamePasswordAuthenticationToken(subjectOrganisation, null, emptyList())
         SecurityContextHolder.getContext().authentication = authentication
-
-        filterChain.doFilter(request, response)
     }
 
     private fun buildCanonicalUrl(request: HttpServletRequest): String {
@@ -73,7 +73,8 @@ class BitbucketCloudAuthenticationFilter(
             .filter { it.key.lowercase() != "jwt" }
             .map {
                 URLEncoder.encode(it.key, Charset.forName("UTF-8")) to
-                        it.value.sorted().joinToString(",") { value -> URLEncoder.encode(value, Charset.forName("UTF-8")) }
+                        it.value.sorted()
+                            .joinToString(",") { value -> URLEncoder.encode(value, Charset.forName("UTF-8")) }
             }.joinToString("&") { "${it.first}=${it.second}" }
         return "${request.method}&/${pathSegments}&${queryParams}"
     }

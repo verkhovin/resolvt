@@ -11,5 +11,5 @@ interface WorkspaceRepository : CrudRepository<Workspace, String> {
 
     fun findBySourceProviderAndExternalId(sourceProvider: SourceProvider, externalId: String): Workspace?
 
-    fun getBySourceProviderApplicationCredentials_ClientKey(clientKey: String): Workspace?
+    fun getBySourceProviderAndSourceProviderApplicationCredentials_ClientKey(sourceProvider: SourceProvider, clientKey: Any): Workspace?
 }

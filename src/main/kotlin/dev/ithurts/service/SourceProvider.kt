@@ -1,5 +1,6 @@
 package dev.ithurts.service
 
 enum class SourceProvider {
-    BITBUCKET
+    BITBUCKET,
+    GITHUB
 }

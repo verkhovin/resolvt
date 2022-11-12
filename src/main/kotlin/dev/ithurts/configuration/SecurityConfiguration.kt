@@ -1,10 +1,12 @@
 package dev.ithurts.configuration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import dev.ithurts.service.account.AccountRepository
 import dev.ithurts.service.workspace.WorkspaceRepository
 import dev.ithurts.api.web.oauth2.AccountPersistingOAuth2UserService
 import dev.ithurts.service.permission.WorkspacePermissionEvaluator
 import dev.ithurts.api.rest.bitbucket.BitbucketCloudAuthenticationFilter
+import dev.ithurts.api.rest.github.GithubAuthenticationFilter
 import dev.ithurts.api.rest.plugin.PluginAuthenticationFilter
 import dev.ithurts.api.rest.plugin.PluginTokenManager
 import org.springframework.context.annotation.Configuration
@@ -51,10 +53,10 @@ class WebSecurityConfiguration(
                 userInfoEndpoint {
                     userService = accountPersistingOAuth2UserService
                 }
+                loginPage = "/"
             }
         }
     }
-
 }
 
 @EnableWebSecurity
@@ -94,23 +96,33 @@ class ApiSecurityConfiguration(
 @Order(2)
 class IntegrationApiSecurityConfiguration(
     private val workspaceRepository: WorkspaceRepository,
-    private val applicationProperties: ApplicationProperties
+    private val applicationProperties: ApplicationProperties,
+    private val objectMapper: ObjectMapper,
+    private val configurationService: ConfigurationService
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity?) {
         http {
-            securityMatcher(AntPathRequestMatcher("/bitbucket/**"))
+            securityMatcher("/bitbucket/**", "/github/**")
             csrf {
                 disable()
             }
             authorizeRequests {
-                authorize(anyRequest, permitAll)
+                authorize("/bitbucket/installed", permitAll)
+                authorize(anyRequest, authenticated)
             }
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
-            addFilterBefore<UsernamePasswordAuthenticationFilter>(
-                BitbucketCloudAuthenticationFilter(workspaceRepository, applicationProperties)
-            )
+            if(configurationService.isBitbucketEnabled()) {
+                addFilterBefore<UsernamePasswordAuthenticationFilter>(
+                    BitbucketCloudAuthenticationFilter(workspaceRepository, applicationProperties)
+                )
+            }
+            if(configurationService.isGithubEnabled()) {
+                addFilterAfter<UsernamePasswordAuthenticationFilter>(
+                    GithubAuthenticationFilter(workspaceRepository, applicationProperties, objectMapper)
+                )
+            }
             exceptionHandling {
 
             }

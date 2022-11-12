@@ -13,12 +13,13 @@ class WorkspaceService(
 ) {
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MEMBER')")
     fun addMemberByEmail(workspaceId: String, email: String) {
-        val account = accountRepository.findByEmail(email) ?: throw EntityNotFoundException("account", "email", email)
         val workspace = workspaceRepository.findByIdOrNull(workspaceId) ?: throw EntityNotFoundException(
             "workspace",
             "id",
             workspaceId
         )
+        val account = accountRepository.findByEmailAndSourceProvider(email, workspace.sourceProvider)
+            ?: throw EntityNotFoundException("account", "email", email)
         workspaceRepository.save(workspace.addMember(account.id, WorkspaceMemberRole.MEMBER, WorkspaceMemberStatus.ACTIVE))
     }
 

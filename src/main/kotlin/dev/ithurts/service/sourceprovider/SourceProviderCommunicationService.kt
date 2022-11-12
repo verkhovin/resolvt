@@ -1,11 +1,14 @@
 package dev.ithurts.service.sourceprovider
 
-import dev.ithurts.service.sourceprovider.bitbucket.BitbucketAuthorizationProvider
+import dev.ithurts.service.sourceprovider.bitbucket.BitbucketAuthenticationProvider
 import dev.ithurts.service.sourceprovider.bitbucket.BitbucketClient
 import dev.ithurts.service.sourceprovider.model.SourceProviderRepository
 import dev.ithurts.service.account.Account
 import dev.ithurts.service.SourceProvider
 import dev.ithurts.service.SourceProvider.*
+import dev.ithurts.service.sourceprovider.github.GithubAppAuthentication
+import dev.ithurts.service.sourceprovider.github.GithubAuthenticationProvider
+import dev.ithurts.service.sourceprovider.github.GithubClient
 import dev.ithurts.service.workspace.Workspace
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
@@ -13,12 +16,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class SourceProviderCommunicationService(
-    private val bitbucketClient: BitbucketClient,
-    private val bitbucketAuthorizationProvider: BitbucketAuthorizationProvider
+    private val bitbucketClient: BitbucketClient?,
+    private val githubClient: GithubClient?,
+    private val bitbucketAuthenticationProvider: BitbucketAuthenticationProvider?,
+    private val githubAuthenticationProvider: GithubAuthenticationProvider?,
 ) {
 
-    fun getDiff(workspaceId: String, repository: String, spec: String): String {
-        return client.getDiff(getAccessToken(), workspaceId, repository, spec)
+    fun getDiff(workspaceExternalId: String, repository: String, spec: String): String {
+        return client.getDiff(getAccessToken(), workspaceExternalId, repository, spec)
     }
 
     fun getFile(workspace: Workspace, repository: String, filePath: String, commitHash: String): String {
@@ -30,21 +35,30 @@ class SourceProviderCommunicationService(
     }
 
     fun checkIsMember(workspace: Workspace, account: Account) {
-        client.checkIsMember(getAccessToken(workspace), workspace.externalId, account.externalId)
+        client.checkIsMember(getAccessToken(workspace), workspace, account)
+    }
+
+    fun getAccountPrimaryEmail(accessToken: String, sourceProvider: SourceProvider): String {
+        return getClient(sourceProvider).getUserPrimaryEmail(accessToken)
     }
 
     private val client: SourceProviderClient
-        get() = when (getCurrentSourceProvider()) {
-            BITBUCKET -> bitbucketClient
+        get() = getClient(getCurrentSourceProvider())
+
+    private fun getClient(sourceProvider: SourceProvider) = when (sourceProvider) {
+        BITBUCKET -> bitbucketClient ?: throw SourceProviderIntegrationDisabledException(BITBUCKET)
+        GITHUB -> githubClient ?: throw SourceProviderIntegrationDisabledException(GITHUB)
+    }
+
+    private fun getAccessToken(): String = authenticationProvider.getAuthentication()
+
+    private fun getAccessToken(workspace: Workspace) = authenticationProvider.getAuthentication(workspace)
+
+    private val authenticationProvider: SourceProviderAuthenticationProvider
+        get() = when(getCurrentSourceProvider()) {
+            BITBUCKET -> bitbucketAuthenticationProvider ?: throw SourceProviderIntegrationDisabledException(BITBUCKET)
+            GITHUB -> githubAuthenticationProvider ?: throw SourceProviderIntegrationDisabledException(GITHUB)
         }
-
-    private fun getAccessToken(): String = when (getCurrentSourceProvider()) {
-        BITBUCKET -> bitbucketAuthorizationProvider.getAuthorization()
-    }
-
-    private fun getAccessToken(workspace: Workspace) = when (getCurrentSourceProvider()) {
-        BITBUCKET -> bitbucketAuthorizationProvider.getAuthorization(workspace)
-    }
 
     private fun getCurrentSourceProvider(): SourceProvider {
         val authentication = SecurityContextHolder.getContext().authentication
@@ -52,6 +66,7 @@ class SourceProviderCommunicationService(
             authentication is OAuth2AuthenticationToken -> SourceProvider.valueOf(authentication.authorizedClientRegistrationId.uppercase())
             authentication.principal is Workspace -> (authentication.principal as Workspace).sourceProvider
             authentication.principal is Account -> (authentication.principal as Account).sourceProvider
+            authentication.principal is GithubAppAuthentication -> GITHUB
             else -> throw IllegalStateException("Unknown authentication type")
         }
     }

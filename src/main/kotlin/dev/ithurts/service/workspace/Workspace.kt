@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 data class Workspace(
     val name: String,
     val sourceProvider: SourceProvider,
+    val type: WorkspaceType,
     val externalId: String,
     @Field
     val sourceProviderApplicationCredentials: SourceProviderApplicationCredentials,
@@ -21,6 +22,12 @@ data class Workspace(
 ) {
     val id: String
         get() = _id!!
+
+    init {
+        if (sourceProvider == SourceProvider.BITBUCKET && sourceProviderApplicationCredentials.secret == null) {
+            throw IllegalArgumentException("Source provider secret must be provided for BITBUCKET")
+        }
+    }
 
     fun addMember(
         account: String,

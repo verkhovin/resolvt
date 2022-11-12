@@ -1,18 +1,15 @@
 package dev.ithurts.service.sourceprovider.bitbucket
 
+import dev.ithurts.configuration.Bitbucket
+import dev.ithurts.service.sourceprovider.SourceProviderAuthenticationProvider
+import dev.ithurts.service.sourceprovider.bitbucket.model.Token
 import dev.ithurts.service.workspace.SourceProviderApplicationCredentials
 import dev.ithurts.service.workspace.Workspace
-import dev.ithurts.api.web.oauth2.AuthenticatedOAuth2User
-import dev.ithurts.service.sourceprovider.bitbucket.model.Token
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.*
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
@@ -20,44 +17,15 @@ import java.time.Clock
 import java.util.*
 
 @Service
-class BitbucketAuthorizationProvider(
-    private val clientService: OAuth2AuthorizedClientService,
+@Bitbucket
+class BitbucketAuthenticationProvider(
+    clientService: OAuth2AuthorizedClientService,
     @Qualifier("commonRestTemplate")
     private val restTemplate: RestTemplate,
     private val clock: Clock,
-) {
-    fun getAuthorization(): String {
-        val authentication = SecurityContextHolder
-            .getContext()
-            .authentication
-        return when (authentication.principal) {
-            is AuthenticatedOAuth2User -> {
-                getAuthenticationOnBehalfOfAccount(authentication)
-            }
-            is Workspace -> {
-                getAuthenticationOnBehalfOfWorkspace(authentication.principal as Workspace)
-            }
-            else -> throw IllegalStateException("Unknown principal type")
-        }
-    }
+) : SourceProviderAuthenticationProvider(clientService) {
 
-    fun getAuthorization(workspace: Workspace): String {
-        return getAuthenticationOnBehalfOfWorkspace(workspace)
-    }
-
-    private fun getAuthenticationOnBehalfOfAccount(authentication: Authentication?): String {
-        authentication as OAuth2AuthenticationToken
-        val client: OAuth2AuthorizedClient = clientService.loadAuthorizedClient(
-            authentication.authorizedClientRegistrationId,
-            authentication.name
-        )
-
-        return client.accessToken.tokenValue
-    }
-
-    private fun getAuthenticationOnBehalfOfWorkspace(
-        workspace: Workspace,
-    ): String {
+    override fun getAuthentication(workspace: Workspace): String {
         val token = buildBitbucketAppJWT(workspace.sourceProviderApplicationCredentials)
         val body = LinkedMultiValueMap<String, String>()
         body.add("grant_type", "urn:bitbucket:oauth2:jwt")
@@ -79,9 +47,9 @@ class BitbucketAuthorizationProvider(
             .setIssuedAt(Date(clock.millis()))
             .setExpiration(Date(clock.instant().plusSeconds(18000).toEpochMilli()))
             .setIssuer("it-hurts-app")
-            .setSubject(clientKey)
+            .setSubject(clientKey.toString())
             .addClaims(mapOf("qsh" to qsh))
-            .signWith(Keys.hmacShaKeyFor(secret.toByteArray()))
+            .signWith(Keys.hmacShaKeyFor(secret!!.toByteArray()))
             .compact()
     }
 

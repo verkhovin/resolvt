@@ -1,5 +1,6 @@
 package dev.ithurts.service.sourceprovider.bitbucket
 
+import dev.ithurts.configuration.Bitbucket
 import dev.ithurts.service.debt.model.PushInfo
 import dev.ithurts.service.permission.IntegrationAuthenticationFacade
 import dev.ithurts.service.sourceprovider.SourceProviderCommunicationService
@@ -11,13 +12,12 @@ import dev.ithurts.service.account.AccountRepository
 import dev.ithurts.service.debt.diff.DiffApplyingService
 import dev.ithurts.service.repository.RepositoryRepository
 import dev.ithurts.service.workspace.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
+@Bitbucket
 class BitbucketWebhookHandler(
     private val accountRepository: AccountRepository,
     private val workspaceRepository: WorkspaceRepository,
@@ -44,6 +44,7 @@ class BitbucketWebhookHandler(
             ?: Workspace(
                 bitbucketWorkspace.displayName,
                 SourceProvider.BITBUCKET,
+                WorkspaceType.ORGANISATION,
                 bitbucketWorkspace.username ?: bitbucketWorkspace.nickname!!,
                 sourceProviderApplicationCredentials,
                 true,
@@ -93,9 +94,5 @@ class BitbucketWebhookHandler(
                 )
             )
         }
-    }
-
-    companion object {
-        val log: Logger = LoggerFactory.getLogger(BitbucketWebhookHandler::class.java)
     }
 }

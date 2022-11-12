@@ -3,10 +3,12 @@ package dev.ithurts.service.sourceprovider.bitbucket
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.ithurts.configuration.ApplicationProperties
+import dev.ithurts.configuration.Bitbucket
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Service
 
 @Service
+@Bitbucket
 class BitbucketDescriptorService(
     private val resourceLoader: ResourceLoader,
     private val applicationProperties: ApplicationProperties,
