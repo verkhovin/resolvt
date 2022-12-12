@@ -1,7 +1,7 @@
 {
-  "description": "It Hurts is a technical debt manager for development teams",
+  "description": "Resolvt is a technical debt manager for development teams",
   "vendor": {
-    "name": "Nikita Verkhovin / It Hurts",
+    "name": "Nikita Verkhovin / Resolvt",
     "url": "https://ithurts.dev"
   },
   "authentication": {
