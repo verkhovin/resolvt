@@ -7,5 +7,5 @@ RUN ./mvnw clean install
 FROM openjdk:11.0.15-jre
 EXPOSE 8080
 RUN mkdir /app
-COPY --from=build /build/target/*ithurts*.jar /app/ithurts.jar
-ENTRYPOINT ["java","-jar","/app/ithurts.jar"]
+COPY --from=build /build/target/*resolvt*.jar /app/resolvt.jar
+ENTRYPOINT ["java","-jar","/app/resolvt.jar"]

@@ -2,7 +2,7 @@
   "description": "Resolvt is a technical debt manager for development teams",
   "vendor": {
     "name": "Nikita Verkhovin / Resolvt",
-    "url": "https://ithurts.dev"
+    "url": "https://resolvt.dev"
   },
   "authentication": {
     "type": "jwt"
