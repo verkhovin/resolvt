@@ -36,7 +36,7 @@ class GithubAuthenticationFilter(
 
     private fun authenticate(request: HttpServletRequest) {
         val appId = request.getHeader("x-github-hook-installation-target-id") ?: return
-        if (appId != applicationProperties.github.appId) return
+        if (appId != applicationProperties.github!!.appId) return
         val signature = request.getHeader("x-hub-signature-256") ?: return
         log.debug("Found x-hub-signature-256 header")
         val body = request.inputStream.readAllBytes()

@@ -31,7 +31,7 @@ class GithubAuthenticationProvider(
     clientService: OAuth2AuthorizedClientService,
     private val clock: Clock,
 ): SourceProviderAuthenticationProvider(clientService) {
-    private val privateKey: Key = getPrivateKeyFromFile(applicationProperties.github.tokenSignaturePrivateKeyLocation)
+    private val privateKey: Key = getPrivateKeyFromFile(applicationProperties.github!!.tokenSignaturePrivateKeyLocation)
 
     override fun getAuthentication(workspace: Workspace): String {
         val appToken = buildJWT()
@@ -48,7 +48,7 @@ class GithubAuthenticationProvider(
         return Jwts.builder()
             .setClaims(mapOf("iat" to now.minusSeconds(60).epochSecond,
                 "exp" to now.plus(5, ChronoUnit.MINUTES).epochSecond))
-            .setIssuer(applicationProperties.github.appId)
+            .setIssuer(applicationProperties.github!!.appId)
             .signWith(privateKey, SignatureAlgorithm.RS256)
             .compact()
     }

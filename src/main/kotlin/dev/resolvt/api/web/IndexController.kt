@@ -2,6 +2,7 @@ package dev.resolvt.api.web
 
 import dev.resolvt.query.DebtQueryRepository
 import dev.resolvt.api.web.oauth2.AuthenticatedOAuth2User
+import dev.resolvt.configuration.ApplicationProperties
 import dev.resolvt.configuration.ConfigurationService
 import dev.resolvt.service.workspace.Workspace
 import dev.resolvt.service.workspace.WorkspaceRepository
@@ -17,7 +18,8 @@ import javax.servlet.http.HttpSession
 class IndexController(
     private val configurationService: ConfigurationService,
     private val workspaceRepository: WorkspaceRepository,
-    private val debtQueryRepository: DebtQueryRepository
+    private val debtQueryRepository: DebtQueryRepository,
+    private val applicationProperties: ApplicationProperties
 ) {
     @GetMapping("/")
     fun index(@AuthenticationPrincipal authentication: AuthenticatedOAuth2User?): String {
@@ -25,7 +27,7 @@ class IndexController(
             return "redirect:/dashboard"
         }
         val sourceProvidersEnabled = configurationService.getEnabledSourceProviders()
-        if (sourceProvidersEnabled.size == 1) {
+        if (sourceProvidersEnabled.size == 1 && !applicationProperties.showMainPage) {
             return "redirect:/oauth2/authorization/${sourceProvidersEnabled[0].name.lowercase()}"
         }
         return "static/index"

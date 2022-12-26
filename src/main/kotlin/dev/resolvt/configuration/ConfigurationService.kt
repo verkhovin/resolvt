@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ConfigurationService(
-    private val environment: Environment,
+    private val environment: Environment
 ) {
     fun getEnabledSourceProviders(): List<SourceProvider> =
         environment.getRequiredProperty("resolvt.source-providers.enabled", List::class.java).map {

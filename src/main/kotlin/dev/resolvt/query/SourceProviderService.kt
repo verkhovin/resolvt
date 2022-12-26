@@ -13,8 +13,8 @@ class SourceProviderService(
 ) {
     fun getSourceProviderConnectLink(): String {
         return when (authenticationFacade.account.sourceProvider) {
-            SourceProvider.BITBUCKET -> "https://bitbucket.org/site/addons/authorize?addon_key=${applicationProperties.bitbucket.appName}"
-            SourceProvider.GITHUB -> "https://github.com/apps/${applicationProperties.github.appName}/installations/new"
+            SourceProvider.BITBUCKET -> "https://bitbucket.org/site/addons/authorize?addon_key=${applicationProperties.bitbucket!!.appName}"
+            SourceProvider.GITHUB -> "https://github.com/apps/${applicationProperties.github!!.appName}/installations/new"
         }
     }
 

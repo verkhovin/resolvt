@@ -18,7 +18,7 @@ class BitbucketDescriptorService(
         val descriptorTemplate: MutableMap<String, Any?> = resourceLoader
             .getResource(ResourceLoader.CLASSPATH_URL_PREFIX + "bitbucket-descriptor.json")
             .inputStream.use { objectMapper.readValue(it) }
-        descriptorTemplate["key"] = applicationProperties.bitbucket.appName
+        descriptorTemplate["key"] = applicationProperties.bitbucket!!.appName
         descriptorTemplate["name"] = "It Hurts for Bitbucket [${applicationProperties.bitbucket.appName}]"
         descriptorTemplate["baseUrl"] = applicationProperties.baseUrl
         return objectMapper.writeValueAsString(descriptorTemplate)

@@ -7,8 +7,9 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConfigurationProperties(prefix = "resolvt")
 class ApplicationProperties(
     val baseUrl: String,
-    val bitbucket: BitbucketProperties,
-    val github: GithubProperties
+    val bitbucket: BitbucketProperties?,
+    val github: GithubProperties?,
+    val showMainPage: Boolean = false
 )
 
 class BitbucketProperties(

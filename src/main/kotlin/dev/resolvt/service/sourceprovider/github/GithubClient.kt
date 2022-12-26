@@ -3,7 +3,7 @@ package dev.resolvt.service.sourceprovider.github
 import dev.resolvt.configuration.Github
 import dev.resolvt.service.account.Account
 import dev.resolvt.service.sourceprovider.SourceProviderClient
-import dev.resolvt.service.sourceprovider.github.model.GithubRepository
+import dev.resolvt.service.sourceprovider.github.model.GithubRepositoryInfo
 import dev.resolvt.service.sourceprovider.github.model.GithubUser
 import dev.resolvt.service.sourceprovider.github.model.GithubUserEmailInfo
 import dev.resolvt.service.sourceprovider.model.SourceProviderRepository
@@ -38,7 +38,7 @@ class GithubClient(
         workspaceExternalId: String,
         repository: String,
     ): SourceProviderRepository {
-        val githubRepository = restTemplate.exchange<GithubRepository>(
+        val githubRepository = restTemplate.exchange<GithubRepositoryInfo>(
             "/repos/$workspaceExternalId/$repository",
             HttpMethod.GET,
             noBody(accessToken)
