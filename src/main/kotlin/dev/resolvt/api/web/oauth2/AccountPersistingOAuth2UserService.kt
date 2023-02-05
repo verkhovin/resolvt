@@ -2,6 +2,7 @@ package dev.resolvt.api.web.oauth2
 
 import dev.resolvt.service.account.Account
 import dev.resolvt.service.account.AccountRepository
+import dev.resolvt.service.beta.PrivateBetaService
 import dev.resolvt.service.sourceprovider.SourceProviderCommunicationService
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Service
 @Service
 class AccountPersistingOAuth2UserService(
     private val sourceProviderCommunicationService: SourceProviderCommunicationService,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val privateBetaService: PrivateBetaService,
 ) : DefaultOAuth2UserService() {
 
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
@@ -28,6 +30,9 @@ class AccountPersistingOAuth2UserService(
     private fun processSignIn(userRequest: OAuth2UserRequest, userInfo: SourceProviderUserInfo): Account {
         val accessToken = userRequest.accessToken.tokenValue
         val email = sourceProviderCommunicationService.getAccountPrimaryEmail(accessToken, userInfo.sourceProvider)
+        if (!privateBetaService.canLogin(email)) {
+            throw NotPrivateBetaUserException()
+        }
         return ensureUser(userInfo, email)
     }
 

@@ -51,11 +51,8 @@
                     <div class="text-center mt-4">
                         <p>Getting started:</p>
 
-                        <a th:if="${@configurationService.isGithubEnabled()}" th:href="@{/oauth2/authorization/github}" type="button" class="btn continue-with-button">
-                            <img th:src="@{/public/imgs/github-logo.png}"/> <span>Continue with GitHub</span>
-                        </a>
-                        <a th:if="${@configurationService.isBitbucketEnabled()}" th:href="@{/oauth2/authorization/bitbucket}" type="button" class="btn continue-with-button">
-                            <img th:src="@{/public/imgs/bitbucket-logo.svg}"/> <span>Continue with Bitbucket</span>
+                        <a th:href="@{/dashboard}">
+                            Log in
                         </a>
                     </div>
                 </div>

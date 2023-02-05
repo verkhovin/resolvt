@@ -9,7 +9,8 @@ class ApplicationProperties(
     val baseUrl: String,
     val bitbucket: BitbucketProperties?,
     val github: GithubProperties?,
-    val showMainPage: Boolean = false
+    val showMainPage: Boolean = false,
+    val privateBeta: Boolean = false
 )
 
 class BitbucketProperties(

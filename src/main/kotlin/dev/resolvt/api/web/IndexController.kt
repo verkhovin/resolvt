@@ -3,7 +3,7 @@ package dev.resolvt.api.web
 import dev.resolvt.query.DebtQueryRepository
 import dev.resolvt.api.web.oauth2.AuthenticatedOAuth2User
 import dev.resolvt.configuration.ApplicationProperties
-import dev.resolvt.configuration.ConfigurationService
+import dev.resolvt.service.beta.PrivateBetaService
 import dev.resolvt.service.workspace.Workspace
 import dev.resolvt.service.workspace.WorkspaceRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -11,24 +11,24 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import javax.servlet.http.HttpSession
 
 @Controller
 class IndexController(
-    private val configurationService: ConfigurationService,
     private val workspaceRepository: WorkspaceRepository,
     private val debtQueryRepository: DebtQueryRepository,
-    private val applicationProperties: ApplicationProperties
+    private val applicationProperties: ApplicationProperties,
+    private val privateBetaService: PrivateBetaService
 ) {
     @GetMapping("/")
     fun index(@AuthenticationPrincipal authentication: AuthenticatedOAuth2User?): String {
         if (authentication != null) {
             return "redirect:/dashboard"
         }
-        val sourceProvidersEnabled = configurationService.getEnabledSourceProviders()
-        if (sourceProvidersEnabled.size == 1 && !applicationProperties.showMainPage) {
-            return "redirect:/oauth2/authorization/${sourceProvidersEnabled[0].name.lowercase()}"
+        if (!applicationProperties.showMainPage) {
+            return "redirect:/login"
         }
         return "static/index"
     }
@@ -57,5 +57,10 @@ class IndexController(
         model.addAttribute("org", workspace)
         model.addAttribute("resolved", status == "resolved")
         return "dashboard"
+    }
+
+    @PostMapping("/beta/request")
+    fun requestBeta(@RequestParam("email") email: String) {
+        privateBetaService.createBetaAccessRequest(email)
     }
 }

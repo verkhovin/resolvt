@@ -5,7 +5,6 @@ import dev.resolvt.service.account.AccountRepository
 import dev.resolvt.service.workspace.WorkspaceRepository
 import dev.resolvt.api.web.oauth2.AccountPersistingOAuth2UserService
 import dev.resolvt.service.permission.WorkspacePermissionEvaluator
-import dev.resolvt.api.rest.bitbucket.BitbucketCloudAuthenticationFilter
 import dev.resolvt.api.rest.github.GithubAuthenticationFilter
 import dev.resolvt.api.rest.plugin.PluginAuthenticationFilter
 import dev.resolvt.api.rest.plugin.PluginTokenManager
@@ -42,6 +41,7 @@ class WebSecurityConfiguration(
             }
             authorizeRequests {
                 authorize("/error", permitAll)
+                authorize("/login", permitAll)
                 authorize("/", permitAll)
                 authorize("/public/**", permitAll)
                 authorize("/favicon.ico", permitAll)
@@ -53,7 +53,7 @@ class WebSecurityConfiguration(
                 userInfoEndpoint {
                     userService = accountPersistingOAuth2UserService
                 }
-                loginPage = "/"
+                loginPage = "/login"
             }
         }
     }
