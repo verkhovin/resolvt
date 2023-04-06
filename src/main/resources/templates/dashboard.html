@@ -7,10 +7,19 @@
         <div class="col-md-12 ">
             <a th:unless="${resolved}" th:href="@{/dashboard?status=resolved}">Show Resolved</a>
             <a th:if="${resolved}" th:href="@{/dashboard}">Show Open</a>
-            <h6 th:if="${debts.isEmpty()}" class="text-center">Dashboard is empty</h6>
-            <p class="text-center"><small th:if="${debts.isEmpty()}"><a target="_blank"
-                                                                        href="https://github.com/ithurtsdev/docs/blob/main/getting-started.md">Checkout
-                Getting Started guide</a></small></p>
+            <div th:if="${debts.isEmpty()}" class="text-center m-4">
+                <h3>Workspace Created Successfully!</h3>
+                <div class="text-secondary">
+                    <p>Now it's time to install the <a href="https://plugins.jetbrains.com/plugin/20735-resolvt-integration"
+                                                       target="_blank">Resolvt Integration plugin for Intellij IDEA</a>.</p>
+                    <p>After the plugin is installed, you can <a target="_blank"
+                            href="https://resolvt.github.io/getting-started.html#reporting-tecnical-debt">
+                        create your first technical debt ticket</a> right from your IDE.</p>
+                    <p>To learn more about how to use Resolvt, <a
+                            href="https://resolvt.github.io/getting-started.html#intellij-idea"
+                            target="_blank">read this guide</a> or <a href="mailto:resolvt@gmail.com">contact us directly</a>.</p>
+                </div>
+            </div>
             <div th:unless="${debts.isEmpty()}">
 
                 <table class="table table-light">
@@ -28,7 +37,7 @@
                     </thead>
                     <tbody>
                     <tr th:each="debt : ${debts}">
-                        <th scope="row"> <a th:href="@{/debts/{id}(id=${debt.id})}" th:text="${debt.title}"></a></th>
+                        <th scope="row"><a th:href="@{/debts/{id}(id=${debt.id})}" th:text="${debt.title}"></a></th>
                         <td th:text="${debt.repository.name}"></td>
                         <td th:text="${debt.bindings.size()}"></td>
                         <td th:text="${debt.votes}"></td>
@@ -36,7 +45,8 @@
                         <td th:text="${debt.reporter.name}"></td>
                         <td th:text="${debt.cost}"></td>
                         <td>
-                            <i th:if="${debt.hasBindingTrackingLost}" class="bi bi-exclamation-triangle text-danger"></i>
+                            <i th:if="${debt.hasBindingTrackingLost}"
+                               class="bi bi-exclamation-triangle text-danger"></i>
                             <i th:if="${!debt.hasBindingTrackingLost}" class="bi bi-check-lg text-success"></i>
                         </td>
                     </tr>

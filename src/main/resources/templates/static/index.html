@@ -5,117 +5,169 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link th:href="@{/public/styles/styles.css}" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            border: none;
+            border-bottom: 1px solid #dcdcdc;
+        }
+
+        .navbar .nav-link {
+            color: #000000 !important;
+        }
+
+        /* Add some padding to the left and right of the screenshot on smaller screens */
+        @media (max-width: 767.98px) {
+            .screenshot {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+
+    </style>
+
     <title>Resolvt - Manage technical debt</title>
 </head>
 <body>
-<div id="home" class="container">
-    <div class="row">
-        <div class="col-12">
-            <nav class="navbar navbar-expand-lg navbar-light navbar-light mt-3 rounded-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="/">
-                        <img class="logo" th:src="@{/public/imgs/logo.svg}" width="150"></a>
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="/">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a target="_blank" class="nav-link" href="https://resolvt.github.io/getting-started.html">Getting started</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand ms-3" href="/">
+            <img th:src="@{/public/imgs/logo.svg}" width="150" alt="Resolvt logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto me-3 mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://resolvt.github.io/getting-started.html" target="_blank">Learn
+                        more</a>
+                </li>
+            </ul>
         </div>
     </div>
-    <div class="container">
-        <div class="row mt-3 mt-lg-3 align-items-center">
-            <div class="col-md">
-                <div class="align-middle">
-                    <h3>
-                        Technical Debt Manager
-                    </h3>
-                    <p class="text-muted">
-                        for Java and Kotlin development teams
-                    </p>
-                    <p>
-                        <b>Resolvt</b> is a tool that helps you to collect, keep track, <b>manage technical debt</b>
-                        across
-                        your
-                        applications,
-                        and does encourage your team to <b>take care of the codebase</b>
-                    </p>
-                    <div class="text-center mt-4">
-                        <p>Getting started:</p>
+</nav>
 
-                        <a th:href="@{/dashboard}">
-                            Log in
-                        </a>
-                    </div>
+<main class="container my-5">
+    <section class="py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="fw-bold fs-2 fs-md-3">
+                    Streamline your technical debt management
+                </h1>
+                <p class="text-muted fs-5">
+                    The comprehensive solution for proactively improving your codebase's maintainability and scalability
+                </p>
+                <div class="d-grid gap-2 mt-4">
+                    <a type="button" class="btn btn-lg btn-dark" th:href="@{/dashboard}">
+                        Get started
+                    </a>
+                    <a href="https://resolvt.github.io/getting-started.html" target="_blank" class="link-primary mt-3">Learn
+                        more</a>
                 </div>
             </div>
-            <div class="col-md mt-3">
-                <img class="img-fluid float-end screen-img" th:src="@{/public/imgs/index-img.png}"/>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <div class="justify-content-center screenshot text-center">
+                    <img th:src="@{/public/imgs/index.png}" alt="Resolvt software screenshot" class="img-fluid">
+                </div>
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+                <p class="fs-5 text-center justify-content-center">
+                    <b>Resolvt</b> is a tool that helps you collect and keep track of technical debt across your
+                    applications, and encourages your team to take care of the codebase.
+                </p>
             </div>
         </div>
-        <div class="row mt-3 mt-lg-5 align-itmes-center howto">
+    </section>
+
+    <section class="py-5">
+        <h2 id="how-it-works" class="text-center mb-5">Three Steps to Tackling Technical Debt</h2>
+        <div class="row gx-5 justify-content-center">
+            <div class="col-md-4">
+                <h3 class="text-center text-muted mb-3">Prioritize</h3>
+                <p class="text-justify">
+                    Resolvt simplifies technical debt prioritization by identifying and highlighting the most critical
+                    issues, enabling teams to make informed decisions and allocate their resources efficiently.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="text-center text-muted mb-3">Contextualize</h3>
+                <p class="text-justify">
+                    Resolvt provides developers with clear and concise context around their technical debt issues by
+                    creating strong links between technical debt tickets and related pieces of code.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="text-center text-muted mb-3">Resolve</h3>
+                <p class="text-justify">
+                    Resolvt streamlines the technical debt resolution process, empowering teams to efficiently resolve
+                    issues and reduce costly rework in the future.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <h2 class="text-center mb-3">Integrates with your tools and complements your development process</h2>
+        <p class="text-center text-muted fs-5">
+            Resolvts supports the following programming languages and tools
+        </p>
+        <div class="container">
             <div class="row">
-                <h2 id="how-it-works" class="text-center">How it works</h2>
-            </div>
-            <div class="row mt-3 mt-lg-3">
-                <div class="col-md step">
-                    <h2 class="text-center text-muted">01</h2>
-                    <h5 class="text-center">Integrate Resolvt with your codebase</h5>
-                    <p class="text-justify">
-                        Create a workspace by connecting <span class="text-nowrap">Resolvt</span> to your source
-                        repositories.
-                    </p>
-                    <p class="text-muted d-md-none">Supported: GitHub, Bitbucket</p>
-                </div>
-                <div class="col-md step">
-                    <h2 class="text-center text-muted">02</h2>
-                    <h5 class="text-center">Install an IDE plugin</h5>
-                    <p class="">
-                        Resolvt plugin makes technical debt always visible while you are working with the code.
-                        There is no need to leave the IDE to browse and report on technical debt.
-                    </p>
-                    <p class="text-muted d-md-none">Supported: Intellij IDEA</p>
-                </div>
-                <div class="col-md step">
-                    <h2 class="text-center text-muted">03</h2>
-                    <h5 class="text-center">That's it</h5>
-                    <p class="">
-                        Resolvt keeps track of your repositories events and automatically updates the debt
-                        records,
-                        trying to keep everything up-to-date.
-                    </p>
+                <div class="col-md tools-wrapper">
+                    <div class="tool-block">
+                        <img th:src="@{/public/imgs/icons/java.svg}" alt="Java"> <span>Java</span>
+                    </div>
+                    <div class="tool-block">
+                        <img th:src="@{/public/imgs/icons/kotlin.svg}" alt="Java"> <span>Kotlin</span>
+                    </div>
+                    <div class="tool-block">
+                        <img th:src="@{/public/imgs/icons/idea.svg}" alt="Intellij IDEA"> <span>Intellij IDEA</span>
+                    </div>
+                    <div class="tool-block">
+                        <img th:src="@{/public/imgs/github-logo.png}" alt="GitHub"> <span>GitHub</span>
+                    </div>
+                    <div class="tool-block">
+                        <img th:src="@{/public/imgs/bitbucket-logo.svg}" alt="Bitbucket"> <span>Bitbucket</span>
+                    </div>
+                    <div class="tool-block">
+                        <img th:src="@{/public/imgs/icons/jira.svg}" alt="Jira"> <span>Jira </span> <span class="badge ">Coming soon</span>
+                    </div>
                 </div>
             </div>
-            <div class="row d-none d-md-flex">
-                <div class="col-md">
-                    <p class="text-muted">Supported: GitHub, Bitbucket</p>
-                </div>
-                <div class="col-md">
-                    <p class="text-muted">Supported: Intellij IDEA</p>
-                </div>
-                <div class="col-md"></div>
-            </div>
         </div>
-        <div class="row mt-3">
-            <small><a target="_blank" href="https://resolvt.github.io/legal/privacy-policy">Privacy policy</a></small>
-            <small><a target="_blank" href="https://resolvt.github.io/legal/terms-and-conditions">Terms and Conditions</a></small>
-        </div>
-        <div class="row">
-        </div>
-        <div class="row">
-        </div>
-    </div>
+    </section>
 
+    <section class="py-5 border-top">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <small class="d-block mb-2">
+                    <a target="_blank" href="https://resolvt.github.io/legal/privacy-policy">Privacy policy</a>
+                </small>
+                <small class="d-block">
+                    <a target="_blank" href="https://resolvt.github.io/legal/terms-and-conditions">Terms and
+                        Conditions</a>
+                </small>
+            </div>
+        </div>
+    </section>
+</main>
 
-</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>

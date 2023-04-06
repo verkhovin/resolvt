@@ -21,5 +21,6 @@ class GithubProperties(
     val appName: String = "",
     val appId: String = "",
     val tokenSignaturePrivateKeyLocation: String = "",
-    val webhookSecret: String = ""
+    val webhookSecret: String = "",
+    val workspaceCreationWaiterSeconds: Int = 3
 )
