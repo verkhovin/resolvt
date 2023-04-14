@@ -11,12 +11,13 @@ import io.jsonwebtoken.SignatureAlgorithm
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.bson.internal.Base64
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpMethod
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import java.io.FileReader
+import java.io.StringReader
 import java.security.Key
 import java.security.KeyPair
 import java.security.PrivateKey
@@ -31,7 +32,7 @@ class GithubAuthenticationProvider(
     clientService: OAuth2AuthorizedClientService,
     private val clock: Clock,
 ): SourceProviderAuthenticationProvider(clientService) {
-    private val privateKey: Key = getPrivateKeyFromFile(applicationProperties.github!!.tokenSignaturePrivateKeyLocation)
+    private val privateKey: Key = buildPrivateKey(applicationProperties.github!!.tokenSignaturePrivateKey)
 
     override fun getAuthentication(workspace: Workspace): String {
         val appToken = buildJWT()
@@ -53,8 +54,8 @@ class GithubAuthenticationProvider(
             .compact()
     }
 
-    private fun getPrivateKeyFromFile(filePath: String): PrivateKey {
-        val pemParser = PEMParser(FileReader(filePath))
+    private fun buildPrivateKey(base64EncodedKey: String): PrivateKey {
+        val pemParser = PEMParser(StringReader(String(Base64.decode(base64EncodedKey))))
         val converter = JcaPEMKeyConverter()
         val `object`: Any = pemParser.readObject()
         val kp: KeyPair = converter.getKeyPair(`object` as PEMKeyPair)
