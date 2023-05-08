@@ -30,7 +30,7 @@ class BitbucketWebhookHandler(
         val actorAccount = accountRepository.findByExternalIdAndSourceProvider(
             "{${bitbucketAppInstallation.actor!!.uuid}}",
             SourceProvider.BITBUCKET
-        ) ?: throw IllegalArgumentException("Actor is not It Hurts account")
+        ) ?: throw IllegalArgumentException("Actor is not Resolvt account")
         val bitbucketWorkspace = bitbucketAppInstallation.principal
         val sourceProviderApplicationCredentials = SourceProviderApplicationCredentials.from(
             bitbucketAppInstallation.clientKey!!,

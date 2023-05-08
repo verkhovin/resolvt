@@ -27,7 +27,7 @@ class GithubWebhookHandler(
         val senderAccount = accountRepository.findByExternalIdAndSourceProvider(
             githubAppInstallation.sender!!.login,
             SourceProvider.GITHUB
-        ) ?: throw IllegalArgumentException("Actor is not It Hurts account")
+        ) ?: throw IllegalArgumentException("Actor is not Resolvt account")
 
         val sourceProviderApplicationCredentials = SourceProviderApplicationCredentials
             .from(githubAppInstallation.installation!!.id, null)
