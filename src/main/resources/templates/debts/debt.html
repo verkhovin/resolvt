@@ -67,7 +67,7 @@
             <p class="fw-bold mb-0 mt-4">Events</p>
             <div class="row d-none d-md-flex">
                 <div class="col-md-1">
-                    <p class="text-muted">Commit</p>
+                    <p class="text-muted" title="Commit Hash">#</p>
                 </div>
                 <div class="col-md-9">
                     <p class="text-muted">Changes</p>
@@ -109,7 +109,9 @@
                         <a th:href="@{/debts/{id}/edit(id=${debt.id})}" class="btn btn-light">
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <a th:href="@{/debts/{id}/delete(id=${debt.id})}" class="btn btn-light">
+                    <a th:href="@{/debts/{id}/delete(id=${debt.id})}" class="btn btn-light"
+                       onclick="return confirm('Are you sure you want to DELETE this debt? ' +
+                        'Action can not be rolled back without support assistance')">
                         <i class="bi bi-trash"></i>
                     </a>
                 </div>
